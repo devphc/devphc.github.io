@@ -1,0 +1,1067 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="杂谈,react," />
+
+  <title> 时间倏忽而逝 // devphc的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">devphc的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              时间倏忽而逝
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2017-01-14
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2017/01/15/2017-and-redux/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/15/2017-and-redux/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p><center>转眼已是经年</center><br><a id="more"></a></p>
+<hr>
+
+<p>2017如期而至，虽然早有准备，但总是难免有点点伤感。不为了什么，只是单纯感慨时光匆匆而已。花相似，人不同。果然我是老了么。。。<br>至少我觉得自己还走在大致正确的方向上，略感欣慰。<br>不过也说不准，说不定明年就回老家种地去了呢。。。</p>
+<p>本文将继续贯彻落实XX届X中X会上确立的<strong>形散神也散</strong>的重要精神，有一些吐槽，也有一些最近研究react/redux的心得，还有各种乱七八糟的东西。</p>
+<h1 id="CPS变换">CPS变换</h1>
+<p>最开始听说cps变换是从<a href="https://www.zhihu.com/question/20822815" target="_blank" rel="external">某个知乎帖子</a>，当时只是不明觉历。最近在研究redux，接触了一些函数式编程相关的思想，机缘巧合下又遇到这个问题，于是研究下。</p>
+<p>简单点说，<a href="https://en.wikipedia.org/wiki/Continuation-passing_style" target="_blank" rel="external">CPS</a>就是一种编程风格。我们调用一个函数后，一般要拿到函数的返回值后再去做各种处理，而cps则将后续的处理逻辑（封装成一个函数）直接传给被调用的函数。有一些“控制反转（IoC）”的味道在里面。</p>
+<p>这么说太抽象，还是看例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ES6语法</span></div><div class="line"><span class="comment">// 一个普通版本的计算阶乘函数，很简单的递归</span></div><div class="line"><span class="keyword">const</span> fac = n =&gt; {</div><div class="line">  <span class="comment">// 递归最重要的是啥？终止条件啊，没有终止条件信不信直接stackoverflow给你看</span></div><div class="line">  <span class="keyword">if</span> (n == <span class="number">0</span>) {</div><div class="line">    <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">  }</div><div class="line">  <span class="keyword">else</span> {</div><div class="line">    <span class="comment">// 为啥会stackoverflow嘞，因为这里必须要将n压栈,等fac(n - 1)计算完毕后，n出栈，再做乘法</span></div><div class="line">    <span class="comment">// 要保留当时的“作案现场”，这也是函数调用后返回的基本操作</span></div><div class="line">    <span class="comment">// 如果n足够大，就算有终止条件，这里也会直接栈溢出</span></div><div class="line">    <span class="keyword">return</span> n * fac(n - <span class="number">1</span>);</div><div class="line">  }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(`<span class="number">10</span>的阶乘是${fac(<span class="number">10</span>)}`)</div></pre></td></tr></table></figure>
+
+<p>上面就是一个非常简单的计算阶乘的函数了，但这种递归非常容易出问题。还记得递归的经典反面教材斐波那契数列么？如果用递归法去求斐波那契数列，非常容易StackOverflow。所以各种算法教材中常常强调“迭代优于递归”，我在刷leetcode时用到递归也总是非常小心，因为心里没底。。。</p>
+<p>如果将上面的函数改写成cps形式，就会变成下面这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// cps版本的计算阶乘</span></div><div class="line"><span class="comment">// 注意这里面不会再有return语句了</span></div><div class="line"><span class="comment">// 正常情况下应该是计算出阶乘后返回结果, 让调用方决定怎么去使用结果</span></div><div class="line"><span class="comment">// 但cps风格中, 如何处理结果已经以callback的形式传过来了</span></div><div class="line"><span class="comment">// 计算出n的阶乘后,直接callback(n)就可以了, 所以不用return</span></div><div class="line"><span class="keyword">const</span> facWithCps = (n, callback) =&gt; {</div><div class="line">  <span class="keyword">if</span> (n == <span class="number">0</span>) {</div><div class="line">    callback(<span class="number">1</span>);</div><div class="line">  }</div><div class="line">  <span class="keyword">else</span> {</div><div class="line">    <span class="comment">// 这里要注意下, ret是n-1的阶乘, 而callback要的是n的阶乘, 所以callback(n * ret)</span></div><div class="line">    <span class="comment">// 相当于又传了一个新的匿名函数进去</span></div><div class="line">    facWithCps(n - <span class="number">1</span>, ret =&gt; callback(n * ret));</div><div class="line">  }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// 计算出n的阶乘后，要对结果做怎样的处理？这个就是callback决定的事</span></div><div class="line"><span class="comment">// callback最终只会调用一次, 参数是1*2*3*4...*n</span></div><div class="line"><span class="keyword">const</span> callback = n =&gt; {</div><div class="line">  <span class="comment">// 由于只是个例子，所以没对结果做什么处理，直接输出了</span></div><div class="line">  <span class="built_in">console</span>.log(`结果是${n}`)</div><div class="line">};</div><div class="line"></div><div class="line">facWithCps(<span class="number">10</span>, callback);</div></pre></td></tr></table></figure>
+
+<p>计算结果和普通的递归是一样的，但却难懂了很多。这么写的好处在哪里？细心观察就知道这段程序理论上不需要压栈/出栈，在函数的最后一行，直接开始下一次递归就可以了，不需要保存上一次递归的状态，这种递归被称作<a href="https://zh.wikipedia.org/wiki/%E5%B0%BE%E8%B0%83%E7%94%A8" target="_blank" rel="external">尾递归</a>（尾调用的一种特殊情况）。</p>
+<blockquote>形式上只要是最后一个return语句返回的是一个完整函数，它就是尾递归。</blockquote>
+
+<p>理论上来说，这段程序即使没有终止条件，无限递归下去，也不会StackOverflow。</p>
+<p>编译器通常可以对尾递归做很多优化，甚至可以将尾递归消除。这种优化在ES中被称作<code>proper tail calls</code>，是ES6中的标准，但目前尚没有主流的浏览器实现这种优化，见<a href="http://kangax.github.io/compat-table/es6/" target="_blank" rel="external">这里</a>。</p>
+<p>cps虽然形式更复杂了，但表达能力也更强，可以基于这个去封装特定用途函数，因为callback的逻辑是由外部控制的。抽象点说，就是用一个高阶函数去生成普通函数。</p>
+<p>cps在函数式编程中似乎是非常重要的一个东西。因为很多函数式语言都非常符号化，非常学院派，不提供if/for/while之类的流程控制语句，而这些都可以用cps去实现。所以对函数式语言来说，尾递归优化是标配。</p>
+<p><a href="https://www.zhihu.com/question/20822815" target="_blank" rel="external">王垠的40行代码</a>据说就是能自动对已有的函数做cps变换？不懂。。。而且似乎还涉及到很多数学上的东西，我一介学渣只能仰望。。。</p>
+<p>研究cps的过程中，突然又想到<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Closures" target="_blank" rel="external">闭包</a>。这也是我一直很模糊的一个概念，每次看定义/示例都觉得已经懂了，但过一段时间之后又觉得自己什么都没懂。。。<br>通俗点说就是每个函数可以有自己的私有变量？或者叫做自己的状态，外界无法修改。感觉上和OOP中的成员变量很像么。毕竟js中没有private/public之类的变量作用域。但却可以用闭包模拟。<br>但这种东西呢，感觉上更像是种hack，似乎还容易造成内存泄漏，少用为妙。<br>一个还可以的闭包教程：<a href="http://www.cnblogs.com/frankfang/archive/2011/08/03/2125663.html" target="_blank" rel="external">http://www.cnblogs.com/frankfang/archive/2011/08/03/2125663.html</a></p>
+<p>一些参考资料：<br>知乎上的一些讨论帖：<a href="https://www.zhihu.com/question/24453254" target="_blank" rel="external">1</a>、<a href="https://www.zhihu.com/question/27581940" target="_blank" rel="external">2</a>、<a href="https://www.zhihu.com/question/20259086" target="_blank" rel="external">3</a><br>其他一些讨论帖：<a href="http://www.cricode.com/613.html" target="_blank" rel="external">1</a>、<a href="https://www.v2ex.com/t/61836" target="_blank" rel="external">2</a><br><a href="https://github.com/vczh/tinymoe" target="_blank" rel="external">轮子哥的tinymoe语言</a>，感觉拿来当编译原理的入门不错<br><a href="http://blog.zhaojie.me/2009/03/tail-recursion-and-continuation.html" target="_blank" rel="external">尾递归与Continuation</a></p>
+<h1 id="async/await">async/await</h1>
+<p>这是个很好玩的东西。但要搞明白这个玩意还要从js的异步机制说起。</p>
+<p>对于刚接触js语言的人来说，印象最深刻的是什么？至少对我而言，是各种callback。这也算是js的一大特色（是不是也可以说是函数式语言的特色）。<br>如果在java中，我要实现一个“异步取数据并消费”的逻辑，我会怎么做？很大概率是写一个生产者-消费者模型，搞一个BlockingQueue，“多线程”在java中是一个很自然的概念（HotSpotVM会把java线程映射到系统线程）。或者搞个事件驱动，比如经典的EventBus。如果强行用回调实现反而麻烦，必须要定义一个接口，回调还要以inner anonymous class的形式传过来，这种代码写起来/看起来都很别扭。当初用到zookeeper的<a href="http://zookeeper.apache.org/doc/r3.4.9/api/index.html" target="_blank" rel="external">API</a>，它提供了同步/异步两种风格的接口，异步版本用起来就很是蛋疼。。。<br>如果是在js中，就没得选择了，只能使用callback。因为js的执行是单线程的（当然这是特指浏览器和node，不排除以后某种js的解释器可能用多线程执行，不过难度太大了）。对于单线程的js而言，要想实现并发的效果，就只能依赖于各种异步操作的callback，具体可以去google：<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/EventLoop" target="_blank" rel="external">Event Loop</a>。好在js的callback用起来很方便（跟java比），因为js是弱类型而且function是一等公民，有了箭头函数之后就更简洁了。</p>
+<p>话说，之前不是总有人纠结基于event loop的并发和基于线程/锁的并发哪个效率高么，还搞各种吞吐率测试。应该说最传统的提高并发量的手段就是多线程，突然出现一个单进程单线程的node确实很容易被人质疑。并发模型其实还有<a href="http://www.ituring.com.cn/book/1649" target="_blank" rel="external">很多种</a>的，各有优劣。还有Concurrent vs Parallel的区别，并发也是个大坑啊。。。</p>
+<p>再话说，js是单线程的，但并不意味着浏览器是单线程，只是说浏览器中有单独一个线程负责执行js而已。很常见的一个现象：浏览器加载外部资源（图片、css、js）时，是可以并发的；包括我们在js中如果同时发送多个ajax，其实也是并发的。并发的请求数是由<a href="http://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser" target="_blank" rel="external">浏览器</a>限制的，chrome中有一个参数可以改这个值，具体是那个参数忘了。。。<br>这又引申出一个问题，如果多个ajax并发，哪个回调会先被执行？个人猜测是跟请求返回的顺序一致的，哪个请求先返回就先放到事件队列，回调先被执行，跟请求发起的顺序无关。</p>
+<p>js语言的设计思路导致它只能用callback解决并发的问题。本来也没啥事，但程序复杂了之后，代码一多，大家渐渐发现回调太多了，就是所谓的callback hell。callback本身就是反直觉的，很容易造成程序的结构复杂，难以维护。更蛋疼的是各种回调的嵌套。一个很常见的场景：后端提供了CRUD的接口，我要先ajax请求某个接口，按一定条件查询，得到某条记录的id，再拿这个id去查询另一个接口得到最终的结果，类似下面这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 第一次ajax，查询出id</span></div><div class="line">$.get(<span class="string">'http://xxx/user?name=jxy'</span>, <span class="function"><span class="keyword">function</span><span class="params">(data)</span></span>{</div><div class="line">  <span class="keyword">var</span> id = data.id;</div><div class="line">  <span class="comment">// 第二次ajax，根据id查询出需要的数据</span></div><div class="line">  $.get(<span class="string">'http://xxx/another?id='</span>+id, <span class="function"><span class="keyword">function</span><span class="params">(data)</span></span>{</div><div class="line">    <span class="comment">// 这里才是真正的处理逻辑</span></div><div class="line">    <span class="comment">// do something...  </span></div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>这样的代码，写起来很蛋疼，支离破碎，而且可能有更多层的嵌套，维护起来十分麻烦。看着满屏幕的<code>function</code>，很容易晕。。。于是有聪明人提出了<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" target="_blank" rel="external">Promise</a>模式。这个东西其实也挺古老了，我最开始听说promise是在<a href="https://api.jquery.com/promise/" target="_blank" rel="external">jquery</a>中，还有<a href="https://api.jquery.com/category/deferred-object/" target="_blank" rel="external">deferred对象</a>。在ES6中，promise正式成为一项标准，不过和jquery的promise用法不太一样。如果用promise去重写上面那段代码，大概是这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 假设$.get会返回一个promise对象</span></div><div class="line">$.get(<span class="string">'http://xxx/user?name=jxy'</span>).then(</div><div class="line">  <span class="function"><span class="keyword">function</span><span class="params">(data)</span></span>{</div><div class="line">    <span class="keyword">var</span> id = data.id;</div><div class="line">    <span class="keyword">return</span> $.get(<span class="string">'http://xxx/another?id='</span>+id)；</div><div class="line">  }</div><div class="line">).then(</div><div class="line">  <span class="function"><span class="keyword">function</span><span class="params">(data)</span></span>{</div><div class="line">    <span class="comment">// 这里才是真正的处理逻辑</span></div><div class="line">    <span class="comment">// do something... </span></div><div class="line">  }</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<p>由于<code>then()</code>可以链式调用，整个流程清晰了很多，不需要嵌套了，但回调函数还是无法避免。promise只是把传统的嵌套回调变成了链式调用，或者叫<a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank" rel="external">fluent style</a>。<br>关于promise的更多资料可以参考<a href="http://wiki.jikexueyuan.com/project/es6/promise.html" target="_blank" rel="external">这个</a>和<a href="https://www.sitepoint.com/six-things-might-know-promises/" target="_blank" rel="external">这个</a>，其实还有很多高级的用法。</p>
+<p>为了解决promise的的问题，于是有更聪明的人提出了async/await，这被称作js中异步调用的终极解决方案。async/await特性本来想随ES7一起发布的，但没赶上截止日。。。目前好像是stage-3的状态，已经很接近发布了。最终发布的ES7只包含很少的<a href="http://www.2ality.com/2016/01/ecmascript-2016.html" target="_blank" rel="external">新特性</a>，async/await估计要随ES8一起发布了，不过现在可以通过<a href="http://babeljs.io/" target="_blank" rel="external">babel</a>使用。<br>话说，ES的这种发布模式我觉得挺好的，看看java9都<a href="http://www.infoq.com/cn/news/2016/12/java9-latest-schedule-at-risk" target="_blank" rel="external">难产</a>多久了。。。<br>如果用async/await来写上面那段代码，大概是这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 伪代码</span></div><div class="line"><span class="comment">// 用async修饰一个函数</span></div><div class="line">async <span class="function"><span class="keyword">function</span> <span class="title">getData</span><span class="params">()</span></span>{</div><div class="line">  <span class="comment">// 用await标记异步操作，会自动等待异步操作执行完毕之后再继续向下执行</span></div><div class="line">  <span class="keyword">const</span> user = await $.get(<span class="string">'http://xxx/user?name=jxy'</span>);</div><div class="line">  <span class="keyword">const</span> id = user.id;</div><div class="line">  <span class="keyword">const</span> data = await $.get(<span class="string">'http://xxx/another?id='</span>+id);</div><div class="line">  <span class="comment">// 真正处理data</span></div><div class="line">  <span class="comment">// do something...</span></div><div class="line">};</div><div class="line"></div><div class="line">getData();</div></pre></td></tr></table></figure>
+
+<p>可以看出，这个代码的逻辑是非常流畅、非常线性的，完全摒弃了回调的存在，写起来非常舒服，读起来也容易懂，“像写同步调用一样写异步调用”。只是有一些需要注意的地方：</p>
+<ul>
+<li>async必须和await搭配使用，await只能用在async函数内部。async的语义是“这个函数内部有异步操作”。</li>
+<li>await后面的变量，必须是一个promise对象。await的语义是“后面的语句是一个异步操作，先不要继续向下执行，等后面这个promise状态变为resolved后再继续”。</li>
+<li>如果异步操作出错，只能通过try-catch来捕捉错误并处理，不像promise对象一样可以用catch()方法。对于js程序员来说这可能有点啰嗦，不过对于java程序员来说倒是很亲切。</li>
+</ul>
+<p>async/await还是挺好用的，要不怎么号称是“终极解决方案”。不过我比较怀疑，前端的同学们这么能折腾，会不会哪天又搞出一个“超・终极解决方案”。。。</p>
+<p>其实，async/await只是一个语法糖，它背后的原理是ES6的另一个新特性：生成器。babel支持async/await的原理，其实也是转换为生成器的写法，见<a href="http://babeljs.io/docs/plugins/transform-async-to-generator/" target="_blank" rel="external">这个插件</a>。</p>
+<h1 id="生成器">生成器</h1>
+<p>生成器（Generators）也是个很好玩的东西，是随ES6发布的新特性，一些基本的使用可以参考<a href="http://www.infoq.com/cn/articles/es6-in-depth-generators" target="_blank" rel="external">InfoQ的教程</a>。</p>
+<p>个人感觉，生成器的本质，其实就是ES6对<a href="https://zh.wikipedia.org/wiki/%E5%8D%8F%E7%A8%8B" target="_blank" rel="external">协程</a>特性的实现，而且从python中借鉴了很多理念。但js/python的协程，貌似和lua/erlang/go之类的协程还不太一样，本来不是为了并发设计的，而是为了方便的迭代，所以才叫做“生成器”，一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 是不是和python里面的range/xrange函数很像</span></div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">range</span><span class="params">(start, stop)</span> </span>{</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = start; i &lt; stop; i++)</div><div class="line">    <span class="keyword">yield</span> i;</div><div class="line">}</div><div class="line"><span class="comment">// 生成器配合for-of语法非常好用</span></div><div class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i of range(<span class="number">10</span>, <span class="number">20</span>)) {</div><div class="line">  <span class="built_in">console</span>.log(i);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>所以，将“生成器”当作“协程”来用，是一种无心插柳么。。。不过他们的逻辑本来就很相似，就算语言原生提供了协程（比如lua），其实也可以包装下当作“生成器”来用。</p>
+<p>那么，啥是协程？几乎所有的语言中，都会有“函数”，或者叫做过程/例程/方法/子程序（function/procedure/routine/method/sub-program），反正就是这么个东西。执行一个函数时，都要保存上下文（压栈），函数执行完毕（碰到return语句或执行到最后）再恢复上下文（出栈）。在这个过程中，函数只有一个入口点和一个出口点，一个函数必须从头开始执行，而且开始后，你必须等待它执行完毕。换句话说，一旦开始执行，这个函数会一直掌握着代码的执行权。</p>
+<p>而协程(co-routine)，跟函数非常类似，区别在于它可以有多个入口和出口。在协程执行的过程中，你可以在某行代码处打断协程，跑去干别的事，然后再回来继续执行。一般通过yield关键字实现，比如js/python。但也有不是用关键字，而是用特定方法的，比如lua的coroutine.yield()。yield关键字的语义就是“将代码的执行权交给其他人”。从某种意义上上来说，yield关键字有点像goto语句，都会很“强硬”的直接改变代码执行流程。</p>
+<p>这个“打断-恢复”就是协程最关键的特性，也是它能被用于处理并发问题的关键。这个过程也是需要切换上下文的，协程从yield的地方继续执行时，必须恢复当初中断时的状态，但未必是像函数一样用栈去实现了，跟具体语言或者协程库的实现有关。相对进程/线程的切换而言，协程的上下文切换代价一般比较低，需要的内存会少很多。<br>更神奇的是，协程的状态可以被外部“干涉”，可以和外部交换数据，一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 一个js的例子，网上随便找的，其他支持协程的语言也有类似的用法</span></div><div class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span><span class="params">(x)</span> </span>{</div><div class="line">    <span class="keyword">var</span> y = <span class="number">2</span> * (<span class="keyword">yield</span> (x + <span class="number">1</span>));</div><div class="line">    <span class="keyword">var</span> z = <span class="keyword">yield</span> (y / <span class="number">3</span>);</div><div class="line">    <span class="keyword">return</span> (x + y + z);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">var</span> it = foo( <span class="number">5</span> );</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log( it.next() );       <span class="comment">// { value:6, done:false }</span></div><div class="line"><span class="comment">// 传入12，所以yied语句返回值12，所以y=24</span></div><div class="line"><span class="built_in">console</span>.log( it.next( <span class="number">12</span> ) );   <span class="comment">// { value:8, done:false }</span></div><div class="line"><span class="comment">// x=5, y=24, z=13</span></div><div class="line"><span class="built_in">console</span>.log( it.next( <span class="number">13</span> ) );   <span class="comment">// { value:42, done:true }</span></div></pre></td></tr></table></figure>
+
+<p>协程的另一个关键特性就是协程之间的切换都是在同一个线程中发生的。还记得《操作系统原理》中的内核线程和用户线程么？内核线程的调度完全由系统内核负责，用户端只负责执行就可以；用户线程则需要单独提供调度器，系统内核完全不知道线程的存在。协程就有那么点用户线程的意思，用户要自己负责协程之间的调度。</p>
+<p>对于js而言，因为它是单线程的，所以协程对它而言“永不并发”。同一时刻只可能有一个协程的代码在运行，最多是代码的执行权在不同协程间切换而已。</p>
+<p>协程的调度算法似乎也是个坑，没啥统一的规范。。。通俗点说，我在协程中yield交出执行权后，这个执行权交给谁？是我直接决定交给另外的某个协程（symmetric coroutines，对称协程，调度是平级的）？还是交给我的上层，让上层去决定接下来如何执行（asymmetric coroutines，非对称协程）？这就是调度算法要决定的事情。<br>就js/python而言，他们的协程都是非对称的，yield时执行权都会返回给上层。</p>
+<p>由于协程的调度是在用户端实现的，所以完全可以根据需要写一个自己的调度器，一个<a href="http://www.jianshu.com/p/8ec105854e05" target="_blank" rel="external">例子</a>。</p>
+<p>扯了一大堆协程的东西，好像有点偏离主题。。。本来是在说js的生成器的。。。<br>生成器/协程除了用在迭代中，还可以用来简化js的异步编程，换句话说，解决callback hell。其实思路也很简单：我要执行异步请求的时候（比如ajax），就yield一下，把执行权交出去，让js引擎先去执行其他的代码；异步请求结束后，再把执行权要回来，从yield的地方继续执行。所以最关键的问题是：执行权的交换是如何做到的？有点类似调度器了。目前看来一般有2种方式：</p>
+<h2 id="Thunk函数">Thunk函数</h2>
+<p><a href="https://en.wikipedia.org/wiki/Thunk" target="_blank" rel="external">Thunk函数</a>是一个很古老的概念了，从函数式编程中发展而来的，似乎最初是为了惰性求值，参考<a href="https://www.techopedia.com/definition/2818/thunk" target="_blank" rel="external">这个</a>。但现在Thunk函数的概念已经很宽泛了，似乎很多辅助性的函数都可以被称作Thunk函数（thunk函数一般都是通过代码自动生成的）。</p>
+<p>个人理解，对js的生成器而言，Thunk函数就是“接受一个callback为参数，做一些操作，并在最后执行callback”的函数。例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> getData = (callback) =&gt; {</div><div class="line">  <span class="comment">// 模拟异步操作</span></div><div class="line">  setTimeout(() =&gt; {</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'异步操作结束'</span>);</div><div class="line">    <span class="comment">// 异步操作结束后执行callback</span></div><div class="line">    <span class="comment">// callback也可以带参数, 不过这个例子里没有</span></div><div class="line">    callback();</div><div class="line">  }, <span class="number">2000</span>);</div><div class="line">};</div></pre></td></tr></table></figure>
+
+
+
+<p>是不是和之前的cps变换中Continuation的概念很像？其实很多概念都是相通的。</p>
+<p>Thunk函数能做什么？由于Thunk函数的最后会调用callback，如果yield（给出执行权）时返回一个Thunk函数，就可以利用callback在Thunk执行完毕后把执行权再“要回来”。一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 假设我们要做一个聊天机器人，机器人说每句话时都必须请求一次服务端</span></div><div class="line"></div><div class="line"><span class="comment">// 为了简单，用一个函数去生成Thunk函数，即是所谓的高阶函数</span></div><div class="line"><span class="keyword">const</span> Thunk = (words) =&gt; {</div><div class="line">  <span class="keyword">return</span> (callback) =&gt; {</div><div class="line">    <span class="comment">// 随机延迟一段时间，用于模拟请求服务端</span></div><div class="line">    <span class="keyword">const</span> rand = <span class="built_in">Math</span>.random() * <span class="number">5000</span>;</div><div class="line">    setTimeout(() =&gt; {</div><div class="line">      <span class="comment">// 如果执行到这里，说明异步请求已经返回了</span></div><div class="line">      <span class="built_in">console</span>.log(words);</div><div class="line">      <span class="built_in">console</span>.log(`本句耗时 ${rand} ms`);</div><div class="line">      <span class="comment">// 服务端返回的数据是啥？大多数业务场景下，我们都要对这个数据做进一步处理</span></div><div class="line">      <span class="comment">// 所以要将返回的结果传给callback，这样在生成器内部才能继续处理</span></div><div class="line">      <span class="comment">// 为了简单我直接把rand传过去了</span></div><div class="line">      callback(rand);</div><div class="line">    }, rand);</div><div class="line">  }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// 定义机器人，这个generator的执行分为3步</span></div><div class="line"><span class="comment">// 每执行一步,都会返回一个Thunk函数,然后将控制权交出去</span></div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">robot</span><span class="params">()</span> </span>{</div><div class="line">  <span class="keyword">const</span> a = <span class="keyword">yield</span> Thunk(<span class="string">'你好'</span>);</div><div class="line">  <span class="keyword">const</span> b = <span class="keyword">yield</span> Thunk(<span class="string">'我是robot'</span>);</div><div class="line">  <span class="keyword">const</span> c = <span class="keyword">yield</span> Thunk(<span class="string">'今天天气不错'</span>);</div><div class="line">  <span class="built_in">console</span>.log(`总共耗时${a + b + c}ms`);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+<p>如上，我们定义好生成器了，如何执行呢？所以还需要一个程序去调度它，或者叫做“驱动程序”：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 定义一个run函数，这个函数会自动执行生成器</span></div><div class="line"><span class="keyword">const</span> run = (generatorName) =&gt; {</div><div class="line">  <span class="comment">// 生成器对象</span></div><div class="line">  <span class="keyword">const</span> generator = generatorName();</div><div class="line">  <span class="comment">// 要传给thunk函数的callback</span></div><div class="line">  <span class="keyword">const</span> callback = (input) =&gt; {</div><div class="line">    <span class="keyword">const</span> result = generator.next(input);  <span class="comment">// 执行下一步，注意把input传进去作为yield语句的值</span></div><div class="line">    <span class="keyword">if</span> (result.done) {  <span class="comment">// 如果已经执行到最后一步, 就停止</span></div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">      result.value(callback);  <span class="comment">// 返回的value是一个Thunk函数, Thunk函数可以接收一个callback继续执行, 而callback的执行又会继续触发generator.next()</span></div><div class="line"></div><div class="line">      <span class="comment">// 本质上还是递归, 而且是尾递归</span></div><div class="line">      <span class="comment">// 这种东西是可能stackoverflow的吧, 尤其是现在浏览器都没有优化过</span></div><div class="line">    }</div><div class="line">  };</div><div class="line"></div><div class="line">  <span class="comment">// 这里其实有点闭包的意味了，callback函数有一个私有的“成员变量”generator，每次执行callback时状态都不一样</span></div><div class="line">  <span class="comment">// 如果最后return callback，就真的是闭包了</span></div><div class="line"></div><div class="line">  <span class="comment">// 第一次执行时不用传参数，传了也会被忽略</span></div><div class="line">  callback();</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// 开始执行robot生成器</span></div><div class="line">run(robot);</div></pre></td></tr></table></figure>
+
+<p>打开console即可看到效果。说实话这段代码挺难懂的。。。估计过一段时间我自己都不懂了。。。关键是要理解“代码执行权”的交换过程。但一旦看懂就会觉得很神奇，“卧槽这也可以”的感觉。</p>
+<p>有了这个run函数，我们就可以“像写同步调用一样写异步调用了”。看下那个robot的生成器，完全屏蔽了异步调用的复杂性，也不用再跟回调打交道了。当然这个thunk+run的机制，可以做的更复杂、更通用一些，比如加上错误处理之类的。其实有很多人已经做好了类似的库，用的最多的就是<a href="https://github.com/tj/node-thunkify" target="_blank" rel="external">thunkify</a>+<a href="https://github.com/tj/co" target="_blank" rel="external">co</a>，不过这两个库是用于node的，不知道能不能用在浏览器端。</p>
+<p>仔细观察下，这个<code>function* + yield</code>的语法就跟<code>async/await</code>很像了。</p>
+<h2 id="Promise对象">Promise对象</h2>
+<p>用生成器处理异步请求的另一个方法就是Promise对象了。其实核心原理还是一样的，就是“异步操作结束后代码执行权的交换”。只不过Thunk函数是用执行完毕之后的callback实现的，而Promise是用自带then()方法，毕竟如果then()方法被触发了，就说明异步请求已经结束了。而且Promise是ES自带的对象，会更通用一点。</p>
+<p>如果用Promise对象改写上面的那个机器人的例子，大概是这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 返回一个promise对象</span></div><div class="line"><span class="keyword">const</span> say = (words) =&gt; {</div><div class="line">  <span class="comment">// 省事起见，忽略reject参数</span></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Promise((resolve) =&gt; {</div><div class="line">    <span class="keyword">const</span> rand = <span class="built_in">Math</span>.random() * <span class="number">5000</span>;</div><div class="line">    setTimeout(() =&gt; {</div><div class="line">      <span class="built_in">console</span>.log(words);</div><div class="line">      <span class="built_in">console</span>.log(`本句耗时 ${rand} ms`);</div><div class="line">      resolve(rand);</div><div class="line">    }, rand);</div><div class="line">  });</div><div class="line">};</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">robot</span><span class="params">()</span> </span>{</div><div class="line">  <span class="keyword">const</span> a = <span class="keyword">yield</span> say(<span class="string">'你好'</span>);</div><div class="line">  <span class="keyword">const</span> b = <span class="keyword">yield</span> say(<span class="string">'我是robot'</span>);</div><div class="line">  <span class="keyword">const</span> c = <span class="keyword">yield</span> say(<span class="string">'今天天气不错'</span>);</div><div class="line">  <span class="built_in">console</span>.log(`总共耗时${a + b + c}ms`);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">const</span> run = (generatorName) =&gt; {</div><div class="line">  <span class="keyword">const</span> generator = generatorName();</div><div class="line"></div><div class="line">  <span class="keyword">const</span> callback = (input) =&gt; {</div><div class="line">    <span class="keyword">const</span> result = generator.next(input);</div><div class="line">    <span class="keyword">if</span> (result.done) {</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">      <span class="comment">// 如果更严谨点，其实这里应该判断下result.value确实是promise对象</span></div><div class="line">      result.value.then(callback);</div><div class="line">    }</div><div class="line">  };</div><div class="line"></div><div class="line">  callback();</div><div class="line">};</div><div class="line"></div><div class="line">run(robot);</div></pre></td></tr></table></figure>
+
+<p>基本原理和Thunk是一样的，不再赘述。<br>这种情况下，<code>function* + yield</code>就和<code>async + await</code>完全等价了。所以说async和await只是生成器+promise的一个语法糖，好处在于更规范，毕竟是从语法层面上去支持。生成器+promise总是有点奇技淫巧的感觉。。。</p>
+<h2 id="其他">其他</h2>
+<p>生成器其实还有很多高级的用法，比如<code>yield*</code>。</p>
+<p>很遗憾的一个地方是生成器不能配合箭头函数使用，见<a href="http://stackoverflow.com/questions/27661306/can-i-use-es6s-arrow-function-syntax-with-generators-arrow-notation" target="_blank" rel="external">这里</a>。箭头函数和普通函数还是有很多不同的，哪里用箭头函数，哪里用普通函数，似乎还有很多争议。<br>箭头函数的一大好处就是自动绑定this，否则就只能手动绑定或使用<code>const that=this</code>之类的hack。。。<br>但async/await却可以配合箭头函数使用，真是奇怪。。。</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a href="http://coolshell.cn/articles/10975.html" target="_blank" rel="external">http://coolshell.cn/articles/10975.html</a><br><a href="https://www.zhihu.com/question/20511233" target="_blank" rel="external">https://www.zhihu.com/question/20511233</a><br><a href="https://gold.xitu.io/entry/581d9f8cda2f60005df771fe" target="_blank" rel="external">https://gold.xitu.io/entry/581d9f8cda2f60005df771fe</a><br><a href="http://stackoverflow.com/questions/2641489/what-is-a-thunk" target="_blank" rel="external">http://stackoverflow.com/questions/2641489/what-is-a-thunk</a><br><a href="http://web.jobbole.com/85901/" target="_blank" rel="external">http://web.jobbole.com/85901/</a><br><a href="http://www.cnblogs.com/Mainz/p/3552717.html" target="_blank" rel="external">Javascript是单线程的深入分析</a></p>
+<h1 id="redux是个好东西">redux是个好东西</h1>
+<p>对redux也是久闻大名了。<a href="/2016/09/06/zhen-second-hand-qianduan/">之前</a>我就说过react组件之间要共享状态，就只能写一些很恶心的代码，结果这居然是react<a href="https://facebook.github.io/react/docs/lifting-state-up.html" target="_blank" rel="external">官方推荐的做法</a>。。。但我还是觉得很蛋疼。<br>那时我虽然没用过redux，但知道他要解决的是什么问题。不过实际研究了下redux后，发现实现上和我想的还是有些不一样。</p>
+<p>这不是个redux教程，只是总结一些感想。</p>
+<p>借用一张图片：<br><img src="/2017/01/15/2017-and-redux/1.jpg" alt=""></p>
+<p>其实redux的核心非常简单，概念上无非是store/reducer/action，操作上也就是dispatch/subscribe，都很好理解。一些tips：</p>
+<ul>
+<li>reducer必须是个纯函数。纯函数是非常非常重要的概念，action creator也必须是纯函数。纯=没有副作用/没有状态/对同样的输入肯定会得到同样的输出。</li>
+<li><code>reducer(previousState, action) =&gt; newState</code>，这就是reducer的作用，每次都应该返回一个新的对象。为什么这个函数叫做 Reducer呢？因为它可以作为数组的reduce方法的参数。MapReduce中的reduce也正是来源于此。也许以后可以批量处理action？感觉不太可能。。。</li>
+<li>Store是全局唯一的状态存储，只能通过dispatch去修改，对应用而言store是只读的</li>
+<li>状态变化时会触发listener，但不会传什么参数，需要自己去查store</li>
+<li>reducer在 default 情况下一定返回旧的 state。千万不要返回undefined。。。血泪教训。</li>
+<li>注意全局的初始状态</li>
+<li>action应该是个不可变对象。尽量减少在action中传递的数据。</li>
+<li><code>Object.assign()</code>和<code>{...state,}</code>应该是同样的效果。但要注意深拷贝和浅拷贝的区别。<code>Object.assign()</code>貌似是浅拷贝，有些时候会有潜在的bug。</li>
+<li><code>bindActionCreators</code>/<code>combineReducers</code>有多种使用方式，根据传入参数的类型不同（object/function）区分。当然结果上没啥区别，爱用哪种看心情</li>
+</ul>
+<p>另外注意redux其实跟react没啥关系，可以应用到其他任意地方，因为它本身只是一个“可预测的状态容器”。我曾经见过把redux用到微信小程序上的。</p>
+<p>redux的设计借鉴了很多函数式编程的思想，非常抽象，非常学院派，概念简单，功能却很强大。而且它的实现里大量利用了js的函数式特性，在我看来可以做到很多“黑魔法”一样的事情。如果看了它的源码，就会叹为观止，我都怀疑自己会不会js了，我可能是学了假的js。。。比如<code>bindActionCreators</code>/<code>combineReducers</code>之类，只会用，凭空想很难想到它是如何实现的，看了代码之后都觉得实现非常精妙。而且redux的<a href="https://github.com/reactjs/redux/tree/master/src" target="_blank" rel="external">代码量非常少</a>，建议大家都看看。<br>如果java的思想去做类似的事，有些是根本实现不了，有些就算实现了代码也会很别扭。。。<br>也许这就是函数式语言的特性吧，很适合开脑洞，能做出很多精巧、让人拍案叫绝的东西。</p>
+<p>另外，对于<a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a>而言，它使用了一种被称作“<a href="https://facebook.github.io/react/docs/higher-order-components.html" target="_blank" rel="external">高阶组件</a>”（Higher-Order Component）的技巧，使用<code>connect()</code>方法包装原有的组件使状态被redux托管。这种技巧还是很有用的，antd的<a href="https://ant.design/components/form-cn/" target="_blank" rel="external">Form组件</a>中也有用到。</p>
+<p>redux的一个“缺点”就是让你的程序更复杂，更难懂。更复杂的程序就意味着更容易有bug。如果不了解redux的原理，也很容易搞出问题来。“如果你不确定是否需要redux，那就不要用”。千万不要为了符合所谓的“业界标准”而引入redux，要看实际的需求。</p>
+<p>但我对redux还是有一些遗留的问题：</p>
+<ul>
+<li>为什么reducer不会跟特定action关联</li>
+</ul>
+<p>我最开始以为redux是一个类似于EventBus的publish-subscribe模型。每个reducer只订阅特定类型的action。换句话说，每个action只会触发一个reducer的代码。<br>但redux目前的实现却是触发一个action后，这个action要在所有的reducer中都“过一遍”，因为redux是不知道哪种reducer处理哪种类型的action的，也就是没有一个“注册”的过程。<br>我们在写reducer时会拆分成一个个小的reducer，每个小reducer都只处理特定action，最后用combineReducers合并为一个大的reducer。但这也只是为了编码上的方便而已，处理action时没啥本质区别。</p>
+<p>为啥redux会采用这种方式呢？也许是因为比较简单吧，但如果action的种类太多，真的不会有性能问题么？这种方式还有个问题，如果某两个reducer会处理同样type的action，可能会隐性的bug，而且不好排查。只能在编码时注意。</p>
+<p>理论上来说publish-subscribe应该效率会更高一点，因为有着“<a href="https://zh.wikipedia.org/wiki/%E5%85%88%E9%A9%97" target="_blank" rel="external">先验知识</a>”，可以针对性的处理。但也要考虑到<a href="https://github.com/google/guava/wiki/EventBusExplained#what-eventbus-problems-may-only-be-detected-later-at-runtime" target="_blank" rel="external">DeadEvent</a>的问题。</p>
+<ul>
+<li>newState会有一个merge的过程么？</li>
+</ul>
+<p>store中保存着preState，当有action触发时，会经过reducer得到一个newState，newState和preState会有一个merge的过程么？还是直接丢掉preState？</p>
+<p>现在redux的实现是直接丢掉preState。这样如果action非常多，就会有非常多的无用对象，会不会有gc问题？<br>所有用到不可变对象的地方，其实都可能有类似的问题。</p>
+<ul>
+<li>如何设计状态是个大麻烦</li>
+</ul>
+<p>虽然state本身只是一个普通的js对象，理论上可以有任意复杂的结构，但为了方便使用和维护还是要遵循一些原则。个人感觉应该尽量“扁平”，尽量不要嵌套。<br>一些文档中提到的设计原则：尽量使state可以轻松的转化为JSON；尽可能地把state范式化，不存在嵌套；把所有数据放到一个对象里，每个数据以ID为主键；把state想象成一个数据库。<br>另外，react组件有自己的状态，但store中又存在全局状态。哪些状态做成全局的，哪些做成局部的，都要仔细考虑。<br>同理，拆分reducer也是个麻烦，哪些reducer要管理哪些状态。</p>
+<p>目前我的做法是每个组件一个reducer，维护每个组件的全局状态。整体的state就是所有组件的全局状态组合起来，类似这种：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 整体的初始状态</span></div><div class="line"><span class="comment">// 就是把每个组件自己的初始状态组合起来, 注意key的名字和组件名一致</span></div><div class="line"><span class="keyword">const</span> initState = {</div><div class="line">  Sidebar: Sidebar.initState,</div><div class="line">  Login: Login.initState,</div><div class="line">};</div></pre></td></tr></table></figure>
+
+<p>不知道这样做好不好。</p>
+<ul>
+<li>会不会有并发的问题？</li>
+</ul>
+<p>换句话说，<code>store.dispatch()</code>是同步还是异步？如果同时触发多个action，处理顺序会错乱么？之所以想到这个问题，是因为<a href="https://facebook.github.io/react/docs/react-component.html#setstate" target="_blank" rel="external">react文档</a>说setState可能是异步的：</p>
+<p><blockquote>setState() does not immediately mutate this.state but creates a pending state transition. Accessing this.state after calling this method can potentially return the existing value.</blockquote><br>相关分析见<a href="https://www.bennadel.com/blog/2893-setstate-state-mutation-operation-may-be-synchronous-in-reactjs.htm" target="_blank" rel="external">这里</a>。我猜react这么设计可能是为了提升<a href="https://facebook.github.io/react/docs/forms.html#controlled-components" target="_blank" rel="external">Controlled Components</a>的性能？毕竟Controlled Components用起来很蛋疼，用户每输入一个字符就render一次完全没必要。。。</p>
+<p>现在<a href="https://github.com/reactjs/redux/blob/master/src/createStore.js#L149" target="_blank" rel="external">dispatch的实现</a>是同步的，也就是说一个action必须reduce完毕才能开始下一个action。而且js本身就是单线程的，应该不会有race condition。但代码中却有一个isDispatching变量，和这样一段代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (isDispatching) {</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Reducers may not dispatch actions.'</span>)</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>理论上来说，这个错误应该永远不会触发啊。不可能同时处理两个action。所以这个isDispatching是啥意思。。。</p>
+<ul>
+<li>状态变化如何反应到组件上？</li>
+</ul>
+<p>换句话说，如何做数据绑定？总不会是像angular一样的dirty-check。。。</p>
+<p>从<a href="https://github.com/reactjs/redux/blob/master/src/createStore.js#L176" target="_blank" rel="external">代码</a>上来看，每次状态变化后，会立刻调用所有listener（同步调用），这时listener就能感知到状态变化了。这里有一个问题：每个listerner所关心的状态是不同的，为啥要所有listener轮询一次呢？如果能知道哪些状态变化了，再触发对应的listener，是不是效率更高？这还是一个为啥不用publish-subscribe模型的问题。。。</p>
+<p>不过那样就需要redux去做diff算法了，必须知道状态中哪些字段变化了，反而让store变得更复杂。也许跟redux追求简单的设计哲学不符吧。<br>话说，高效diff两个对象，好像Immutable.js中提供了一种专用的数据结构？</p>
+<p>但对于<code>react-redux</code>而言，根据我的测试，每次store的变化都会触发所有组件的re-render。。。即是说，真正的listener是App组件（最上层组件）的render方法，每次状态变化都会导致App re-render，进而导致所有子组件re-render。。。这样真的不会有性能问题嘛？有些组件根本就跟store里的状态没关系（没有用connect方法包装），根本就没有必要re-render吧。</p>
+<p>我本来还在想，redux根据什么知道哪些组件需要哪些状态？根据什么检测到状态的变化导致特定组件重新render？结果它直接简单暴力的全部re-render。。。看来还是我想多了。。。但这样真的有性能隐患的，大量无用的re-render会的导致频繁的dom-diff。虽然我们可以通过<a href="https://www.npmjs.com/package/pure-render-decorator" target="_blank" rel="external">pureRender</a>/<a href="https://facebook.github.io/react/docs/optimizing-performance.html#shouldcomponentupdate-in-action" target="_blank" rel="external">PureComponent</a>/<a href="https://facebook.github.io/immutable-js/" target="_blank" rel="external">Immutable.js</a>之类的手段去优化shouldComponentUpdate方法，去避免这种系统能损失，但总归增加了额外的工作量和复杂度。</p>
+<p>归根结底一句话，redux为啥不用publish-subscribe模型啊。。。</p>
+<p>另外说下中间件，redux的中间件有点类似JavaEE的filter，也是继承了redux一贯的简洁风格。中间件可以用如下的形式来表示：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> anyMiddleware = <span class="function"><span class="keyword">function</span> <span class="params">({ dispatch, getState })</span> </span>{</div><div class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span><span class="params">(next)</span> </span>{</div><div class="line">        <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(action)</span> </span>{</div><div class="line">            <span class="comment">// 中间件相关代码</span></div><div class="line">            <span class="comment">// 这个next和JavaEE中的filterChain.doFilter作用类似</span></div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>所以可以按自己的需要很方便的写一些特定的中间件。<br>另外要注意下中间件的次序。</p>
+<p>redux中最常用的中间件应该就是<a href="https://github.com/gaearon/redux-thunk" target="_blank" rel="external">redux-thunk</a>和<a href="https://github.com/acdlite/redux-promise" target="_blank" rel="external">redux-promise</a>了，二者都是用来做一些异步操作的。细心些就会发现，这我们上面说的用生成器做异步操作的两种方式（thunk/promise）正好是对应的。这其实算不上什么巧合，因为对于异步操作，redux和生成器关心的问题是类似的。生成器关心的是“异步操作结束后如何要回代码执行权”，redux关心的是“异步操作结束后如何触发新的action”。所以他们的解决方法也都类似。</p>
+<p>重点说说Thunk中间件。redux中的thunk相当于一种特殊的action creator。普通的action creator直接返回action对象，而thunk会返回一个function（入参是dispatch），我们就可以在这个function中做异步操作，异步操作结束后重新dispatch了。store.dispatch时如果发现入参是function，就会执行它。原理其实非常简单，代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 这个中间件说穿了就一行代码。。。但能想到这个方法才是关键</span></div><div class="line"><span class="keyword">var</span> thunkMiddleware = <span class="function"><span class="keyword">function</span><span class="params">({dispatch,getState})</span></span>{</div><div class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span><span class="params">(next)</span></span>{</div><div class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span><span class="params">(action)</span></span>{</div><div class="line">      <span class="keyword">return</span> <span class="keyword">typeof</span> action === <span class="string">'function'</span> ? action(dispatch,getState):next(action);</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 普通的creator</span></div><div class="line"><span class="keyword">const</span> normalActionCreator = () =&gt; {</div><div class="line">  <span class="keyword">return</span> {type: <span class="string">'INCREMENT'</span>};</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// 异步的creator, 用setTimeout模拟网络请求</span></div><div class="line"><span class="keyword">const</span> asyncActionCreator = () =&gt; {</div><div class="line">  <span class="comment">// 其实返回的函数, 可以有两个参数的, (dispatch, getState)</span></div><div class="line">  <span class="comment">// 还可以自定义额外参数, 见https://github.com/gaearon/redux-thunk#injecting-a-custom-argument</span></div><div class="line">  <span class="keyword">return</span> (dispatch) =&gt; {</div><div class="line">    setTimeout(() =&gt; {</div><div class="line">      <span class="comment">// 过一秒之后触发一个正常的action</span></div><div class="line">      dispatch(normalActionCreator());</div><div class="line">    }, <span class="number">1000</span>);</div><div class="line"></div><div class="line">    <span class="comment">// thunk函数里可以再次dipatch thunk</span></div><div class="line">    <span class="comment">// dispatch(asyncActionCreator());   // 纯属测试</span></div><div class="line"></div><div class="line">    <span class="comment">// 关于store.dispatch的返回值</span></div><div class="line">    <span class="comment">// 如果传入的参数是普通对象, 返回值就是那个对象</span></div><div class="line">    <span class="comment">// 如果传入的参数是函数, 就是函数执行后的结果, 如果函数中没有明确的return语句, 就返回undefined</span></div><div class="line">    <span class="keyword">return</span> <span class="string">'dispatch'</span>;</div><div class="line">  };</div><div class="line">};</div></pre></td></tr></table></figure>
+
+<p>参考资料：</p>
+<p><a href="https://github.com/zalmoxisus/redux-devtools-extension" target="_blank" rel="external">Redux DevTools Extension</a>：调试redux必备</p>
+<p>ruanyifeng的redux系列教程：<a href="http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_one_basic_usages.html" target="_blank" rel="external">1</a>/<a href="http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_two_async_operations.html" target="_blank" rel="external">2</a>/<a href="http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_three_react-redux.html" target="_blank" rel="external">3</a>。</p>
+<p>关于action格式的社区规范：<br><a href="https://github.com/acdlite/flux-standard-action" target="_blank" rel="external">https://github.com/acdlite/flux-standard-action</a><br><a href="https://github.com/acdlite/redux-actions" target="_blank" rel="external">https://github.com/acdlite/redux-actions</a></p>
+<p>其他一些react/redux的文档：<br><a href="http://cn.redux.js.org//docs/introduction/index.html" target="_blank" rel="external">http://cn.redux.js.org//docs/introduction/index.html</a><br><a href="https://github.com/react-guide" target="_blank" rel="external">https://github.com/react-guide</a><br><a href="https://github.com/camsong/redux-in-chinese" target="_blank" rel="external">https://github.com/camsong/redux-in-chinese</a><br><a href="http://stackoverflow.com/questions/36085726/setstate-in-reactjs-is-async-or-sync" target="_blank" rel="external">http://stackoverflow.com/questions/36085726/setstate-in-reactjs-is-async-or-sync</a><br><a href="https://github.com/camsong/blog/issues/3" target="_blank" rel="external">Immutable 详解及 React 中实践</a><br><a href="https://github.com/lcxfs1991/blog/issues/8" target="_blank" rel="external">React移动web极致优化</a></p>
+<h1 id="前端是个大坑">前端是个大坑</h1>
+<p>我虽然一直戏称自己是二手前端，但其实对前端也研究了不少了，尤其是跳了react的坑之后。<br>千言万语汇成一句话：前端是个大坑。而且比我目前跳过的任何坑都深。。。如果对自己的“抗折腾”能力没自信，千万不要入坑。<br>虽然已经有无数人吐槽过了，但我还是忍不住要吐槽下。。。槽点多不可怕，关键是总是有新的槽点出现，这就很蛋疼了，再专业的吐槽也遭不住啊。</p>
+<ul>
+<li>总是有各种稀奇古怪的新东西</li>
+</ul>
+<p>昨天还说promise要一桶浆糊，今天就说async/await是终极解决方案了。<br>昨天还是react集万千宠爱，今天就开始一股脑吹捧vue了。<br>还有fetch，这货用起来还一堆问题，timeout都不支持，就已经有人在叫着ajax已死了。<br>npm还没搞明白，又跳出来一个<a href="https://code.facebook.com/posts/1840075619545360" target="_blank" rel="external">yarn</a>。<br>同构应用？怎么突然开始流行这个概念了？<br>服务端渲染？感觉又是一个大坑。<br><a href="http://webassembly.org/" target="_blank" rel="external">WebAssembly</a>、<a href="https://developer.mozilla.org/zh-CN/docs/Web/Web_Components" target="_blank" rel="external">WebComponents</a>，这都是什么鬼？</p>
+<p>总结下就是：心累。。。不过新技术很多，至少说明这个领域一直在发展，我还算可以接受。</p>
+<ul>
+<li>缺少规范</li>
+</ul>
+<p>在研究redux的时候，工程结构又让我纠结了好久。。。有人说reducers代码放一个单独的文件夹，actions放一个单独的文件夹，但也有人说放在一起。然后把组件强制分为“显示组件”、“逻辑组件”？显示组件里才有render方法，只从props里读数据并显示；逻辑组件里只有一个connect方法。。。不蛋疼么。。。<br>更别提webpack的各种坑爹配置了。</p>
+<p>总之就是每个人都有自己的做事方法，缺少一个统一的规范。在合作大型项目的时候，真的不会有问题么？本来么，没有规范大家商量出来一个就可以了，各方妥协下，但总是有人认为自己的方式就是比别人好，我也只能呵呵。。。这应该说是有傲骨呢还是情商低呢。。。</p>
+<p>以后前端领域会不会细分出来一个角色：“Dev Environment Administrator”，专门负责维护开发环境，各种配置都丢给他去搞。。。就像现在的SA一样。</p>
+<ul>
+<li>js果然还是不适合协作？</li>
+</ul>
+<p>同一个组件我有6种写法你信不？</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 函数式组件</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Test1</span><span class="params">(props)</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span>hello, {props.name1}, {props.name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// 函数式组件+解构</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Test2</span><span class="params">({name1, name2})</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span>hello, {name1}, {name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// 还是函数式组件，但换成箭头函数的写法，可以省略return语句</span></div><div class="line"><span class="comment">// 普通函数组件不能省略return</span></div><div class="line"><span class="keyword">const</span> Test3 = props =&gt; <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span> hello, {props.name1}, {props.name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Test4 = ({name1, name2}) =&gt; <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span>hello, {name1}, {name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</span></div><div class="line"></div><div class="line"><span class="comment">// 这是最正常的写法</span></div><div class="line"><span class="keyword">class</span> Test5 extends React.Component {</div><div class="line">  render() {</div><div class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span>hello, {this.props.name1}, {this.props.name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span></span></div><div class="line">  }</div><div class="line">}</div><div class="line"></div><div class="line">// 这是装逼的写法</div><div class="line">class Test6 extends React.Component {</div><div class="line">  // 为了装逼,箭头函数的参数用一个_接收</div><div class="line">  // 别笑, 我真的见过有人这么写</div><div class="line">  // 没有参数就老老实实写作() =&gt; 不好么, 非要写成 _ =&gt;</div><div class="line">  // 你是lodash用多了吧</div><div class="line">  render = _ =&gt; <span class="tag">&lt;<span class="title">div</span>&gt;</span>hello, {this.props.name1}, {this.props.name2}<span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</div><div class="line">}</div><div class="line"></div><div class="line">ReactDOM.render(</div><div class="line">  <span class="xml"><span class="tag">&lt;<span class="title">Test6</span> <span class="attribute">name1</span>=<span class="value">"jxy"</span> <span class="attribute">name2</span>=<span class="value">"xy"</span>/&gt;</span>,</span></div><div class="line">  document.getElementById('root')</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<p>这6种写法居然是一样的效果你敢信？一毛一样啊。让我想到孔乙己的“回字有4种写法”。。。你要是对ES6不熟，看到这一堆货肯定直接懵逼。</p>
+<p>如果了解过一些python vs perl在语言哲学上的区别，就可以知道js和perl类似，也是典型的<code>many ways to do one thing</code>。换句话说，可以玩出非常多的花样，非常灵活。我在写js的时候就特别激进，会尝试使用各种新特性，一遍遍的重构代码；但我写java的时候就很保守。。。说实话很多java8甚至java7的特性都还没用过。。。毕竟生产环境也只是jdk7而已。</p>
+<p>但对于协作而言，这种灵活性就可能导致问题。每个人的思路、代码风格都千差万别，有些人就很喜欢用function component，有些人就喜欢用普通的class。<br>在这种情况下，统一的编码规范或者说是“最佳实践”非常重要。啥是最佳实践？不同的人去实现同样的功能，他们的实现是类似的，达到这个效果就可以。毕竟大型协作项目中要的不是炫技，不是各种hack，而是可读性、可维护性。这种哲学在python中其实是非常常见的，python可以说直接从语言层面给出了最佳实践。<br>比如对于react组件，我就倾向于不要使用函数式组件，全都用class去定义。这样虽然会有冗余代码，但代码很“规整”，更清晰。</p>
+<ul>
+<li>啥时候能不用写css啊</li>
+</ul>
+<p>对css实在是无力吐槽了，折腾起来太麻烦了。布局居然有好几种方式：float/position/flex之类。我前段时间还特意把css布局的教程从头到尾看了一遍，以为已经是天下无敌了，结果过段时间就全部忘掉了。。。<br>这玩意如果不是天天用，根本记不住。只能是头痛医头脚痛医脚，哪里显示有问题就打开chrome慢慢调试。所谓的调试也是在凭感觉乱搞，<code>display:block</code>不对？那就试试<code>display:inline-block</code>；<code>position:absolute</code>有问题？那就试试<code>position:relative</code>，要不再加个<code>float</code>；边界有问题？那就<code>left/right-margin/padding</code>统统搞一遍试试。。。<br>作为二手前端，css是最让我头疼的东西了。据说很早以前写css和写js的人是分开的？设计师做好页面写好css再让程序员去填写逻辑。不过那可能是静态网页时代的做法了。。。</p>
+<p>题外话，我之前一直疑惑<code>npm run start</code>和<code>npm start</code>有啥区别，后来发现原来start和test对npm而言是特殊处理的。。。见<a href="https://blog.jayway.com/2014/03/28/running-scripts-with-npm/" target="_blank" rel="external">这里</a>：<code>In addition to the shell&#39;s pre-existing PATH, npm run adds node_modules/.bin to the PATH provided to scripts.</code><br>这tm也是个隐藏很深的坑。。。</p>
+<h1 id="杂七杂八">杂七杂八</h1>
+<p>google协程的过程中，顺便了解了很多并发相关的事情。如果不考虑多核（并行），只考虑单核下分时间片执行（并发）的情况下，并发最大的代价就是上下文的切换。所以并发模型的演进（多进程-&gt;多线程-&gt;Event Loop-&gt;协程）其实一直致力于减少上下文切换的开销。参考：<a href="http://yanyiwu.com/work/2014/12/20/c-coroutine.html" target="_blank" rel="external">1</a>/<a href="https://segmentfault.com/a/1190000001813992" target="_blank" rel="external">2</a>。<br>其实并发是个很复杂的问题，还涉及到指令乱序/重排、内存可见性等等蛋疼事，可以看下<a href="http://www.ituring.com.cn/book/1649" target="_blank" rel="external">《七周七并发模型》</a>。</p>
+<p>看<a href="http://www.infoq.com/cn/news/2016/12/What-architect-do" target="_blank" rel="external">某篇文章</a>时突然想到，到底啥是架构？<br>我一直觉得“架构”是个很容易有水份的词。架构本质上是一种抽象，它的抽象能力必须足够强大，才能承载各种各样形态的具体业务。如果业务超出了你的架构的抽象能力，要么对系统做“大手术”，要么削减业务（有点削足适履的感觉）。<br>说的通俗点，什么是好的架构？就是迥然不同的业务逻辑，系统的底层却是完全相同的。搞零售的和玩期货的，用的是同样的底层系统；每天一单的普通个人店铺，和峰值十万单的大V，是同样的底层系统；一口价和团购，用的还是同样的底层。从这种角度上来说，DNA-蛋白质这套系统，算是个好架构吧。。。不过这个与其说是架构，更像是“语言”。</p>
+<p>但是如果抽象过度了，架构也就没啥用了。借用一张“神图”：<br><img src="/2017/01/15/2017-and-redux/2.jpg" alt=""><br>这张图是很久之前在微博上看到的，好像是在讲云计算什么的。这张图的“神”就在于，你可以在所有的分布式系统、云计算、甚至是什么组织结构、神经系统之类上面套用这张图，反正就是一个中心节点+一堆子节点么。。。如果你敢跟老板说这就是你的系统的架构图，信不信分分钟被打出去。。。这张图生动的告诉了我们，什么是“正确的废话”。<br>所以，架构对业务的抽象，必须限定在一定的范围内，至少要让人看明白吧。越抽象就会丢失越多细节，如何把握这个“度”，才是我们应该思考的。<br>另外注意要划分清楚系统的边界（业务边界），不可能有一个系统能承载所有的业务的，要知道哪些该做/哪些不该做。</p>
+<p>一般而言，当我们接到需求时，首先要从业务的角度出发去看，梳理清楚所有的业务规则，保证整个业务流程是通畅的，能走通的；然后再去考虑如何去实现业务逻辑，如何让各个业务规则的实现不要互相干扰并且便于扩展。也就是先有需求再有架构。<br>尤其不要依赖于具体的技术实现，这对以后的系统改造也会方便很多，比如php迁移到java之类的。<br>但很多人看到需求总是会直接联想到代码。。。这其实是有问题的。。。<br>另一个很容易犯的错误：代码依赖于具体的数据库/应用服务器实现，比如依赖于mysql+tomcat，也会为日后的扩展埋下隐患。</p>
+<h1 id="总结？">总结？</h1>
+<p>怎么写了这么多。。。最近乱七八糟的研究了很多东西。其实我本来是想学下redux的，不知道怎么回事就开始研究async/await、生成器了。。。<br>发现我如果学什么东西，一不小心就会变成DFS。看到一个新的概念就会去google，然后偏离主题。。。最后才想起来自己本来想学啥。这样会不会栈溢出啊。。。</p>
+<p>之前搞的<a href="https://github.com/jiangxy/react-antd-admin" target="_blank" rel="external">React后台</a>意外收获近100个star，受宠若惊，也帮助了一些人。看来不能拖更了。</p>
+<p>数了下2016年只写了9篇blog。。。比我想的少很多。<br>好长时间没有刷算法题了。。。我的<a href="https://www.gitbook.com/book/jiangxy/leetcode-gossip/details" target="_blank" rel="external">leetcode题解</a>也坑了好久。<br>果然懒惰才是我最大的敌人啊。。。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/杂谈/">
+                #杂谈
+              </a>
+            
+              <a href="/tags/react/">
+                #react
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/04/02/lazy-busy-lazy/">拖更已是常态</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2016/12/07/wx-applet/">不务正业again</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2017/01/15/2017-and-redux/"
+             data-title="时间倏忽而逝" data-url="http://jxy.me/2017/01/15/2017-and-redux/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CPS变换"><span class="nav-number">1.</span> <span class="nav-text">CPS变换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#async/await"><span class="nav-number">2.</span> <span class="nav-text">async/await</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#生成器"><span class="nav-number">3.</span> <span class="nav-text">生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Thunk函数"><span class="nav-number">3.1.</span> <span class="nav-text">Thunk函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise对象"><span class="nav-number">3.2.</span> <span class="nav-text">Promise对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">3.3.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.4.</span> <span class="nav-text">参考资料</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#redux是个好东西"><span class="nav-number">4.</span> <span class="nav-text">redux是个好东西</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前端是个大坑"><span class="nav-number">5.</span> <span class="nav-text">前端是个大坑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#杂七杂八"><span class="nav-number">6.</span> <span class="nav-text">杂七杂八</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结？"><span class="nav-number">7.</span> <span class="nav-text">总结？</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

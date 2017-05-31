@@ -1,0 +1,909 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,HA," />
+
+  <title> HA集群中如何判断ActiveNN // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              HA集群中如何判断ActiveNN
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-04-09
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/04/09/hadoop-ha-active-nn/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/09/hadoop-ha-active-nn/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>偶然的机会，想到一个问题，HA的集群中，客户端是如何得知Active NN的地址的？</p>
+<a id="more"></a>
+<p>以前以为是从zk中查的，类似hbase一样，只配置一个zookeeper集群的地址就可以访问了。</p>
+<p>结果发现不是。。<br>hadoop的机制就是简单暴力的重试。不过也有些道理，毕竟NN最多就2个，重试最多1次就能知道哪个是Active了。不像hbase，可能有任意多个master，一个个重试的话效率会很低</p>
+<h1 id="新的问题">新的问题</h1>
+<p>但测试时又发现有些问题。我们的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.ha.namenodes.hp1<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">value</span>&gt;</span>nn1,nn2<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.namenode.rpc-address.hp1.nn1<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">value</span>&gt;</span>inspur129.photo.163.org:8020<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.namenode.rpc-address.hp1.nn2<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">value</span>&gt;</span>inspur120.photo.163.org:8020<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>发现无论dfs.ha.namenodes.hp1写成nn1,nn2还是nn2,nn1，客户端总是会先尝试去连nn1。其实nn1是standby，如果开启了DEBUG日志，就会看到客户端抛出一个异常：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG ipc.Client: IPC Client (<span class="number">2136875125</span>) connection <span class="keyword">to</span> inspur129.photo<span class="number">.163</span>.org/<span class="number">10.160</span><span class="number">.128</span><span class="number">.197</span>:<span class="number">8020</span> <span class="keyword">from</span> mine/admin@HADOOP.HZ.NETEASE.COM got value <span class="comment">#0</span></div><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG retry.RetryInvocationHandler: Exception <span class="keyword">while</span> invoking getFileInfo <span class="keyword">of</span> <span class="type">class</span> ClientNamenodeProtocolTranslatorPB. Trying <span class="keyword">to</span> fail <span class="keyword">over</span> immediately.</div><div class="line">org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.ipc.StandbyException): Operation category READ <span class="keyword">is</span> <span class="keyword">not</span> supported <span class="keyword">in</span> state standby</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.ha.StandbyState.checkOperation(StandbyState.java:<span class="number">87</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.NameNode$NameNodeHAContext.checkOperation(NameNode.java:<span class="number">1496</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.checkOperation(FSNamesystem.java:<span class="number">1030</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.getFileInfo(FSNamesystem.java:<span class="number">3275</span>)</div></pre></td></tr></table></figure>
+
+<p>然后才去尝试nn2并成功：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG ipc.Client: IPC Client (<span class="number">2136875125</span>) connection <span class="built_in">to</span> inspur120.photo<span class="number">.163</span>.org/<span class="number">10.160</span><span class="number">.128</span><span class="number">.192</span>:<span class="number">8020</span> <span class="built_in">from</span> mine/admin@HADOOP.HZ.NETEASE.COM: starting, having connections <span class="number">2</span></div><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG ipc.Client: IPC Client (<span class="number">2136875125</span>) connection <span class="built_in">to</span> inspur120.photo<span class="number">.163</span>.org/<span class="number">10.160</span><span class="number">.128</span><span class="number">.192</span>:<span class="number">8020</span> <span class="built_in">from</span> mine/admin@HADOOP.HZ.NETEASE.COM sending <span class="comment">#0</span></div><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG ipc.Client: IPC Client (<span class="number">2136875125</span>) connection <span class="built_in">to</span> inspur120.photo<span class="number">.163</span>.org/<span class="number">10.160</span><span class="number">.128</span><span class="number">.192</span>:<span class="number">8020</span> <span class="built_in">from</span> mine/admin@HADOOP.HZ.NETEASE.COM got <span class="built_in">value</span> <span class="comment">#0</span></div><div class="line"><span class="number">15</span>/<span class="number">02</span>/<span class="number">02</span> <span class="number">15</span>:<span class="number">48</span>:<span class="number">05</span> DEBUG ipc.ProtobufRpcEngine: Call: getFileInfo took <span class="number">29</span>ms</div></pre></td></tr></table></figure>
+
+<p>无论重复多少次都是这样。为什么呢？按理说没必要排序。一时好奇研究下。</p>
+<h1 id="看下代码">看下代码</h1>
+<p>一路追查：<code>FileSystem.get(conf)</code> -&gt; <code>FileSystem.createFileSystem</code> -&gt; <code>FileSystem.initialize</code> -&gt; <code>DistributedFileSystem.initialize</code>：</p>
+<figure class="highlight java"><figcaption><span>DistributedFileSystem.java</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span>(URI uri, Configuration conf) <span class="keyword">throws</span> IOException {</div><div class="line">  <span class="keyword">super</span>.initialize(uri, conf);</div><div class="line">  setConf(conf);</div><div class="line"> </div><div class="line">  String host = uri.getHost();</div><div class="line">  <span class="keyword">if</span> (host == <span class="keyword">null</span>) {</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"Incomplete HDFS URI, no host: "</span>+ uri);</div><div class="line">  }</div><div class="line">  <span class="comment">// 关键在这里，DFSClient才是利用RPC协议真正和Namenode交互的，只是平常我们不会直接使用，FileSystem在它上面包装了一层</span></div><div class="line">  <span class="comment">// 这里传入的uri就是在core-site.xml中的配置，我们的集群上是hdfs://hp1</span></div><div class="line">  <span class="keyword">this</span>.dfs = <span class="keyword">new</span> DFSClient(uri, conf, statistics);</div><div class="line">  <span class="keyword">this</span>.uri = URI.create(uri.getScheme()+<span class="string">"://"</span>+uri.getAuthority());</div><div class="line">  <span class="keyword">this</span>.workingDir = getHomeDirectory();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>继续看DFSClient的构造函数：</p>
+<figure class="highlight java"><figcaption><span>DFSClient.java</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="title">DFSClient</span>(URI nameNodeUri, Configuration conf,</div><div class="line">                 FileSystem.Statistics stats)</div><div class="line">  <span class="keyword">throws</span> IOException {</div><div class="line">  <span class="keyword">this</span>(nameNodeUri, <span class="keyword">null</span>, conf, stats);</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="title">DFSClient</span>(URI nameNodeUri, ClientProtocol rpcNamenode,</div><div class="line">    Configuration conf, FileSystem.Statistics stats)</div><div class="line">  <span class="keyword">throws</span> IOException {</div><div class="line">  <span class="comment">// 省略了很多无关代码</span></div><div class="line">  ......</div><div class="line">  <span class="keyword">if</span> (proxyInfo != <span class="keyword">null</span>) {</div><div class="line">    <span class="keyword">this</span>.dtService = proxyInfo.getDelegationTokenService();</div><div class="line">    <span class="keyword">this</span>.namenode = proxyInfo.getProxy();</div><div class="line">  } <span class="keyword">else</span> <span class="keyword">if</span> (rpcNamenode != <span class="keyword">null</span>) {</div><div class="line">    <span class="comment">// This case is used for testing.</span></div><div class="line">    Preconditions.checkArgument(nameNodeUri == <span class="keyword">null</span>);</div><div class="line">    <span class="keyword">this</span>.namenode = rpcNamenode;</div><div class="line">    dtService = <span class="keyword">null</span>;</div><div class="line">  } <span class="keyword">else</span> {</div><div class="line">    Preconditions.checkArgument(nameNodeUri != <span class="keyword">null</span>,</div><div class="line">        <span class="string">"null URI"</span>);</div><div class="line">    <span class="comment">// DFSClient也不知道具体访问的是那个机器，它是通过一个proxy对象访问的</span></div><div class="line">    proxyInfo = NameNodeProxies.createProxy(conf, nameNodeUri,</div><div class="line">        ClientProtocol.class);</div><div class="line">    <span class="keyword">this</span>.dtService = proxyInfo.getDelegationTokenService();</div><div class="line">    <span class="keyword">this</span>.namenode = proxyInfo.getProxy();</div><div class="line">  }</div><div class="line">  ......</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>继续：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; ProxyAndInfo&lt;T&gt; <span class="title">createProxy</span>(Configuration conf,</div><div class="line">    URI nameNodeUri, Class&lt;T&gt; xface) <span class="keyword">throws</span> IOException {</div><div class="line">  <span class="comment">// 这个类其实就是hdfs-site.xml中的dfs.client.failover.proxy.provider.$nameservice</span></div><div class="line">  <span class="comment">// 在我们的集群上就是dfs.client.failover.proxy.provider.hp1，默认值是org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</span></div><div class="line">  Class&lt;FailoverProxyProvider&lt;T&gt;&gt; failoverProxyProviderClass =</div><div class="line">      getFailoverProxyProviderClass(conf, nameNodeUri, xface);</div><div class="line">  <span class="comment">// 如果配置了dfs.client.failover.proxy.provider.$nameservice属性，就认为是开启HA的集群</span></div><div class="line">  <span class="keyword">if</span> (failoverProxyProviderClass == <span class="keyword">null</span>) {</div><div class="line">    <span class="comment">// Non-HA case</span></div><div class="line">    <span class="keyword">return</span> createNonHAProxy(conf, NameNode.getAddress(nameNodeUri), xface,</div><div class="line">        UserGroupInformation.getCurrentUser(), <span class="keyword">true</span>);</div><div class="line">  } <span class="keyword">else</span> {</div><div class="line">    <span class="comment">// HA case</span></div><div class="line">    FailoverProxyProvider&lt;T&gt; failoverProxyProvider = NameNodeProxies</div><div class="line">        .createFailoverProxyProvider(conf, failoverProxyProviderClass, xface,</div><div class="line">            nameNodeUri);</div><div class="line">    Conf config = <span class="keyword">new</span> Conf(conf);</div><div class="line">    <span class="comment">// 这里有点复杂，利用java的代理机制返回一个ClientProtocol对象，调用这个对象的任意方法都会有重试机制，具体见RetryInvocationHandler.invoke方法</span></div><div class="line">    T proxy = (T) RetryProxy.create(xface, failoverProxyProvider, RetryPolicies</div><div class="line">        .failoverOnNetworkException(RetryPolicies.TRY_ONCE_THEN_FAIL,</div><div class="line">            config.maxFailoverAttempts, config.failoverSleepBaseMillis,</div><div class="line">            config.failoverSleepMaxMillis));</div><div class="line">    </div><div class="line">    Text dtService = HAUtil.buildTokenServiceForLogicalUri(nameNodeUri);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ProxyAndInfo&lt;T&gt;(proxy, dtService);</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>RetryProxy.create方法具体的代码不列了，大概的原理是通过代理返回一个实现了ClientProtocol接口的对象A（这个对象是java动态生成的，没有对应的Class定义），这个对象内部包装了一个真正的ClientProtocol对象B，对A的操作都是在内部转化成对B的操作，只是加上了很多异常处理和重试机制。要先了解代理机制。</p>
+<p>那真正的对象B是怎么得到的？是FailoverProxyProvider<clientprotocol>.getProxy得到的，看具体的实现类ConfiguredFailoverProxyProvider：</clientprotocol></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">final</span> List&lt;AddressRpcProxyPair&lt;T&gt;&gt; proxies =</div><div class="line">    <span class="keyword">new</span> ArrayList&lt;AddressRpcProxyPair&lt;T&gt;&gt;();</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="title">ConfiguredFailoverProxyProvider</span>(Configuration conf, URI uri,</div><div class="line">    Class&lt;T&gt; xface) {</div><div class="line">    ......</div><div class="line">    <span class="comment">// 其实就是从conf中读取dfs.namenode.rpc-address.hp1.nn1等配置</span></div><div class="line">    Map&lt;String, Map&lt;String, InetSocketAddress&gt;&gt; map = DFSUtil.getHaNnRpcAddresses(</div><div class="line">        conf);</div><div class="line">    Map&lt;String, InetSocketAddress&gt; addressesInNN = map.get(uri.getHost());</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (addressesInNN == <span class="keyword">null</span> || addressesInNN.size() == <span class="number">0</span>) {</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Could not find any configured addresses "</span> +</div><div class="line">          <span class="string">"for URI "</span> + uri);</div><div class="line">    }</div><div class="line">    </div><div class="line">    Collection&lt;InetSocketAddress&gt; addressesOfNns = addressesInNN.values();</div><div class="line">    <span class="comment">// 将values加入ArrayList</span></div><div class="line">    <span class="keyword">for</span> (InetSocketAddress address : addressesOfNns) {</div><div class="line">      proxies.add(<span class="keyword">new</span> AddressRpcProxyPair&lt;T&gt;(address));</div><div class="line">    }</div><div class="line">    ......</div><div class="line">  } <span class="keyword">catch</span> (IOException e) {</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);</div><div class="line">  }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> T <span class="title">getProxy</span>() {</div><div class="line">  <span class="comment">// 从这里可知，尝试连接的顺序和加入ArrayList的顺序是对应的</span></div><div class="line">  AddressRpcProxyPair current = proxies.get(currentProxyIndex);</div><div class="line">  <span class="keyword">if</span> (current.namenode == <span class="keyword">null</span>) {</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">      current.namenode = NameNodeProxies.createNonHAProxy(conf,</div><div class="line">          current.address, xface, ugi, <span class="keyword">false</span>).getProxy();</div><div class="line">    } <span class="keyword">catch</span> (IOException e) {</div><div class="line">      LOG.error(<span class="string">"Failed to create RPC proxy to NameNode"</span>, e);</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);</div><div class="line">    }</div><div class="line">  }</div><div class="line">  <span class="keyword">return</span> (T)current.namenode;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>继续看DFSUtil的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Map&lt;String, InetSocketAddress&gt;&gt;</div><div class="line">  <span class="title">getAddresses</span>(Configuration conf,</div><div class="line">    String defaultAddress, String... keys) {</div><div class="line">  <span class="comment">// 在我们的集群上就一个nameservice，就是hp1</span></div><div class="line">  Collection&lt;String&gt; nameserviceIds = getNameServiceIds(conf);</div><div class="line">  <span class="comment">// Look for configurations of the form &lt;key&gt;[.&lt;nameserviceId&gt;][.&lt;namenodeId&gt;]</span></div><div class="line">  <span class="comment">// across all of the configured nameservices and namenodes.</span></div><div class="line">  Map&lt;String, Map&lt;String, InetSocketAddress&gt;&gt; ret = Maps.newLinkedHashMap();</div><div class="line">  <span class="keyword">for</span> (String nsId : emptyAsSingletonNull(nameserviceIds)) {</div><div class="line">    Map&lt;String, InetSocketAddress&gt; isas =</div><div class="line">      getAddressesForNameserviceId(conf, nsId, defaultAddress, keys);</div><div class="line">    <span class="keyword">if</span> (!isas.isEmpty()) {</div><div class="line">      ret.put(nsId, isas);</div><div class="line">    }</div><div class="line">  }</div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, InetSocketAddress&gt; <span class="title">getAddressesForNameserviceId</span>(</div><div class="line">    Configuration conf, String nsId, String defaultValue,</div><div class="line">    String[] keys) {</div><div class="line">  <span class="comment">// 这里是读取dfs.ha.namenodes.hp1属性，将逗号分隔的字符串转化为一个Collection，其实是个ArrayList</span></div><div class="line">  <span class="comment">// 所以遍历整个Collection时其实是有序的，和字符串中逗号分隔的顺序一样</span></div><div class="line">  Collection&lt;String&gt; nnIds = getNameNodeIds(conf, nsId);</div><div class="line">  <span class="comment">// 注意这里是个HashMap存储，按理说应该是无序的</span></div><div class="line">  Map&lt;String, InetSocketAddress&gt; ret = Maps.newHashMap();</div><div class="line">  <span class="comment">// 注意这里的遍历是有序的，如果配置是nn2,nn1，遍历的顺序就是先nn2再nn1</span></div><div class="line">  <span class="keyword">for</span> (String nnId : emptyAsSingletonNull(nnIds)) {</div><div class="line">    String suffix = concatSuffixes(nsId, nnId);</div><div class="line">    String address = getConfValue(defaultValue, suffix, conf, keys);</div><div class="line">    <span class="keyword">if</span> (address != <span class="keyword">null</span>) {</div><div class="line">      InetSocketAddress isa = NetUtils.createSocketAddr(address);</div><div class="line">      <span class="comment">// 放到一个HashMap里</span></div><div class="line">      ret.put(nnId, isa);</div><div class="line">    }</div><div class="line">  }</div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>于是问题退化成了为何HashMap.values()方法返回的集合是有序的。。。</p>
+<p>可以用下面一段代码验证：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">HashMap&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</div><div class="line">map.put(<span class="string">"nn4"</span>, <span class="string">"value4"</span>);</div><div class="line">map.put(<span class="string">"nn3"</span>, <span class="string">"value3"</span>);</div><div class="line">map.put(<span class="string">"nn1"</span>, <span class="string">"value1"</span>);</div><div class="line">map.put(<span class="string">"nn2"</span>, <span class="string">"value2"</span>);</div><div class="line">map.put(<span class="string">"nn5"</span>, <span class="string">"value5"</span>);</div><div class="line"><span class="keyword">for</span> (String x : map.values()) {</div><div class="line">    System.out.println(x);   <span class="comment">// 这里的输出必定是有序的value1,value2,value3,value4,value5</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>其实这是个巧合。。。HashMap确实不保证顺序。</p>
+<p>HashMap内部用一个Entry[]保存各个元素，默认size是16，就是16个桶。HashMap根据对象的hashCode方法决定将对象放入哪个桶。而nn1~nn5这5个字符串的hashCode都正好相差1，HashMap转换后会将这个5个key分别放入9、10、11、12、13号桶（具体的计算方法不列了）。而values()方法返回的集合的iterator是按顺序遍历Entry[]的（从Entry[0]开始顺序遍历），结果就好像里面的元素有序一样。。。</p>
+<p>具体的原理去看HashMap的代码吧。</p>
+<p>追查了半天结果只是个巧合。。。不过也算有些收获。如果我们的集群配置不是nn1,nn2，而是其他字符串，结果应该就不同了</p>
+<h1 id="P-S-1">P.S.1</h1>
+<p>关于DFSClient的重试机制</p>
+<p>DFSClient连接出现异常时会重试，比如连接DN异常时加入deadNode再换一个节点。重试机制就是通过上面说过的RetryProxy.create方法实现的。<br>关于重试有很多参数可以调，见DFSClient.Conf类。</p>
+<h1 id="P-S-2">P.S.2</h1>
+<p>关于HA相关参数</p>
+<p>上述配置中的hp1/nn1/nn2等名称完全是客户端的，其实可以是任意字符串，只要能对应上就行，可以和服务端不同。<br>因为hp1之类的名称只是逻辑上的概念，不会真的存在一个叫hp1的机器，客户端API会自动根据配置替换成实际的地址。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/HA/">
+                #HA
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/04/16/standby-namenode-slow-web/">SNN web页面加载缓慢</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/04/07/hbase-switch-problem/">交换机引起的hbase事故</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/04/09/hadoop-ha-active-nn/"
+             data-title="HA集群中如何判断ActiveNN" data-url="http://jxy.me/2015/04/09/hadoop-ha-active-nn/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#新的问题"><span class="nav-number">1.</span> <span class="nav-text">新的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#看下代码"><span class="nav-number">2.</span> <span class="nav-text">看下代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P-S-1"><span class="nav-number">3.</span> <span class="nav-text">P.S.1</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P-S-2"><span class="nav-number">4.</span> <span class="nav-text">P.S.2</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,996 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="react,前端," />
+
+  <title> 真・二手前端 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              真・二手前端
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2016-09-06
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/09/06/zhen-second-hand-qianduan/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/06/zhen-second-hand-qianduan/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p><a href="/2015/09/21/second-hand-frontend/">《二手的前端开发》</a>续集，继续折腾，跳了React的大坑。。。</p>
+<a id="more"></a>
+<p>掐指一算，已经近3个月没更新了，再创新纪录，可喜可贺。<br>这段时间呢，可以说是忙，做着各种奇奇怪怪的事，跟各种各样的人打交道，写着各种“片段式”的代码。感觉很忙却又说不清自己在做什么。总是感觉时间很零碎，很久没有整块的时间去潜心做一件事了。这个有机会再单独写一篇去吐槽吧。<br>但也可以说是懒，毕竟还是有时间把《权利的游戏》1~5季追完。。。<br>人啊，总是会有“去tmd工作我什么都不想干就想宅着”的时候。</p>
+<p>言归正传，本篇的主角是React。<a href="/2015/09/21/second-hand-frontend/">之前</a>我也搞过一点前端的工作，但是比较low，大多是jquery+bootstrap之类的东西，感觉就是在逆时代潮流而动啊。。。也听说过React，一直很口水，身不能至心向往之。尤其是<a href="https://facebook.github.io/react-native/" target="_blank" rel="external">React Native</a>出来之后，感觉就是“卧槽这也行”，颇有点当年java的“write once, run everywhere”的风范。不过java的这个牛皮是吹破了，react的口号也跟这个不太一样，“learn once, write everywhere”，后文再详细说。<br>正好之前有点空闲时间，新项目还没开始，于是就研究了下React和<a href="http://ant.design" target="_blank" rel="external">Ant Design</a>。初衷很简单，如果我能自己写前端，那做项目就不用求人了，前端资源真是很紧张。</p>
+<p>一边学一边写，最后搞了<a href="https://github.com/jiangxy/react-antd-admin" target="_blank" rel="external">这么个东西</a>出来。本意是想简化下各种后台页面的开发，尽量做的通用一点，欢迎各种吐槽。</p>
+<p>注意，本文<strong>不是一个React教程</strong>，只是总结下学习过程中一些个人的感想。React教程实在太多了，遍地都是。。。</p>
+<h1 id="最佳实践？">最佳实践？</h1>
+<p>首先我要抱怨下前端开发的现状，对于新人，对于二手前端，真是太不友好了。。。因为乱。</p>
+<p>引用一张图片：<br><img src="/2016/09/06/zhen-second-hand-qianduan/1.png" alt=""></p>
+<p>原图在<a href="http://fefe.jeroenheijmans.nl/" target="_blank" rel="external">这里</a>，列举了前端的大部分框架和相关的工具。反正我第一眼看到感觉就是“日居然要学这么多东西”。。。</p>
+<p>之前我就觉得前端很乱。不是难，是乱。技术么，不管多难，只要肯下功夫总能学会的。但是工程化的标准、开发风格、开发框架之类的，前端一直没有一个“业界标准”，太多框架、太多工具可以选择。我用react，能实现需求；你用angular？也行啊；什么他要写原生js？貌似也可以。。。</p>
+<p>一个很让人头疼的问题就是工程结构。一个典型的java工程，一般都会有<code>src/main/java</code>、<code>src/test/java</code>之类的目录放置源码，<code>target</code>目录放置构建结果，可以很清楚整个工程结构是什么样的，其他人接手也很简单。这就是maven提倡的“约定优于配置”的理念。但前端世界完全没有这种规范，编译后的目标目录，有人叫<code>build</code>，有人叫<code>dist</code>，也有<code>target</code>/<code>result</code>的。。。源码目录的结构更是一团糟，完全取决于开发者的个人兴趣。每次看别人的工程都很头疼。这时才感受到maven的可贵啊。</p>
+<p>至于css/js/html/兼容性上的各种混乱，更是无力吐槽了。。。不过值得欣慰的是，至少比以前的洪荒时代好多了。</p>
+<p>还有啊，为什么某个组件我升级个小版本就导致整个项目挂了啊，你们这版本号也太乱来了吧。。。</p>
+<p>前端开发另一个怪现象就是很喜欢自己造轮子，即使有可用的工具也要自己重新造一套，我觉得大概有几个原因：</p>
+<ul>
+<li>确实现在前端生态圈还不完善，各个领域没有一个决定性的优胜者，只能说各擅胜场</li>
+<li>因为没有标准，每个人都觉得自己掌握的才是宇宙真理。。。看别人的工具总是不爽，“文人相轻”比较严重，各种“派系”林立</li>
+<li>js语言太灵活。一门语言如果表达力很强，就意味着不同的人写同样的功能，写出来的代码可能天差地别。而且你总觉得有更好的写法。。。所以说，太灵活的语言不适合协作，但适合炫技。。。</li>
+</ul>
+<p>不要说专业前端了，我这个二手前端都会一遍遍重构自己的代码。我会特意去用ES6的各种新特性，class/箭头函数之类的，不用不舒服斯基。说实话挺头疼的，尤其是对于强迫症。</p>
+<p>唠叨了这么多，对“混乱”抱怨了这么久，所以，前端领域到底有没有所谓的“<strong>最佳实践</strong>”？<br>恐怕我无法回答这个问题。但在学习react的过程中，我总结了一些规则，仅供参考：</p>
+<ul>
+<li>抱着HTML5的大腿</li>
+<li>写<a href="http://less.bootcss.com/" target="_blank" rel="external">less</a>，不要写原生css。话说css真是难，前端同学你们是怎么记住那么多样式的。我只能抄其他人的，或者找些开源的，再对着<a href="http://www.w3school.com.cn/cssref/index.asp" target="_blank" rel="external">css手册</a>一点点改，有时候调css能花上一天。。。</li>
+<li>依赖管理都用<a href="https://www.npmjs.com/" target="_blank" rel="external">npm</a></li>
+<li>js都用ES6的写法，但也要能看懂ES5。至于各种方言，CoffeeScript/TypeScript之类的，注定是历史的垃圾堆</li>
+<li>一切以DOM为基础。虽然大家都说DOM慢，而且很多框架都会屏蔽DOM操作。但它是最底层的操作，理解之后有很多好处。不要上来就搞一堆框架专有的概念，没错我说的就是angular。。。</li>
+<li>怎么熟悉DOM？先把<a href="https://jquery.com/" target="_blank" rel="external">jquery</a>/<a href="http://zeptojs.com/" target="_blank" rel="external">zepto</a>用熟吧少年</li>
+<li><a href="http://babeljs.io/" target="_blank" rel="external">Babel</a>真是神器，可以让你提前使用ES6甚至ES7的特性。大部分特性是编译时的优化，可以认为是语法糖，但注意有些特性可能需要运行时的polyfill。</li>
+<li><a href="https://webpack.github.io/" target="_blank" rel="external">Webpack</a>是React绝配，有各种神奇的loader和插件，后文详述</li>
+<li>React全家桶（React+ <a href="https://github.com/ReactTraining/react-router" target="_blank" rel="external">React Router</a> + <a href="https://github.com/reactjs/redux" target="_blank" rel="external">Redux</a>）看情况是否采用。一般而言React Router是必须的，但是否用Redux就取决于你的需求了</li>
+</ul>
+<p>大概就是这样了。最佳实践不能帮你写代码，但可以少踩些坑。</p>
+<p>话说，前端的混乱也是有历史原因的。因为以前的前端都很简单，我记得以前还用记事本写html和js，那时候写前端约等于“写脚本/写样式/做一些动态效果”。但现在前端越来越重了，越来越多的业务逻辑转移到前端，又赶上了移动互联网的大潮，复杂化/工程化是不可避免的。但却缺少约束和规范，野蛮生长，再加上一些先天的缺陷（比如原生js的各种坑爹设计），造成了如今的局面。</p>
+<p>不过前端真的是很有活力的一个领域，有各种好玩&amp;吊炸天的东西。比如<a href="http://codepen.io/" target="_blank" rel="external">CodePen</a>、<a href="https://jsfiddle.net/" target="_blank" rel="external">JSFiddle</a>、<a href="http://threejs.org/" target="_blank" rel="external">three.js</a>、<a href="https://github.com/d3/d3/wiki/Gallery" target="_blank" rel="external">D3.js</a>、<a href="http://rap.taobao.org" target="_blank" rel="external">RAP</a>、<a href="http://periodic.famo.us/" target="_blank" rel="external">famo.us</a>、<a href="http://moebio.com/" target="_blank" rel="external">Moebio Labs</a>等等很多。</p>
+<h1 id="React印象">React印象</h1>
+<p>说实话，react给我的第一印象实在不咋地。因为我先看到的是JSX语法，感觉很难受，比如像下面这种：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Hello extends React.Component {</div><div class="line">  render() {</div><div class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="title">div</span>&gt;</span><span class="tag">&lt;<span class="title">h1</span> <span class="attribute">className</span>=<span class="value">"testStyle"</span>&gt;</span>Hello, React!<span class="tag">&lt;/<span class="title">h1</span>&gt;</span><span class="tag">&lt;/<span class="title">div</span>&gt;</span>;</span></div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在js里写html，你特么在逗我吧？这是什么鬼？还记得以前的各种<code>xxx.innerHTML=</code>/<code>document.write(xxx)</code>的痛苦么。用js写html早就被证实是不可行了吧，极难维护而且扩展性堪忧，就跟JavaEE早期直接用servlet输出html代码一样。<br>我不喜欢angular一个原因就是它把太多逻辑揉到html里了，各种<code>ng-xx</code>标签。结果react反其道而行之，把html搞到业务逻辑代码里去了。。。</p>
+<p>直到我看了<a href="http://www.hubwiz.com/class/552762019964049d1872fc88" target="_blank" rel="external">这个教程</a>，颇有茅塞顿开的感觉。这个教程从传统的DOM操作一步步过渡到react，很赞，很多教程上来就是一大堆react的概念，头都晕了。</p>
+<p>原来React的<strong>本质还是DOM操作</strong>，它只不过额外做了几件事：</p>
+<ul>
+<li>提出虚拟DOM的概念，解决DOM操作效率低的痛点。至于它是如何做到DOM diff，如何将虚拟DOM渲染到真实DOM上的，完全不用关心。</li>
+<li>在虚拟DOM的基础上，提出react元素/react组件的概念，强调高内聚，强调封装性，强调复用。React组件的本质就是一组DOM元素，这组DOM元素的样式和操作逻辑都被封装到组件中，并且可以被渲染到虚拟DOM上。围绕组件又会产生状态/props/生命周期等一系列概念。</li>
+<li>提出JSX语法，解决DOM操作繁琐、不易读的痛点。JSX虽然看起来像html，但是一些细节的写法还是有区别的。只是一种语法糖，但习惯之后就再也离不开了。</li>
+<li>在“一切皆组件”这个概念基础之上，提出各种“设计模式”，比如下文中的单向数据流/flux等，解决在大型项目中如何应用/解耦的问题。当然这些模式不是强制性的，算是react给出的最佳实践吧。</li>
+</ul>
+<p>可以说，react的本质就是对<strong>传统DOM操作的一个封装</strong>，使之更易用更易规模化。理解这点非常关键。如果对react的认识只停留在组件的层面，出现问题时就很容易懵，不知如何入手去解决。如果知道它背后其实是DOM，知道了react组件的渲染过程，很多概念都好理解了，包括对React的设计哲学也更容易理解。<br>python有“<a href="https://www.python.org/dev/peps/pep-0020/" target="_blank" rel="external">The Zen of Python</a>”，不知react有没有“The Zen of React”之类的啊。。。<br>此外，理解<a href="https://facebook.github.io/react/docs/component-specs.html#lifecycle-methods" target="_blank" rel="external">生命周期</a>也非常重要，可以帮助理解react的设计理念。</p>
+<p>话说，大公司真是有底气自己造轮子啊，JSX这种奇怪的语法，说搞就搞。个人自己造轮子的话，很容易死掉。</p>
+<p>虚拟DOM算是react的一大创新吧，也是react能喊出“learn once, write everywhere”的关键。react给我们画了一个大饼：<br><img src="/2016/09/06/zhen-second-hand-qianduan/2.png" alt=""><br>大意就是虚拟DOM能被不同的平台渲染，就像JVM一样，我们只要针对虚拟DOM去写程序就可以了。看着很美好是吧，但<strong>太美好的东西注定不会实现的</strong>。首先跨平台的代码肯定要有些修改的，据说facebook自己用React Native也只能做到70%复用。其次DOM这种抽象结构真的能应付所有情况么？我看悬。</p>
+<p>很多人喜欢对比react和angular，但其实二者并不是对等的。angular是典型的google风格，all in one，非常重量级，你前端开发需要的所有东西都能在angular中找到。它是一个封闭的圈子，有自己发明很多奇怪的概念，对你的编码方式/思路侵入性很强。react则如我之前所说，只是对DOM操作的一个封装，而且非常轻量级，抽象层次很浅，DOM做不到的东西，它也做不到。很多事情都要借助第三方。react上手很快，像我这种用惯了jquery的很容易就能理解它的思路。React Native也是大杀器啊，是不是以后我也可以说自己会开发app了😄。<br>而且，angular还有一个很大的劣势，就是1和2不兼容。。。而且2居然是用TypeScript写的。。。感觉这是邪路啊。微软在开源界的口碑可一向不怎么样。</p>
+<h1 id="单向数据流">单向数据流</h1>
+<p>单向数据流是react中很重要的一个哲学。我的理解，一个组件被渲染成什么样子，取决于：</p>
+<ol>
+<li>组件自身的状态。根据封装性原则，每个组件内部维护自己的状态，外界不能也不应该去干涉</li>
+<li>外界传过来的props。就是组件对外界因素的响应，也是外界干涉组件的唯一方式</li>
+</ol>
+<p>一个是内因，一个是外因。<br>不知为何，写这段时我总是会想到草履虫。。。想到生物课上讲的“应激性”。。。</p>
+<p>所谓单向数据流，就是指props只能从父组件流向子组件。这样，每个组件要做的事情就很简单了：1. 维护自己的状态；2. 接收外部的props并做出反应；3. 看情况是否更新子组件的props。<br>这样看来，每个组件的职责都很明确，非常利于解耦。</p>
+<p>这样的设计很简单很美是不是？如果大家都能遵从这样的原则，世界就和平了。可惜，看着很美的设计往往都是有缺陷的，不能覆盖所有情况。就像不可变对象，能减少线程同步的问题，那就把所有对象都做成不可变的？are you kidding me ？<br>这个设计最大的问题是假设子组件与子组件之间不需要通信，并且父组件也无需获知子组件的状态。一些简单的应用确实可以这么假设。但只要稍微复杂一点的应用中，组件之间往往需要共享状态/互相传props，甚至子组件可能修改父组件的状态，为了达到这个目的，就只能写一些<a href="https://github.com/jiangxy/react-antd-admin/blob/master/src/components/DBTable/index.js" target="_blank" rel="external">很恶心的代码</a>：</p>
+<ol>
+<li>很多子组件自身的状态要“提升”到父组件中，只是为了能和其他子组件共享</li>
+<li>props搞得很重，有很多不必要的属性在里面，因为是跟子组件交互的唯一方式</li>
+<li>父组件必须传回调函数给子组件，这样子组件状态变化时才能通知到上层</li>
+</ol>
+<p>写这种代码很头疼，完全破坏了组件的封装性。而且状态的变化很难搞清楚，经常写着写着思路就乱了，要停下来想想。。。</p>
+<p>为了解决这种问题，facebook提出了<a href="https://facebook.github.io/flux/docs/overview.html" target="_blank" rel="external">Flux</a>模式，可以类比常见的MVC模式。为啥facebook不套用MVC模式而要重新发明个轮子呢？好像跟react自身的特点有关，网上也有很多讨论。<br>注意这只是一种思路，可以有很多种具体实现，最著名的实现就是Redux，也算是React全家桶中的元老了。我没实际用过Redux，但我写过那种恶心的代码，知道它要解决的痛点是什么。。。我的理解，它提供了一个统一的状态存储的地方，而且数据变化时会有消息通知到对应的组件，有点类似消息队列？</p>
+<p>当然Flux/Redux也不是万能的。引入这种模式必然会增加你的应用的复杂度，而且可能连带的引入一些其他的问题，是否使用还是要看自己的需求。如果你像我一样，写组件的过程中觉得组件之间通信太恶心了，别犹豫了快试试吧，人生苦短何必为难自己。。。</p>
+<h1 id="状态是万恶之源">状态是万恶之源</h1>
+<p>现在越来越觉得，在设计一个系统/模块的时候，“状态”才是优先要考虑的事，无论是前端/后端，无论什么需求，无论什么开发语言。</p>
+<p>没有状态的东西（所谓“东西”，可能是一个对象/API/进程/模块/机器，甚至可能是更抽象的概念），就意味着可以快速复制出一个一模一样的。不用为状态操心，也可以避免很多潜在的坑，在解耦、可用性上会有很大的便利。一个例子是不可变对象；另一个印象深刻的例子是storm的nimbus进程，无状态所以随时重启；REST风格API也要求请求是无状态的；MapReduce的<code>share nothing</code>理念也是这样一个思路。与之相对的就是Oracle RAC，share everything，就会导致出问题时非常难处理。</p>
+<p>状态让一切变得复杂。在函数式编程中，也会一再强调不可变/幂等性/无副作用的函数，一个道理。</p>
+<p>但状态也不可能完全避免，否则这个系统还有啥用，就像人没了记忆一样。如何设计状态、如何设计状态之间的变化、如何设计系统对不同状态的响应，就是我们要思考的事情了。安利下一位大牛的文章：<a href="https://segmentfault.com/a/1190000005704433" target="_blank" rel="external">舌尖上的状态机</a>。</p>
+<p>说回react。状态在react中是尤其重要的一件事，因为每个组件都可以有自己的状态，而状态的变化会自动触发render方法。所以，先整理好状态的变化是很重要的，不然写着写着代码就懵了。。。</p>
+<p>一般的设计原则就是“最小化”，使用尽量少的状态，参考<a href="https://facebook.github.io/react/docs/interactivity-and-dynamic-uis.html#what-components-should-have-state" target="_blank" rel="external">官方文档</a>。facebook甚至专门提出了“<a href="https://facebook.github.io/react/docs/reusable-components.html#stateless-functions" target="_blank" rel="external">无状态组件</a>”的概念。总之状态越少越好维护，但也不能矫枉过正。</p>
+<h1 id="关于Ant_Design">关于Ant Design</h1>
+<p>口水<a href="http://ant.design" target="_blank" rel="external">Ant Design</a>（简称antd）很久了，一直想研究下，终于得偿所愿。</p>
+<p>对antd的第一印象就是“哎呦这个界面看着不错哦”。其实围绕React的UI KIT也有很多了，比较出名的是<a href="https://react-bootstrap.github.io/" target="_blank" rel="external">React-Bootstrap</a>和<a href="http://www.material-ui.com/#/" target="_blank" rel="external">Material-UI</a>。但antd最大的优势是语言，无论文档还是issues，都是中文，方便了很多。如果有几个差不多的开源项目摆在我面前，我当然选中文的那个啊。无论你英文多熟练，也还是中文看着舒服对不。而且antd社区也很活跃，版本更新很快，提出问题也能很快有人解答，用的人也算比较多。希望国内能有更多的这种开源项目啊。</p>
+<p>最近antd又发布了<a href="http://mobile.ant.design/" target="_blank" rel="external">Ant Design Mobile</a>（简称antd-mobile），可以写移动端的H5了，对二手前端来说真是喜大普奔，我也写了个简单的<a href="https://github.com/jiangxy/react-antd-mobile-demo" target="_blank" rel="external">DEMO</a>。简单的需求都不用去求前端同学了，自己搞定。而且antd-mobile似乎也准备支持React Native，持续关注中。</p>
+<p>antd对我而言，最大的意义就是不用写样式了（当然也不可能完全避免）。。。毕竟它已经封装好各种各样的组件，直接用就可以了。就像我之前说的，前端开发中最痛苦的事情就是写css。js好歹还算一门语言，对于标准的engineer来说都能很快上手，写各种业务逻辑驾轻就熟。但css就不一样了，每种样式在不同浏览器下有什么区别？常用的布局属性？各种overflow、display搞的头都要炸了。。。搞好css需要大量的经验和实践，不是我这种半路出家的二手前端能很快掌握的。<br>最关键的，我对自己的审美没什么信心。。。我觉得不错的界面，其他人觉得一般；我觉得还可以的界面，其他人一般觉得丑。。。</p>
+<p>so，antd真是大救星啊。就像以前jquery时代的Bootstrap/Metronic/AdminLTE一样，但是好用了很多。而且也能追赶下React的潮流不是。</p>
+<p>但我还是要吐槽下，<a href="http://ant.design/components/form/" target="_blank" rel="external">Form组件</a>实在是难用。。。这个组件跟其他组件的用法截然不同，各种东西都要从props里取，antd搞了很多黑盒的操作。但这也不能说是antd的锅，而是react的痼疾。react处理各种input元素，本来就很麻烦，见官方文档<a href="https://facebook.github.io/react/docs/forms.html#controlled-components" target="_blank" rel="external">Controlled Components</a>。这种设计会导致表单中输入项一多，很有可能会卡，因为每输入一个字符都要重新render。希望antd能想办法优化下吧。</p>
+<h1 id="Webpack是个好东西">Webpack是个好东西</h1>
+<p>有人说，前端开发一半的时间都在搭环境。其实很有道理，尤其在前端现在的混乱情况下，对于一个强迫症而言，想搭一个顺手的开发环境，真是各种纠结。</p>
+<p>刚开始接触antd时，我直接使用了<a href="http://ant.design/docs/react/getting-started#标准开发" target="_blank" rel="external">官方的脚手架</a>。但我讨厌黑盒，很多东西如果我不了解基本的原理，用着心虚。官方的脚手架就是一个黑盒，在npm + webpack的基础上各种包装，搞出一些奇奇怪怪的东西，比如<a href="https://github.com/ant-design/antd-tools" target="_blank" rel="external">antd-tools</a>/<a href="https://github.com/ant-design/antd-init" target="_blank" rel="external">antd-init</a>/<a href="https://github.com/dora-js/dora" target="_blank" rel="external">dora</a>（这个好像不是antd团队搞出来的，但也是支付宝的）之类的，美其名曰一站式解决方案。要不怎么说前端喜欢自己造轮子呢。</p>
+<p>也许对新人而言这种方式确实比较好吧，毕竟可以很快开始投入编码。但碰到问题怎么办？去研究这些黑盒？就算花很大力气研究明白了，对自己又有什么益处呢？与其研究这些自己造的轮子，我为啥不去直接去研究“业界标准”webpack呢？webpack如果研究明白了，以后很长时间都会受益吧。</p>
+<p>同理我也不想用各种react工程模版，比如<a href="https://github.com/kriasoft/react-starter-kit" target="_blank" rel="external">这个</a>还是WebStorm官方推荐的，感觉都是加了特技的啊，各种不需要的功能都duang duang duang的扔进去。</p>
+<p>于是我就走上了绕过官方脚手架，自己搭建环境的不归路。。。纠结了好久啊，结果见<a href="https://github.com/jiangxy/react-antd-admin/blob/master/docs/Structure.md" target="_blank" rel="external">这里</a>。</p>
+<p>说回webpack。最开始我以为这是跟maven类似的一个构建工具。但实际用下来发现不太一样：</p>
+<ul>
+<li>webpack对工程结构没有任何约定</li>
+<li>maven的依赖管理，用npm去实现，跟webpack没啥关系</li>
+<li>webpack有点像maven-compiler-plugin插件的加强版</li>
+</ul>
+<p>说白了，webpack就是一个编译工具，又兼一点打包的功能。但它的强大之处在于：</p>
+<ol>
+<li>各种loader可以支持特定语法。比如babel-loader可以让你使用ES6甚至ES7的语法，也可以支持react特定的JSX语法。loader还可以实现各种神奇的功能，比如react-hot-loader，发挥自己的想象力吧。</li>
+<li>各种plugin，也能实现很多神奇的功能。常见的就是压缩&amp;混淆代码。</li>
+</ol>
+<p>loader + plugin的机制让webpack变得非常灵活，可以各种自由定制，也让强迫症多了很多纠结的地方。。。最后我的配置文件见<a href="https://github.com/jiangxy/react-antd-admin/blob/master/webpack.config.js" target="_blank" rel="external">这里</a>。<br>React + Webpack的搭配，写起代码来非常爽。如果不用webpack，你的JSX语法就要单独编译，调试起来也很麻烦。而使用webpack的babel-loader，编译过程对你而言是完全透明的。再搭配上<a href="https://webpack.github.io/docs/webpack-dev-server.html" target="_blank" rel="external">webpack-dev-server</a>和<a href="https://github.com/gaearon/react-hot-loader" target="_blank" rel="external">react-hot-loader</a>，调试也非常方便。写React的基本都是这么一套配置。</p>
+<p>但webpack似乎更适用于SPA，对于一些多页面的应用似乎不太好用。</p>
+<h1 id="ES6也是个好东西">ES6也是个好东西</h1>
+<p>很早就知道ES6，但一直没有大规模的用过，最多用用<code>for-of</code>之类的语法。总的感觉，ES6不算是一次彻底的变革，更像是在ES5的基础上加了各种语法糖，让写代码的时候能够更舒服点，但底层其实是没啥变化的。虽然各大浏览器还没有完全支持ES6，不过有了<a href="http://babeljs.io/" target="_blank" rel="external">Babel</a>这种神器，根本不用担心兼容性，最多可能加些运行时的polyfill。</p>
+<p>我最常用的ES6特性，无非是class/import/箭头函数之类的，确实很爽。值得庆幸的是终于不用再跟prototype打交道了。我一直觉得js的prototype是个很奇怪的设计。。。强行面向对象。但如果要兼容一些老的代码，还是要用prototype。</p>
+<p>感觉以前写js真的是“写脚本”，跟写bash之类的没啥区别；现在写js就真的是“写程序”了。其中区别，自己体验过才能理解。话说js越来越像java了。。。也越来越规范了。ES7都快出来了，这样强行每年一个版本真的好么。。。</p>
+<p>ES6的教程我推荐<a href="http://www.infoq.com/cn/es6-in-depth/" target="_blank" rel="external">InfoQ的</a>，讲解很详细，还有<a href="http://www.infoq.com/cn/minibooks/ES6-in-Depth" target="_blank" rel="external">PDF版本</a>。当然事先要对js有些基础。</p>
+<p>React能很好的兼容ES6，但写法上要有些变化。参考<a href="http://babeljs.io/blog/2015/06/07/react-on-es6-plus" target="_blank" rel="external">这篇文章</a>和<a href="https://facebook.github.io/react/docs/reusable-components.html#es6-classes" target="_blank" rel="external">官方文档</a>。至于说是用ES5风格的<code>React.createClass</code>还是ES6风格的<code>extends React.Component</code>，完全看个人喜好，反正经过babel之后应该都是没差别的。但个人倾向于ES6的写法，包括模块/集合等，也尽量遵循ES6的标准。</p>
+<h1 id="零散的知识点">零散的知识点</h1>
+<p>一些零散的东西，记录下备忘：</p>
+<ol>
+<li>this.props对当前组件而言是只读的</li>
+<li>props和state变化都可能引起重新render</li>
+<li>很多时候，组件是“单例”的</li>
+<li>注意JSX中的<code>className</code>，这是React的一个妥协，不那么优雅</li>
+<li>JSX中，内联样式必须通过js对象实现</li>
+<li>JSX中，可以为React元素设置一个JSON对象作为属性包，使用<code>{...obj}</code>的语法</li>
+<li>mixin感觉是继承的简化版，但很少用到。而且React在ES6语境下是不支持mixin的。</li>
+<li>使用this.props.children就可以访问React子元素</li>
+<li><code>React.findDOMNode(this.refs.q)</code>也是一个不那么优雅的设计，但很有用</li>
+<li>现在跨域请求都流行用<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">CORS</a>了，不用JSONP了，不过貌似safari对CORS的支持有点问题</li>
+</ol>
+<h1 id="总结">总结</h1>
+<p>至此，算是把自己对前端&amp;React的理解总结完毕了。</p>
+<p>其实这篇文章2个月之前就想写了，那个时候就开始研究React了。但拖了很久，最主要的原因是我想把之前做的<a href="https://github.com/jiangxy/react-antd-admin" target="_blank" rel="external">通用后台</a>扔到github上，但从自己的一个玩具到一个公开的项目，还是有很多事情要做的。要完善各种边角的功能、测试各种流程、补充各种文档等等。再加上工作上事情确实比较多，所以进度很慢。好在趁着G20放假的期间，终于基本搞定了。<br>题外话，正确写一个user guide文档的方法：interesting hello world -&gt; overview -&gt; 分块讲解，写文档过程中的一点小小感悟，虽然这次也没用上就是了。。。</p>
+<p>以前我也尝试过学习React，大多半途而废，看了下教程就放弃了。没想到这次居然能坚持下来，还搞了个简单的<a href="https://github.com/jiangxy/react-antd-admin" target="_blank" rel="external">项目</a>，我想了想原因：</p>
+<ol>
+<li>一个好的入门教程非常非常重要。很多人推荐<a href="http://www.ruanyifeng.com/blog/2015/03/react.html" target="_blank" rel="external">阮一峰的React教程</a>，但我看了还是感觉一头雾水。反而<a href="http://www.hubwiz.com/class/552762019964049d1872fc88" target="_blank" rel="external">这个教程</a>我感觉非常赞。教一个零基础的人和一个有基础的人，当然方法也不一样。所以适合自己的教程才是最好的。</li>
+<li>Ant Design功不可没，要是没有antd，我估计写个Hello world就该干嘛干嘛去了。</li>
+<li>根本原因：都是被逼的啊！没有前端来给我们写界面啊，只能自己上了啊。好在运营后台对前端性能一般没什么要求，易用性/用户体验上也可以商量，二手前端也能应付。。。</li>
+</ol>
+<p>话说，我身为一个java开发，第一次认真搞的开源项目居然React的，世界真是奇妙啊。。。<br>最后分享一个ppt吧，之前组内分享用的，<a href="https://pan.baidu.com/s/1geZkgsb" target="_blank" rel="external">《二手前端心得》</a>，不过技术人员做的ppt嘛，一般都不咋地。。。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/react/">
+                #react
+              </a>
+            
+              <a href="/tags/前端/">
+                #前端
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2016/10/02/docker-for-mac/">Docker与虚拟化</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2016/06/10/machine-learning-outsider/">ML门外汉的哀嚎</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2016/09/06/zhen-second-hand-qianduan/"
+             data-title="真・二手前端" data-url="http://jxy.me/2016/09/06/zhen-second-hand-qianduan/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#最佳实践？"><span class="nav-number">1.</span> <span class="nav-text">最佳实践？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#React印象"><span class="nav-number">2.</span> <span class="nav-text">React印象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单向数据流"><span class="nav-number">3.</span> <span class="nav-text">单向数据流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态是万恶之源"><span class="nav-number">4.</span> <span class="nav-text">状态是万恶之源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Ant_Design"><span class="nav-number">5.</span> <span class="nav-text">关于Ant Design</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Webpack是个好东西"><span class="nav-number">6.</span> <span class="nav-text">Webpack是个好东西</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES6也是个好东西"><span class="nav-number">7.</span> <span class="nav-text">ES6也是个好东西</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#零散的知识点"><span class="nav-number">8.</span> <span class="nav-text">零散的知识点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

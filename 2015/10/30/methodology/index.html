@@ -1,0 +1,904 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="杂谈," />
+
+  <title> 方法论？ // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              方法论？
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-10-30
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/10/30/methodology/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/30/methodology/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>似乎最近写的纯技术文章少了很多，反而很多吐槽。。。<br>“杂谈”这个tag，不会超过hadoop吧。。。<br>不过，无论技术还是抱怨，无论总结还是吐槽，有思考总是好的。</p>
+<a id="more"></a>
+<h1 id="关于代码洁癖">关于代码洁癖</h1>
+<p>我算是有点强迫症的，对代码总是要改来改去，有时自己也觉得很头疼。<br>空行、缩进、变量名之类的就不说了，而且绝对不能有warning。<br>还有注释，如果看到很长一段代码没有注释，就会不舒服。。。所以即使是废话也要加几行注释。<br>怎么说呢，没有注释感觉冷冰冰的，有注释就觉得代码真的是一个“人”写的。<br>pom里，一定要把所有依赖精简到最小，有多余的依赖就很难受。scope能为provided的一定不compile。打包时，有多余的jar打进去，也很难受。<br>log4j的配置里，无用的appender一定要删掉。<br>各种抽象、各种接口、各种设计模式。<br>所以只从速度上来讲，我写代码是很慢的，总是要想半天才写几行，而且经常重构。<br>说实话，这样很累。</p>
+<p>但最近，总是不自觉的用些quick and dirty的方法。<br>小到编码，比如字符串于之于enum，写一大堆if else，各种hard code。<br>大到设计，各种简单粗暴。<br>因为deadline压在那里。。。<br>测试催的人头痛。稍有延迟就会邮件通告，似乎你的进度耽误了测试、耽误了整个项目、妨碍了公司、妨碍了世界和平。。。这是个不好的地方，出问题时，所有人都在忙着推卸责任，而不是想办法解决。。。<br>更别提需求变更了。<br>在这种情况下，真的很难再精雕细琢。</p>
+<p>但写这种代码有点不安啊。。。这就是个大坑，不一定落在谁头上，而且很可能落在自己头上。。。<br>有句话叫eat your own dog food，但长此以往，当你真的准备吃时，发现已不是dog food，而是dog shit了。。。到时只能自我安慰，自己X的，含泪也要吃完。。。</p>
+<p>关于这个问题，应该有很多人思考过了。不知道他人是如何解决的。<br>常见的所谓解决方法是快速迭代、上线，再重构。我也很难评判是对是错。<br>不过重构真的不是万能的。<br>只能说，如何取舍，如何平衡，都没有定式。只能自己把握。</p>
+<h1 id="@Autowired">@Autowired</h1>
+<p>见过一些人，根本不知spring是何物，但<code>@Autowired</code>用的很欢快。<br>因为整个项目的框架已经搭好，一些“大牛”已经写好一些类，只要照猫画虎就可以了。<br>我当时就给跪了。</p>
+<p>暂且不谈对于项目，这种“分工”是否合适。至少对于个人，是百弊而无一利。<br>不要以为新人才会出现这种情况，所有人都会。<br>对于自己不熟悉的领域，人们总是倾向于浅尝辄止，会用就好，而不太关注原理性的东西。<br>从我的面试经历来看，会用MR的很多，能说清shuffle过程的没几个。</p>
+<p>但这种浅尝辄止式的“学习”，有个好处，就是可以用来吹B，糊弄下不懂的人。。。只要自己保持一副高深莫测的样子就可以。。。某人看了篇quick start就来跟我大谈特谈hadoop，还好我机智。。。<br>但不得不说，吹B才能获得注意，才能有存在感，所以我也很理解。<br>另外很多面试官其实都是这样的，问你的问题他自己都不懂。。。我找工作时就被某HR镇住了，还以为是个技术总监，太年轻啊。。。<br>其实分辨方法也很简单，就是看他会不会追问，考察技术的广度还是深度。</p>
+<p>不是说一定要深入源码去了解，至少要知道大概的原理吧。还是要多看书。</p>
+<p>我也在反思，多注意自己的言行。谨记。</p>
+<h1 id="关于打杂">关于打杂</h1>
+<p>前段时间折腾linkedin，要填自己的职位，想了半天，我写了“打杂工程师”。<br>这倒不是抱怨，而是我觉得，每个人都要有些打杂的能力。</p>
+<p>最近做的事情确实比较杂。在好几个项目之间转，哪里缺人，哪里进度紧急，就被派到哪里。感觉就是个救火队员。。。做的事情也不全是hadoop相关，一般是普通的Java EE，有时还做前端。。。缺人的时候还去到处收集简历和面试。</p>
+<p>如果能专注于某件事，专注于某些技术，当然很好。<br>但现实中往往不会有这种条件，除非是专门的做研究。大公司分工很细，也许可以，小公司却诸事混杂，很难专一。为什么有些大公司出来的人受到各种诟病，就是因为只会一种技能，只能在这个公司里用。<br>所以各种地方都混混，各种工作都参与下，蛮好。<br>但也不能忘记本职。个人感觉，能有一两项核心技能，同时触类旁通，博闻强识，是最好的。<br>通俗点说，需要你打杂的时候要能hold住。用老郭的话说，上炕认识娘们下炕认识鞋，嗯。我也越来越三俗了。。。</p>
+<p>对我来说，目前为止，我的本职是hadoop相关的应用/运维，其他都是副业。写简历的话，至少hadoop中的某些部分我敢写精通，其他最多写个熟练。。。但要我去搞前端什么的，我也不会怕，多少还是知道点的。哪怕让我去写lisp/haskell之类的，也有信心短时间内熟练使用，不过最好不要。。。</p>
+<h1 id="微服务？">微服务？</h1>
+<p>最近似乎所谓的micro service很火？我在InfoQ上看到了很多文章：<a href="http://www.infoq.com/cn/news/2015/07/success-of-microservices" target="_blank" rel="external">1</a>/<a href="http://www.infoq.com/cn/news/2015/04/micro-service-architecture" target="_blank" rel="external">2</a>/<a href="http://www.infoq.com/cn/articles/analysis-the-architecture-of-microservice-part-01" target="_blank" rel="external">3</a>/<a href="http://www.infoq.com/cn/articles/analysis-the-architecture-of-microservice-part-02" target="_blank" rel="external">4</a>。大都是“SOA已死，微服务当立”之类的论调。</p>
+<p><a href="http://www.dropwizard.io" target="_blank" rel="external">Dropwizard</a>我很早就知道，非常喜欢这种开箱即用的框架。最近又知道了<a href="http://projects.spring.io/spring-boot/" target="_blank" rel="external">Spring Boot</a>。这就是所谓的微框架。难道用了微框架就是微服务？恐怕不是。</p>
+<p>虽然我对SOA的理解完全来自google，没什么实践经验（只用过dubbo）。但感觉SOA是抽象程度非常高的概念，所以每个人的理解、实现都会有不同。而现有的标准实现太复杂了，需要各种技术SOAP、WDSL啥啥的。就像以前的EJB规范一样。<br>引用一段话：</p>
+<blockquote>
+<p>很多人使用SOA的原因就是为了用而用；厂商、委员会与协会一起过来告诉我们什么是我们“需要”的。最终，SOA也提出了关于组织结构的相同目标，不过却迷失在了WS-*规范中。</p>
+</blockquote>
+<p>于是出现了一种SOA的简单实现，就是微服务。SOA和微服务不是对立的，而是class和instance的关系。<br>感觉微服务就是一堆小的tomcat，使用者要按需调用。。。这其中也有很多问题，比如如何发现服务、如何管理之类的。<br>其实很多产品，早期都是所有服务做在一起的，可以理解为一个大tomcat。后来随着业务发展，才开始逐渐拆分。</p>
+<p>所谓天下大势，分久必合，合久必分。<br>反正就是来回折腾。也许某天“微服务”又被一个大一统的框架取代了。</p>
+<p>据说JAX-RS是用来取代JAX-WS的，但用起来也没觉得简单。。。<br>另外“软件咨询师”到底是干啥的。。。感觉就是发明一堆概念拿去卖钱。。。</p>
+<h1 id="小步快跑？平台化？">小步快跑？平台化？</h1>
+<p>最近老大总是跟我们提到一个词，小步快跑。感觉上就是快速迭代，先把眼前的需求做掉再说，细节的问题以后再修。<br>不过他是很鄙视这样的，说这样坚持不了多久，早晚会死掉。他给我们灌输的思想是要做通用性的平台，在这个平台上可以承载各种各样的业务。平台初期可以做的不完善，但一定要留出扩展的余地。<br>我想了想，觉得还是很有道理。</p>
+<p>所谓的小步快跑，初期实现非常容易，一个星期上线一个产品绝对不是开玩笑。但蛋疼的地方在于容错性小，扩展性差。如果不断的有需求进来，就要不断的做一个个小的系统，不断重复着相似但是又有些许不同的代码和逻辑。最后变成一堆无人敢碰的遗留系统。。。<br>小步快跑适合用在哪里？1.初期圈地；2.忽悠投资人。。。</p>
+<p>平台化的思维则是尽量考虑扩展性，初期也许降低了开发速度。但有了平台的支撑，以后的开发反而会变的很简单。所以最关键的问题在于平台的设计。这没什么捷径可以走，只能凭经验和自己摸索。成了就是高瞻远瞩，不成就是过度设计。<br>比如我拿到某个产品的需求，感觉就是很简单的java应用啊，mysql+spring搞搞不就好了。<br>但老大一看，就说这个功能可以用已有的招商系统实现，这个功能可以套到已有的运营后台，另一个功能我们要做一个服务凭证的平台，以后其他产品也可以用。。。</p>
+<p>怎么说呢，这是思维方式的差别，不服不行。<br>我是没什么电商相关的从业经验的，所以只能看到具体的需求。而从阿里出来的人，见识过很多。尤其是呆的时间比较长的，经历了淘宝怎样从一个普通的LAMP变成巨大的平台。经历过，自然知道怎么做。思考问题的方式自然也不同。<br>比如我，有过一些运维经验，所以在设计系统时，也会更多的考虑可用性、SLA、运维友好之类的问题。<br>而经验这种东西，是不能凭空想象的，需要一点点积累。</p>
+<p>小步快跑和平台化，从某种角度上来说是对立的。<br>就好像你不能既当T又当DPS，总要有所取舍。<br>开挂另当别论。如果有这种逆天的挂，请务必通知我。。。<br>每个公司的发展过程中，都必然经历这一阶段。只有度过这一阶段，小公司才有可能发展成大公司，注意只是有可能。小公司发展过程中有太多因素会导致死掉，但如果是死在技术不给力上，身为码农也太没面子了。<br>而我们目前就在这个阶段艰难跋涉。对我个人而言，有这样一段经历，蛮好。</p>
+<p>于是我对自己有了新的定位：造积木的。<br>我做的只是造出尽量好的积木，表现力尽量丰富，比如乐高那样的。让使用方按自己的意愿拼成自己想要的样子。也许叫橡皮泥更合适？<br>其实吧，这有点类似中间件的概念。具体业务之下的，都可以叫做积木，无论是语言、框架、工具。当然hadoop也是。但积木是有层次之分的。java属于底层的积木，MQ更上一层。而我要造的，是比较接近上层的，与业务方只有一层之隔。<br>我以后写本书，就叫《积木论》，感觉像儿童图书。。。</p>
+<h1 id="关于翻译">关于翻译</h1>
+<p>曾经我还想<a href="/2015/03/23/beyond-8-hours/">翻译一些技术blog</a>，比如cloudera blog，databricks blog之类的。上面有很多高质量的关于大数据的文章。<br>到时在文章标题前面有个大大的前缀——【译】，好像也不错啊，逼格瞬间提升。</p>
+<p>可惜，看懂是一回事，翻译又是另一回事。<br>尝试着译了几段，自己读着都别扭，就跟hadoop权威指南的中译本似的。<br>我算知道这本书是怎么翻译出来的了，敢情语文水平都跟我差不多，也就比机翻好一点。<br>黑这本书已经是我的日常了。。。</p>
+<p>而且按我的风格，总想夹带些私货进去，吐个槽之类的。<br>但既然是翻译别人的文章，总要严肃些。如果我的私货比原文还多，还不如重新写一篇。<br>于是不了了之。</p>
+<p>也许其实只是懒而已。。。</p>
+<h1 id="总结？">总结？</h1>
+<p>只是想随便写写而已，为何又写了这么多。。。<br>本来还有一节，叫做“装B有风险”，写了一长串又被我删掉了，怕影响不好啊，我记得就好了。<br>大千世界无奇不有，不能高估别人的下限。</p>
+<p>本篇文章为何叫“方法论？”（注意是有问号的）？可能部分是受了<a href="http://www.infoq.com/cn/news/2015/10/Bryanedds-Medium" target="_blank" rel="external">这篇文章</a>影响。这些抱怨我觉得都有些道理。</p>
+<p>在我们身边存在着各种各样的“方法”，大多是别人告诉我们的，比如软件工程、各种管理书籍、各种业界标准。似乎只要按着这些方法做事，就是正确的，至少也能避免最坏的结果。也许这些“方法”刚发明时是好的，但很多却渐渐僵化，变成了为了使用而使用。不顾实际场景而硬往方法上套，往往很惨。<br>也许我是个怀疑论者？我怎么觉得各种“方法”大多是忽悠人的。也许其中有些是有价值的，但很难明确该如何使用、该用在哪种场景。<br>工作过程中，我也会总结一些“方法”，但也会碰到很多问题。大多数问题是一个“度”的问题。</p>
+<p>可惜我能看到问题，却给不出答案。<br>也许根本没有标准答案，只能凭感觉和经验行事。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/杂谈/">
+                #杂谈
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/11/29/south-trip/">南游记</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/10/12/hadoop-application-architectures/">《Hadoop Application Architectures》</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/10/30/methodology/"
+             data-title="方法论？" data-url="http://jxy.me/2015/10/30/methodology/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于代码洁癖"><span class="nav-number">1.</span> <span class="nav-text">关于代码洁癖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#@Autowired"><span class="nav-number">2.</span> <span class="nav-text">@Autowired</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于打杂"><span class="nav-number">3.</span> <span class="nav-text">关于打杂</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#微服务？"><span class="nav-number">4.</span> <span class="nav-text">微服务？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小步快跑？平台化？"><span class="nav-number">5.</span> <span class="nav-text">小步快跑？平台化？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于翻译"><span class="nav-number">6.</span> <span class="nav-text">关于翻译</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结？"><span class="nav-number">7.</span> <span class="nav-text">总结？</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

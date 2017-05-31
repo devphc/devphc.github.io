@@ -1,0 +1,927 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,windows," />
+
+  <title> hadoop与windows // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              hadoop与windows
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-27
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/06/27/hadoop-and-windows/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/27/hadoop-and-windows/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>以前写的一篇文章。<br>折腾了下windows下的编译、部署、使用。纯粹为了好玩，肯定不能用于生产环境。</p>
+<a id="more"></a>
+<h1 id="在windows中编译hadoop">在windows中编译hadoop</h1>
+<p>以2.5.2的代码为基准。系统为32位WinXP SP3（虚拟机）。</p>
+<h2 id="前置要求">前置要求</h2>
+<p>看BUILDING.txt：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Building <span class="function_start"><span class="keyword">on</span></span> Windows</div><div class="line"></div><div class="line"><span class="comment">----------------------------------------------------------------------------------</span></div><div class="line">Requirements:</div><div class="line"></div><div class="line">* Windows System</div><div class="line">* JDK <span class="number">1.6</span>+</div><div class="line">* Maven <span class="number">3.0</span> <span class="keyword">or</span> later</div><div class="line">* Findbugs <span class="number">1.3</span><span class="number">.9</span> (<span class="keyword">if</span> <span class="property">running</span> findbugs)</div><div class="line">* ProtocolBuffer <span class="number">2.5</span><span class="number">.0</span></div><div class="line">* Windows SDK <span class="keyword">or</span> Visual Studio <span class="number">2010</span> Professional</div><div class="line">* Unix command-line tools <span class="keyword">from</span> GnuWin32 <span class="keyword">or</span> Cygwin: sh, mkdir, rm, cp, tar, gzip</div><div class="line">* zlib headers (<span class="keyword">if</span> building native code bindings <span class="keyword">for</span> zlib)</div><div class="line">* Internet connection <span class="keyword">for</span> <span class="keyword">first</span> build (<span class="keyword">to</span> fetch all Maven <span class="keyword">and</span> Hadoop dependencies)</div></pre></td></tr></table></figure>
+
+<p>大多数都好说，有几个要求比较麻烦：</p>
+<h3 id="ProtocolBuffer">ProtocolBuffer</h3>
+<p>protocbuffer项目迁到github了，目前好像最新是3.0版。<br>以前的版本还可以在google code上下载。直接下载编译好的：<a href="https://protobuf.googlecode.com/files/protoc-2.5.0-win32.zip" target="_blank" rel="external">https://protobuf.googlecode.com/files/protoc-2.5.0-win32.zip</a><br>解压后将protoc.exe加入PATH。我是直接扔到c:\windows里了，省事。</p>
+<h3 id="Windows_SDK">Windows SDK</h3>
+<p>可以去<a href="http://www.microsoft.com/en-us/download/details.aspx?id=8279" target="_blank" rel="external">http://www.microsoft.com/en-us/download/details.aspx?id=8279</a>下载。<br>但这里给出的是在线安装，非常非常慢。还是下载完整的程序自己安装吧。<br>完整的iso在这里下载：<a href="http://www.microsoft.com/en-us/download/details.aspx?id=8442" target="_blank" rel="external">http://www.microsoft.com/en-us/download/details.aspx?id=8442</a>。<br>注意根据需要选择32位或64位版本。<br>安装也是一路next。</p>
+<h3 id="Unix_command-line_tools">Unix command-line tools</h3>
+<p>很多文章推荐cygwin。但是cygwin太重量级了。<br>我推荐直接安装git bash，它自带一个MinGW32，包含常用的linux命令。<br>去<a href="http://git-scm.com/download/win" target="_blank" rel="external">http://git-scm.com/download/win</a>这里下载并安装。注意安装中有一步询问是否将相关命令加入PATH，选择加入。</p>
+<p>其他依赖就很简单了。记得把相关命令都加入PATH。在cmd里输入mvn/protoc/ls等命令验证下。</p>
+<h2 id="修改代码">修改代码</h2>
+<p>原来的代码直接编译有些问题。<br>主要参考<a href="http://www.cnblogs.com/smartbooks/p/3694760.html" target="_blank" rel="external">这篇文章</a>。</p>
+<p>原作者说要改3个地方：</p>
+<ol>
+<li>hadoop-common-project\hadoop-auth\pom.xml增加一个依赖org.mortbay.jetty:jetty-util。在2.2.0确实有这个问题。但2.5.2已经修复了。</li>
+<li>修改hadoop-common-project\hadoop-common\src\main\native\native.sln。将{4C0C12D2-3CB0-47F8-BCD0-55BD5732DFA7}.Debug|Win32.XXX = Release|x64修改为{4C0C12D2-3CB0-47F8-BCD0-55BD5732DFA7}.Debug|Win32.XXX = Release|Win32。总共要修改4行。</li>
+<li>修改hadoop-common-project\hadoop-common\src\main\native\native.vcxproj，将所有Release|x64替换为Release|Win32。</li>
+</ol>
+<p>我估计如果是在64位系统中编译，2、3两步是不用改的。</p>
+<p>（我想在Win7 64位下测试下的，但Windows SDK死活安装不上，看日志里有报错vcredist_x64.exe installation failed with return code 5100，google的话能找到这个链接：<a href="http://support.microsoft.com/kb/2717426/de" target="_blank" rel="external">http://support.microsoft.com/kb/2717426/de</a>。但按这个链接卸载了vcredist也不行。折腾了半天。为这个重装系统也不值得。）</p>
+<h2 id="编译">编译</h2>
+<p>进入Windows SDK 7.1 Command Prompt，开始编译：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># maven下载非常慢。设置代理也很麻烦。</span></div><div class="line"><span class="preprocessor"># 我以前在服务器（linux）上编译过2.5.2的hadoop。把~/.m2下所有文件拷到虚拟机里，替换原来的maven repo。</span></div><div class="line"><span class="keyword">set</span> ZLIB_HOME=E:\zlib128-dll\include</div><div class="line"><span class="preprocessor"># 注意大小写，必须是Platform</span></div><div class="line"><span class="keyword">set</span> Platform=Win32</div><div class="line"><span class="preprocessor"># 从本地下载tomcat。否则从外网下载非常慢。</span></div><div class="line">mvn package -Pdist,native-win -DskipTests -Dtar -Dtomcat.version=<span class="number">6.0</span><span class="number">.36</span> -Dtomcat.download.url=file:<span class="comment">//e:/apache-tomcat-6.0.36.tar.gz</span></div></pre></td></tr></table></figure>
+
+<p>编译成功后在hadoop-dist生成tar包。和linux一样。</p>
+<h2 id="一些注意事项">一些注意事项</h2>
+<p>JDK的路径不要包含空格<br>hadoop的代码所在路径尽量简短。比如e:\h252<br>执行命令时总是出现一个warn：unable to load native lib。但编译时其实编译了native库的，开debug日志似乎是说hadoop.dll有问题，暂时不明白是怎么回事。<br>虽然我是32位winxp下编译的，但拿到64位win7中也能用，因为我只是当做客户端来用，访问hdfs，提交job之类的。如果在windows中部署集群估计就不能通用了。<br>其他一些事项见BUILDING.txt</p>
+<h1 id="windows客户端使用">windows客户端使用</h1>
+<p>这个客户端可以在windows下读写2.5.2、2.2.0的hdfs。可以向2.5.2的yarn提交任务，不能向2.2.0的yarn提交任务，见<a href="https://issues.apache.org/jira/browse/MAPREDUCE-4052" target="_blank" rel="external">MAPREDUCE-4052</a>。（有人给出过解决方法，但只是临时方案，比较麻烦）<br>在32位WinXP SP3和64位Win7中测试通过。</p>
+<h2 id="设置JAVA_HOME">设置JAVA_HOME</h2>
+<p>为避免一些不必要的问题，JAVA_HOME的路径不要有空格。<br>下载jce的jar替换JAVA_HOME/jre/lib/security中的同名文件。如果是OpenJDK不用替换。<br>修改HADOOP_HOME/etc/hadoop/hadoop-env.cmd：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">set JAVA_HOME=D:<span class="command">\test</span><span class="command">\jdk</span>1.6.0_30</div></pre></td></tr></table></figure>
+
+<h2 id="kerberos认证">kerberos认证</h2>
+<p>首先安装kerberos的win客户端：<a href="http://web.mit.edu/kerberos/dist/kfw/3.2/kfw-3.2.2/kfw-3-2-2.exe" target="_blank" rel="external">http://web.mit.edu/kerberos/dist/kfw/3.2/kfw-3.2.2/kfw-3-2-2.exe</a>。现在有4.x版本的了，但我还是觉得这个3.2的用着方便。<br>设置c:\windows\krb5.ini的过程不多说了。</p>
+<p>认证首先要有keytab文件。<br>win版的kerberos似乎有些问题，必须手动设置一下票据缓存的位置，否则hadoop认证时会失败。而且在win7下和winxp下输出也不同。</p>
+<p>Win7下的输出：<br><img src="/2015/06/27/hadoop-and-windows/1.png" alt=""></p>
+<p>WinXP下的输出：<br><img src="/2015/06/27/hadoop-and-windows/2.png" alt=""></p>
+<p>KRB5CCNAME环境变量可以设置为任意文件名，有权限就行。<br>无论如何，如果kinit命令没有出错，就可以认为kerberos认证成功了。</p>
+<h2 id="访问hdfs和yarn">访问hdfs和yarn</h2>
+<p>大多数命令都跟linux下是一样的。<br>执行ls命令验证下：<br><img src="/2015/06/27/hadoop-and-windows/3.png" alt=""></p>
+<p>提交一个wordcount任务：<br><img src="/2015/06/27/hadoop-and-windows/4.png" alt=""></p>
+<h2 id="一些注意事项-1">一些注意事项</h2>
+<p>win客户端不能-text lzo文件，似乎没有windows可用的lzo库。google的话能找到一个链接：<a href="http://gnuwin32.sourceforge.net/packages/lzo.htm" target="_blank" rel="external">http://gnuwin32.sourceforge.net/packages/lzo.htm</a>，可以在win下安装，但试过不好使。<br>Unable to load native-hadoop这个warn，没找到办法消除。我已经编译了hadoop.dll，但还是有warn。可以set HADOOP_ROOT_LOGGER=DEBUG,console开下debug日志，看下具体的错误。暂时没法解决。<br>注意core-site.xml中的hadoop.tmp.dir设置，默认是/tmp/hadoop-${user.name}，会在硬盘上自动建个文件夹。</p>
+<h1 id="在eclipse中读写HDFS">在eclipse中读写HDFS</h1>
+<p>其实跟windows没啥关系。只是我一般用win下的eclipse，写到这正好想起来，顺便记下。仅供调试使用。<br>其实也可以用于Linux下，一样的道理。</p>
+<p>关键问题就是如何获得必要的Configuration对象。正常情况下把core-site.xml和hdfs-site.xml放到classpath里，再conf.addResource(“hdfs-site.xml”)就可以了（core-site.xml会自动加载）。<br>但其实不是所有属性都是必要的。测试时完全可以在代码里手动设置，不用配置文件。<br>代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) throws IOException {</div><div class="line">    <span class="comment">// kerberos的配置文件的位置，windows下叫krb5.ini，linux下叫krb5.conf</span></div><div class="line">    System.setProperty(<span class="string">"java.security.krb5.conf"</span>, <span class="string">"e:/Documents/TEMP/krb5.ini"</span>);</div><div class="line">    <span class="comment">// 在windows下会需要一个winutil.exe的文件，要放在hadoop.home.dir/bin目录下，否则会报个异常，但不影响程序运行</span></div><div class="line">    System.setProperty(<span class="string">"hadoop.home.dir"</span>, <span class="string">"D:\\Hadoop_src\\hadoop-2.2.0"</span>);</div><div class="line">    <span class="comment">// 默认的构造函数会在classpath中查找core-site.xml并加载</span></div><div class="line">    Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line"> </div><div class="line">    <span class="comment">// 第一种方法，直接加载配置文件。需要core-site.xml和hdfs-site.xml都在classpath中</span></div><div class="line">    <span class="comment">// conf.addResource("hdfs-site.xml");</span></div><div class="line"> </div><div class="line">    <span class="comment">// 第二种方法，自己手动set需要的属性，不需要任何xml配置文件</span></div><div class="line">    <span class="comment">// 这里又分两种情况，如果没开启HA或者知道哪台机器是ActiveNN，可以直接写死地址</span></div><div class="line">    <span class="comment">// 否则要加上HA相关配置</span></div><div class="line"> </div><div class="line">    <span class="comment">// non-HA case</span></div><div class="line">    <span class="comment">// conf.setBoolean("hadoop.security.authorization", true);</span></div><div class="line">    <span class="comment">// conf.set("hadoop.security.authentication", "kerberos");      </span></div><div class="line">    <span class="comment">// conf.set("fs.defaultFS", "hdfs://inspur129.photo.163.org:8020");</span></div><div class="line">    <span class="comment">// conf.set("dfs.namenode.kerberos.principal","hdfs/inspur129.photo.163.org@HADOOP.HZ.NETEASE.COM");</span></div><div class="line"> </div><div class="line">    <span class="comment">// HA case</span></div><div class="line">    <span class="comment">// 这里以测试集群为例，参考自己的hdfs-site.xml</span></div><div class="line">    conf.setBoolean(<span class="string">"hadoop.security.authorization"</span>, <span class="keyword">true</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"hadoop.security.authentication"</span>, <span class="string">"kerberos"</span>);        </div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"fs.defaultFS"</span>, <span class="string">"hdfs://hp1"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.nameservices"</span>, <span class="string">"hp1"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.ha.namenodes.hp1"</span>, <span class="string">"nn1,nn2"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.namenode.rpc-address.hp1.nn1"</span>,<span class="string">"inspur120.photo.163.org:8020"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.namenode.rpc-address.hp1.nn2"</span>,<span class="string">"inspur129.photo.163.org:8020"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.client.failover.proxy.provider.hp1"</span>,<span class="string">"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"</span>);</div><div class="line">    conf.<span class="keyword">set</span>(<span class="string">"dfs.namenode.kerberos.principal"</span>,<span class="string">"hdfs/_HOST@HADOOP.HZ.NETEASE.COM"</span>);</div><div class="line"> </div><div class="line">    <span class="comment">// 至此已经获得了正确配置的Configuration对象，可以访问NN了</span></div><div class="line"> </div><div class="line">    <span class="comment">// 用keytab认证</span></div><div class="line">    UserGroupInformation.setConfiguration(conf);</div><div class="line">    UserGroupInformation.loginUserFromKeytab(<span class="string">"spark@HADOOP.HZ.NETEASE.COM"</span>,</div><div class="line">            <span class="string">"E:\\Documents\\TEMP\\spark.keytab"</span>);</div><div class="line"> </div><div class="line">    <span class="comment">// 获得FileSystem对象后，就可以读写hdfs了，客户端API隐藏了很多细节</span></div><div class="line">    FileSystem fs = FileSystem.<span class="keyword">get</span>(conf);</div><div class="line">    InputStream <span class="keyword">in</span> = fs.open(<span class="keyword">new</span> Path(<span class="string">"/tmp/hadoop-env.sh"</span>));</div><div class="line">    IOUtils.copyBytes(<span class="keyword">in</span>, System.<span class="keyword">out</span>, conf, <span class="keyword">false</span>);</div><div class="line">    fs.close();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>推荐还是尽量使用HA的配置吧。</p>
+<p>加上maven依赖即可运行：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>hadoop-client<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>2.2.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这种方法只能用于测试，把配置在程序中写死是很low的。<br>其实除了第一步设置winutil.exe的位置，其他代码在linux下是通用的。</p>
+<p>题外话：<br>上述配置中的hp1/nn1/nn2等名称完全是客户端的，其实可以是任意字符串，只要能对应上就行，比如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"fs.defaultFS"</span>, <span class="string">"hdfs://xyxyxy"</span>);</div><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"dfs.nameservices"</span>, <span class="string">"xyxyxy"</span>);</div><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"dfs.ha.namenodes.xyxyxy"</span>, <span class="string">"jiang,xi"</span>);</div><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"dfs.namenode.rpc-address.xyxyxy.jiang"</span>,<span class="string">"inspur120.photo.163.org:8020"</span>);</div><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"dfs.namenode.rpc-address.xyxyxy.xi"</span>,<span class="string">"inspur129.photo.163.org:8020"</span>);</div><div class="line"><span class="keyword">conf</span>.<span class="keyword">set</span>(<span class="string">"dfs.client.failover.proxy.provider.xyxyxy"</span>,<span class="string">"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"</span>);</div></pre></td></tr></table></figure>
+
+<p>改成这样的配置也可以正常运行。因为hp1之类的名称只是逻辑上的概念，不会真的存在一个叫hp1的机器，客户端API会自动根据配置替换成实际的地址。<br>不过一般用户不用关心这个，直接抄我们配置好的hdfs-site.xml里的就好。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/windows/">
+                #windows
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/06/27/some-gossip/">闲言碎语</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/06/10/socket-exhausted-deadnode/">socket连接过多导致dead node</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/06/27/hadoop-and-windows/"
+             data-title="hadoop与windows" data-url="http://jxy.me/2015/06/27/hadoop-and-windows/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#在windows中编译hadoop"><span class="nav-number">1.</span> <span class="nav-text">在windows中编译hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前置要求"><span class="nav-number">1.1.</span> <span class="nav-text">前置要求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ProtocolBuffer"><span class="nav-number">1.1.1.</span> <span class="nav-text">ProtocolBuffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows_SDK"><span class="nav-number">1.1.2.</span> <span class="nav-text">Windows SDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unix_command-line_tools"><span class="nav-number">1.1.3.</span> <span class="nav-text">Unix command-line tools</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改代码"><span class="nav-number">1.2.</span> <span class="nav-text">修改代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">1.3.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些注意事项"><span class="nav-number">1.4.</span> <span class="nav-text">一些注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#windows客户端使用"><span class="nav-number">2.</span> <span class="nav-text">windows客户端使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置JAVA_HOME"><span class="nav-number">2.1.</span> <span class="nav-text">设置JAVA_HOME</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kerberos认证"><span class="nav-number">2.2.</span> <span class="nav-text">kerberos认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问hdfs和yarn"><span class="nav-number">2.3.</span> <span class="nav-text">访问hdfs和yarn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些注意事项-1"><span class="nav-number">2.4.</span> <span class="nav-text">一些注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在eclipse中读写HDFS"><span class="nav-number">3.</span> <span class="nav-text">在eclipse中读写HDFS</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

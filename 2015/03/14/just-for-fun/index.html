@@ -1,0 +1,975 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="读书,回忆," />
+
+  <title> 《Just for fun —— Linus Torvalds自传》 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              《Just for fun —— Linus Torvalds自传》
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-03-14
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/03/14/just-for-fun/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/14/just-for-fun/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <blockquote class="blockquote-center">Talk is cheap. Show me the code.</blockquote>
+
+<p>其实这本书大概一周前就读完了，只是一直懒得总结。<br>技术的书看多了，偶尔看看这种轻松愉快的调剂下，蛮好的。翻译的也不错。</p>
+<a id="more"></a>
+<p>Linus毫无疑问是大神，但只是别人眼中的而已。跟乔老师、比老师相比，Linus低调的多。<br>但他也不是一个无欲无求的隐者。给人的感觉，1.真实；2.有趣。</p>
+<p>他不会刻意营造一个高高在上的形象，那个年代非常流行这种科技英雄吧，比如Bill Gates。与其说是科技英雄不如说是造富神话。现在不也一样么，各种“导师”，各种“成功学”，各种装X。如Jobs这种，都成为一种信仰了。人们一直在追逐着“风口”，渴望自己能“飞起来”。大众一直是浮躁的。而Linus只是老老实实的写代码，解决着自己的需求。当初他只是觉得Minix不好用，想自己写个Terminal而已。<br>他的不同之处在于他能把coding当做乐趣，并且坚持下来。写一些工具，很多人都能做到。但能不断完善，添加新功能，直至成为一个系统的，凤毛麟角。我最近在尝试一些开源项目，但看到用户提的一堆issue，真是头痛，做了又没有回报（物质的），想坚持真的很难。很多人缺的不是天赋，而是坚持。<br>Linus的天赋当然也不容置疑，Git就是明证。短时间内写出这样风靡世界的工具，几人能做到？<br>Linus成功的另一个重要原因是开源。现今我们对开源软件习以为常（感谢ASF），但在当时还是很前卫的。开源当然有很多好处，但最大的问题在于<strong>管理</strong>，不是说所有人把代码提交过来就完了。现在我们有GitHub、有JIRA、有持续集成、自动化测试，离开这些工具，简直就不会开发了。当年还是用邮件列表交流的，即时通讯都没有。能把这一大堆管起来真的很不容易。毕竟Linux号称是人类史上最大的协作项目。不过我没有经历过那个年代，只是难以想象而已。</p>
+<p>天赋 + 坚持 + 环境，大概就是做成一件大事的必要因素了。</p>
+<p>以上纯属胡言乱语。我对这种“鸡汤”深恶痛绝，只是想看看Linus和我们有什么不同罢了。<br>如果我和Linus的角色对调，我能写出Linux么？只能呵呵了。。。</p>
+<p>话说那一代的程序员似乎都是从硬件开始就了解的特别透彻。可能当时电脑也简单吧，现在已经太复杂了。当时的电脑是可以自己在车库组装起来的。。。<br>为什么外国人都有在车库里搞发明创造的传统呢。。。<br>现在的我们，能拆开机箱清下灰尘就不错了。。。</p>
+<p>Linus对事物有独特的看法，他认为所有的事情都可以分为3个层次：1.生存；2.社会需求；3.娱乐。也就是说，所有事情发展到最后都是为娱乐服务。这不能说绝对正确，但是也有些道理。比如电脑刚发明时只是做科学计算的，现在很多人基本把它当游戏机了。比如手机，以前是用来打电话的，现在也快变成游戏机了。就是因为秉承着这种信念，他才能够把coding当做乐趣吧。</p>
+<p>不管一个工具刚发明的时候是什么目的，人民群众总能找到娱乐的方法。人民群众的智慧是无穷的。。。<br>比如无论什么社交APP，人们都会拿来约X。。。</p>
+<p>摘录书中一些有趣的话：</p>
+<blockquote>
+<p>有时候妈妈叫我吃饭我都不愿出来。这时她就会跟她的一些记者朋友们说，我是个很好养的小孩，只要把我和一台电脑关在一个黑乎乎的小屋里，再时不时扔一点面条进去就行了。</p>
+</blockquote>
+<p>宅啊。。。</p>
+<blockquote>
+<p>当我扛着武器上完了11个月的“体育课”之后，我觉得我余下几十年完全有资格平静快乐、一动不动地度过，以后我唯一的体力活就是敲键盘写代码，或者是抓着一瓶比尔森啤酒享受，这样才叫公平。</p>
+</blockquote>
+<p>有同感。</p>
+<blockquote>
+<p>编程是一件充满创造力的过程。<br>你可以创造出一个世界来，一个自主制定规则的新世界。<br>其实所有程序都是在制定规则。只不过操作系统制定的是最根本的规则。</p>
+</blockquote>
+<p>编程的乐趣到底在哪？就是挑战自己的智力吧。<br>这就是一个高级的智力游戏。<br>但大众往往更喜欢无脑的游戏。比如玩数独的少，玩Angry Birds的多。</p>
+<blockquote>
+<p>竟然有我不认识的Linux用户，当时觉得真有趣。</p>
+</blockquote>
+<p>开源的一大乐趣就是认识各种各样的人。</p>
+<blockquote>
+<p>游戏一直引领着技术的潮流。而且通常程序员最先写的都是游戏。</p>
+</blockquote>
+<p>一切都是为了娱乐。<br>现在的“显卡杀手”都是游戏。。。nVidia和ATI（现在该叫AMD？）某种程度上就是靠游戏推动着的。</p>
+<blockquote>
+<p>曾几何时，男人都是真汉子，自己动手写设备驱动。你是否渴望回到那个时候？<br>                                            ——Linux 0.02版本发布宣言</p>
+</blockquote>
+<p>坦白说，不想。现在的电脑已经太复杂了，不太可能直接在裸设备上写程序了。<br>不过那种洪荒时代的程序员很让人敬佩。据说求伯君那代的程序员都是靠反汇编别人的程序学编程的。。。</p>
+<blockquote>
+<p>从一开始，Linux的分页到磁盘功能就让它在竞争中脱颖而出。</p>
+</blockquote>
+<p>Page to disk原来是Linux发明的啊。我还记得以前Win98的C盘下会有一个超大的win386.swp文件。</p>
+<blockquote>
+<p>我站在台上一副张皇失措的模样，像抱着救生圈一样死死地盯着PPT幻灯片（感谢上帝让微软公司发明出这个软件救了我一命）。</p>
+</blockquote>
+<p>Linus的第一次公开演讲。</p>
+<blockquote>
+<p>1992年3月原本是计划发布0.13版本的，但由于图形用户界面的顺利到位，我信心十足，对于发展完整、可并且支持联网的操作系统的目标，我感觉我们一下子有了95%的把握。所以，我将新发布的版本定为0.95版。<br>天啊，那时我真是太天真了！无知就更不必说了。</p>
+</blockquote>
+<p>Linux内核的版本之谜。</p>
+<blockquote>
+<p>作技术决定倒没什么，难的是在作了技术决定之后，如何圆滑老练地告诉一个人，我为何倾向于采用另一个人的方案。</p>
+</blockquote>
+<p>技术不是一切。</p>
+<blockquote>
+<p>1.0版本的诞生，意味着Linux系统需要开拓一个新的方向：公共关系。</p>
+</blockquote>
+<p>同上，技术不是一切。营销策略也非常重要。<br>1.0版本未必是技术上有什么巨大突破的，但会释放一个明确的商业信号。用户会觉得1.0版本相对0.x而言更可靠。<br>现在很多开源项目也是同样的版本号策略，比如hadoop/hive/hbase。</p>
+<blockquote>
+<p>有些人喜欢加班加点干活，非得轮上两班、三班甚至四班的活不可。我不是那种人。不管是全美达的项目还是Linux的任务，我都不会牺牲睡眠时间。好吧，如果你非要听真话，其实是我非常爱睡觉。</p>
+</blockquote>
+<p>Linus认为与其加班不如多睡觉，提高工作效率。<br>可惜很多老板不这么想。</p>
+<blockquote>
+<p>那些冒险进入微软内部的人告诉我，他们曾在飞镖靶子上见过我的头像。对此我唯一的评论就是：我的鼻子那么大，不会有人射不中吧？</p>
+</blockquote>
+<p>当年媒体也在刻意营造Linux和Windows的对立氛围。</p>
+<blockquote>
+<p>我常常一觉醒来，觉得自己是全世界最幸运的家伙。</p>
+</blockquote>
+<p>我什么时候也能有这种感觉呢。。。</p>
+<blockquote>
+<p>我确实一直就是这么一个混蛋。这个老早就不是什么新鲜事了。<br>搞开放源代码是一回事，但我开放的是源代码，又不是我自己。这不代表我就得比别人更开放，也不代表我就得比别人更容易接受意见。</p>
+</blockquote>
+<p>其实Linus是很能吵架的。。。不过他一般只争论技术问题。</p>
+<blockquote>
+<p>说实话，我一直憎恶那个清心寡欲的修道士形象，因为那个形象一点也不酷。那是个沉闷乏味的形象，而且还不是真的。</p>
+</blockquote>
+<p>媒体的造神运动。</p>
+<blockquote>
+<p>我尤其憎恶别人自认为有资格把他们的观点凌驾于我的个人决定之上（不过，我妻子可能就另当别论了）。</p>
+</blockquote>
+<p>不应该把道德观念强加给别人。<br>当年整个社会的风气就是反战、自由。IT业界也是如此。<br><a href="http://zh.wikipedia.org/wiki/Richard_Stallman" target="_blank" rel="external">理查德斯托曼</a>和他引领的<a href="http://zh.wikipedia.org/wiki/%E8%87%AA%E7%94%B1%E8%BD%AF%E4%BB%B6%E8%BF%90%E5%8A%A8" target="_blank" rel="external">自由软件运动</a>，观念比较极端，认为所有的软件都要用GPL授权，有一个术语：“被GPL”。<br>而Linus相对中立，他并不排斥商业软件。为此也和RMS有很多争论。<br>看看现在的开源界，最流行的许可证是Apache许可。GPL确实过于激进。<br>商业不全是罪恶的。</p>
+<blockquote>
+<p>要是没有意识到和风车较劲有多难，你会觉得那是件很容易做到的事。<br>要是我早知道有多少活要干，而且这些活竟然多到过了十年我还在干——这十年我几乎是全职专注地干这个，我根本就不会起头做这个项目。<br>如果我懂得足够多，能够理解实现Linux的种种问题，我大概发布一次就算完了，不会把Linux拉扯大，到如今这样。<br>但是，我也预测不到这当中好的一面。比如说会有多少人支持我，以及会有多少人和我齐心协力一起搞这个项目。所以，我现在改变主意了：我想，要是事先知道这好的一面，我大概还是会起这个头的。</p>
+</blockquote>
+<p>先迈出第一步再说，但行好事，莫问前程。<br>还没开始就患得患失，是成不了大事的。</p>
+<blockquote>
+<p>说道技术的未来，真正要紧的是人们到底想要什么。<br>如果十五年后我们还在对操作系统高谈阔论，那一定是进化中出了什么问题。可能这话从一个靠写操作系统成名的人嘴里说出来有点奇怪，但事实就是，从统计上来说，根本没有人想要操作系统。<br>事实上，压根就没有人想要电脑。他们想要的只是一个神奇的小玩意，能用来上上网页，写写期末论文，玩玩游戏，记记账之类的。确实，你需要一个电脑和一个操作系统才能做这些事情，但是大多数人永远都不会认识到这一点。</p>
+</blockquote>
+<p>这就是现在的手机、Pad啊。<br>Jobs是否也是有同样观点？才会推出iPhone/iPad？<br>现在的电脑太通用、太复杂了。如果能专注于用户某一方面的需求，并将体验做到极致，是否是更好的思路？<br>另一个例子就是Xbox/PS等，专注于细分市场。</p>
+<blockquote>
+<p>在开源环境中，软件工程师不再只能与公司里雇来的几个同行一起工作，而是能够与世界上最优秀的程序员一起工作。他们必须使出浑身解数才能赢得同行们的尊重。这难道不是一种高效的激励模式吗？</p>
+</blockquote>
+<p>开源的动力。</p>
+<font color="red" size="6">勾起一些回忆</font>
+
+<blockquote>
+<p>我写的第一个程序跟其他人编写的第一个程序没什么两样。<br>10 PRINT “HELLO”<br>20 GOTO 10</p>
+</blockquote>
+<p>我的第一个程序是啥？不严格的说，是小霸王学习机上面的一个BASIC程序。当时完全没有“程序”的概念，只是照着书把一行行代码敲进去。最后会在屏幕上出现一个马里奥，可以用手柄控制它移动。<br>严格的说，是C语言的hello world。当时初中，捧着一本谭浩强的书在学。当时很单纯，以为写程序就是windows界面那种，人家说编程要先学C语言，就买了本书在那看。可惜那本书看了很多遍，也不知道怎么做windows界面。后来才知道VC++/MFC之类的东西。<br>计算机的书真tm贵。。。</p>
+<blockquote>
+<p>开过的车、干过的工作、住过的地方，或者是约会过的情人……有人用这些来追忆往昔，我则以用过的电脑来划分过去。</p>
+</blockquote>
+<p>我也来回忆下。<br>最开始接触电脑应该是小学的微机课吧。当时老师给每人发了一张软盘，电脑必须要用自己的软盘启动。启动之后是DOS，进一个叫“天天练”的系统，天天在里面练打字。五笔口诀我背的特别熟，可惜不会用。。。不过我英文打的很快。每次打完后系统根据你的正确率给你一定的分数（满分100，我每次都有90几），可以用这些分数换一些奖励，比如一些图片，一些文章。当时最吸引我们的是一个“终极奖励”——5000分的游戏。为了攒到5000分我们一遍遍的打字，可惜一直攒不够，倒是把打字练的很熟了，当年会“盲打”是很NB的。。。后来知道这其实是一个弹球游戏，看别人玩过，不好玩。或者用分数换一些文章，里面有些诗之类的。不过如果一直翻页会有一些预言（现在想来应该是诺查丹玛斯），行星十字架、末日之类的，感觉很恐怖。。。<br>还有WPS（我们拿来画图，其实是制表）、LOGO（这个有点像编程了）之类。其他还有些软件吧，印象不深了。</p>
+<p>我家的第一台电脑是我初二的时候，父母买了看股票行情的，但最后基本变成了我一个人的玩具。金长城的品牌机，这台电脑我拆了无数次，配置我记得特别清楚：赛扬466的CPU（老赛扬，好像是没有二级缓存的），32M内存（PC100 SDRAM），SIS620芯片组（集成声卡显卡），4.3G的硬盘，14寸CRT，40倍速的光驱（现在还有倍速这个概念么）。集成显卡还要占掉8M内存，所以实际可用内存只有24M。C盘只有1G，装了Win98系统。还有超级解霸、东方快车、金山词霸等等软件。用56K Modem拨号上网，很贵。家里还特意拉了一条电话线到我房间。也是从这个时候开始买各种电脑杂志买各种书，电脑爱好者、家用电脑世界（我最喜欢的杂志，可惜不久就停刊了）、电脑应用文萃、网友世界、PC应用200X、黑客防线、黑客X档案。各种杂志的光盘放了两大盒子。开始学着攒机（但没钱，只能纸上谈兵）、装系统、各种折腾。也玩了不少游戏，红警、模拟城市、盟军敢死队之类的。那时的经历就决定了我以后会是个码农。。。</p>
+<p>那时信息还很匮乏，了解外部信息的方式就是杂志。<br>最大的乐趣就是试用各种各样的软件（都是杂志附赠的光盘里的）。我会把觉得有意思的软件都收集起来。可惜后来重装系统都丢失了。<br>有个词叫做红客，特别崇拜他们。自己也搞来一些工具，流光、溯雪、各种扫描工具之类的，标准的script kid。可惜只是理论派，从来没有入侵成功，唯一一次进到学校的系统还是弱密码。<br>还尝试过Crack，动态跟踪、反汇编、加壳脱壳。当年动态跟踪的2大利器：TRW2000/SoftICE。可惜汇编完全不懂，只记得暴力破解要把je改成无条件跳转jmp。<br>感觉编程非常神秘。一直想学，可惜没有人能教。<br>另一个乐趣就是帮各种人解决电脑上的问题，有小小的满足感。</p>
+<p>那时QQ还叫OICQ，服务器很烂，申请OICQ号总是申请不到，只能半夜去申请。<br>第一次网聊是在263.net的聊天室。<br>网上的免费资源很多（网络泡沫最盛的时候），申请了很多免费邮箱、免费空间、免费网盘。甚至还买过一本《免费资源大全》的小册子。现在回家还能找到。</p>
+<p>后来我还花压岁钱买了根128M的内存条，小小的升级了下。其他的买不起了。</p>
+<p>大概是高中刚开始的时候吧。老爸给电脑升了下级。主板换成什么我忘了，反正也是SIS的芯片组。CPU Pentium 4 1.6G，硬盘40G（希捷U6），内存256M的DDR，17寸纯平显示器。我又开始了新一轮折腾。当时有2块硬盘，我又开始搞软RAID，甚至自己用泡沫塑料做了个光驱位的硬盘架。。。自己把IDE线剖成一条条的，据说有利于散热。装WinXP，折腾98/2000/XP 3系统，还装过红旗Linux。。。玩大航海时代、GTA VC、各种模拟器游戏（收集各个平台的ROM）。</p>
+<p>当年Flash还很红火，闪客还是很热门的词。我的一大爱好就是收集好玩的Flash动画。很多收藏直到现在还留着。也曾经尝试过Flash 5/Photoshop 6之类的，但实在没有艺术细胞。。。</p>
+<p>可惜高中之后玩电脑就少了。学习压力山大。</p>
+<p>上大学后有了第一台笔记本，联想TY100A，Pentinm M 1.2G、60G硬盘、512M内存（DDR333）、Geforce Go 620。这个电脑很坑爹的地方是只有一个内存插槽。有256M的内存是直接焊在主板上的。另外插了一根256M的内存条。而且散热有些问题，夏天总死机。</p>
+<p>真正开始编程，变成了“业内人士”。</p>
+<p>但再也找不回小时候那种很新奇、很激动的感觉了。。。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/读书/">
+                #读书
+              </a>
+            
+              <a href="/tags/回忆/">
+                #回忆
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/03/21/hexo-theme-sync/">同步hexo主题</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/03/10/hadoop-lzo-and-snappy/">hadoop中的lzo和snappy</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/03/14/just-for-fun/"
+             data-title="《Just for fun —— Linus Torvalds自传》" data-url="http://jxy.me/2015/03/14/just-for-fun/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <p class="post-toc-empty">此文章未包含目录</div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,hdfs,socket,运维," />
+
+  <title> socket连接过多导致dead node // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              socket连接过多导致dead node
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-10
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/06/10/socket-exhausted-deadnode/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/10/socket-exhausted-deadnode/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>近日碰到的一个问题，某些用户的程序耗尽了一些节点的socket资源导致dead node。</p>
+<a id="more"></a>
+<h1 id="症状">症状</h1>
+<p>我们有用zabbix监控NN metrics。<br>17点30左右收到报警，集群出现deadnode，但DN进程还在。<br>查看deadnode的日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="number">2015</span>-<span class="number">06</span>-<span class="number">05</span> <span class="number">16</span>:<span class="number">47</span>:<span class="number">00</span>,<span class="number">663</span> WARN org.apache.hadoop.hdfs.server.datanode.DataNode: IOException <span class="operator">in</span> offerService</div><div class="line">java.net.BindException: Problem binding <span class="built_in">to</span> [hadoop72.photo<span class="number">.163</span>.org/<span class="number">10.160</span><span class="number">.173</span><span class="number">.13</span>:<span class="number">0</span>] java.net.BindException: Address already <span class="operator">in</span> use; For more details see: <span class="keyword">http</span>://wiki.apache.org/hadoop/BindException</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.net.NetUtils.wrapException(NetUtils.java:<span class="number">719</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.ipc.Client.call(Client.java:<span class="number">1351</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.ipc.Client.call(Client.java:<span class="number">1300</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:<span class="number">206</span>)</div><div class="line"><span class="keyword">at</span> com.sun.proxy.$Proxy9.sendHeartbeat(Unknown Source)</div><div class="line"><span class="keyword">at</span> sun.reflect.GeneratedMethodAccessor3.invoke(Unknown Source)</div><div class="line"><span class="keyword">at</span> sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="number">25</span>)</div><div class="line"><span class="keyword">at</span> java.lang.reflect.Method.invoke(Method.java:<span class="number">597</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java:<span class="number">186</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:<span class="number">102</span>)</div><div class="line"><span class="keyword">at</span> com.sun.proxy.$Proxy9.sendHeartbeat(Unknown Source)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB.sendHeartbeat(DatanodeProtocolClientSideTranslatorPB.java:<span class="number">167</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.hdfs.server.datanode.BPServiceActor.sendHeartBeat(BPServiceActor.java:<span class="number">445</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.hdfs.server.datanode.BPServiceActor.offerService(BPServiceActor.java:<span class="number">525</span>)</div><div class="line"><span class="keyword">at</span> org.apache.hadoop.hdfs.server.datanode.BPServiceActor.run(BPServiceActor.java:<span class="number">676</span>)</div><div class="line"><span class="keyword">at</span> java.lang.Thread.run(Thread.java:<span class="number">662</span>)</div></pre></td></tr></table></figure>
+
+<p>这个错误的意思是DN无法向NN发送心跳。<br>NN超过一定时间没有收到心跳，就会将DN标记为dead。这个超时机制见<a href="/2015/04/01/hadoop-tips/">这里第8条</a>。</p>
+<p>但为什么无法发送心跳？检查网络、系统、交换机，都没有任何异常。<br>而且在排查过程中，dead node不断增多，最多时达到6个，已经开始出现missing block。部分用户的任务会失败。</p>
+<p>仔细看上面的异常，发现DN进程试图绑定到0号端口。根据给出的wiki链接，0号端口是让系统自动分配一个空闲的端口。<br>而绑定失败，说明系统已经没有空闲的端口可以分配了。怀疑是网络连接过多。</p>
+<p><code>netstat -anp | grep 1004</code>（1004是DN的RPC端口）看下，发现了8w+的TCP CLOSE_WAIT连接。这8w+里有进来的连接也有出去的连接，没细分。<br>本来-p参数应该能看到进程id的，就能统计到底哪个进程开了这么多socket。但netstat命令我没有sudo权限，只能看到自己的进程，真是蛋疼。</p>
+<p>尝试重启DN进程，没有效果，还是deadnode。<br>尝试重启NM进程，连接数立刻就正常了。deadnode也消失了。<br>于是怀疑是某个用户的container进程的问题。</p>
+<p>在RM的web界面上查看正在运行的job，根据启动时间排除下，只有一个job符合条件。<br>查看所有变为dead node的DN，确实都有这个job的reduce在上面跑。<br>尝试杀掉一个reduce attempt，连接数立刻下降。<br>可以确定就是这个job的问题。</p>
+<p>杀掉这个job，所有DN恢复正常。</p>
+<p>另外，在这个过程中，出现了一次NN切换，具体原因不明，不知是否和这次事件有关。好在没有造成什么影响。</p>
+<h1 id="分析">分析</h1>
+<p>事后跟用户沟通，他的代码大概是这么写的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reduce</span>(Text key, Iterable&lt;LongWritable&gt; values,</div><div class="line">				Context context) {</div><div class="line">	FileSystem fs=FileSystem.<span class="keyword">get</span>(context.getConfiguration());</div><div class="line">	InputStream <span class="keyword">in</span>=fs.open(<span class="keyword">new</span> Path(<span class="string">"some_file"</span>));</div><div class="line">	<span class="comment">// 将数据读到一个map中</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>也就是说，每次reduce都会读取hdfs上一个文件。他的本意是做类似于join的事情，这个读取数据的逻辑应该放到setup()方法里的，但却放到了reduce()方法。<br>而且他最后没有调用in.close()方法，导致打开的socket链接不会释放。</p>
+<p>这个问题很容易重现，我先写一段单机的代码试下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) throws IOException,</div><div class="line">			InterruptedException {</div><div class="line">		Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line">		FileSystem fs = FileSystem.<span class="keyword">get</span>(conf);</div><div class="line">		<span class="comment">// 随便读取hdfs上一个文件</span></div><div class="line">		InputStream <span class="keyword">in</span> = fs.open(<span class="keyword">new</span> Path(<span class="string">"/user/mine/jxy/yarn.cmd"</span>));</div><div class="line">		<span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</div><div class="line">		<span class="keyword">in</span>.read(buffer);</div><div class="line">		Thread.sleep(Integer.MAX_VALUE);</div><div class="line">	}</div></pre></td></tr></table></figure>
+
+<p>运行后，用netstat查看：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">hadoop<span class="variable">@inspur116</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span></div><div class="line">(<span class="constant">Not</span> all processes could be identified, non-owned process info</div><div class="line"> will <span class="keyword">not</span> be shown, you would have to be root to see it all.)</div><div class="line">tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:</span><span class="number">1004</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      -               </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21072</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">27744</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21075</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">27841</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21069</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">25892</span>/java      </div><div class="line">unix  <span class="number">2</span>      [ <span class="constant">ACC</span> ]     <span class="constant">STREAM</span>     <span class="constant">LISTENING</span>     <span class="number">3620589941</span> -                   <span class="regexp">/var/run</span><span class="regexp">/hadoop-hdfs/dn</span>.<span class="number">1004</span></div></pre></td></tr></table></figure>
+
+<p>因为我启动了3个进程，所以有3个CLOSE_WAIT的连接。<code>dn.1004</code>那个是用于short-circuit read的<code>unix domain socket</code>，而不是我们通常说的<code>network socket</code>，忽略。<br>可见如果不调用in.close()确实会造成很多CLOSE_WAIT的连接。</p>
+<p>如果在一个进程中循环调用那段代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">hadoop<span class="variable">@inspur116</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span></div><div class="line">(<span class="constant">Not</span> all processes could be identified, non-owned process info</div><div class="line"> will <span class="keyword">not</span> be shown, you would have to be root to see it all.)</div><div class="line">tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:</span><span class="number">1004</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      -               </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21137</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21143</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21182</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21178</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21139</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21141</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">tcp        <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21180</span>    <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="constant">CLOSE_WAIT</span>  <span class="number">31153</span>/java      </div><div class="line">unix  <span class="number">2</span>      [ <span class="constant">ACC</span> ]     <span class="constant">STREAM</span>     <span class="constant">LISTENING</span>     <span class="number">3620589941</span> -                   <span class="regexp">/var/run</span><span class="regexp">/hadoop-hdfs/dn</span>.<span class="number">1004</span></div></pre></td></tr></table></figure>
+
+<p>如果登陆到10.160.128.193这台DN上去看：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">hadoop<span class="variable">@inspur122</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span></div><div class="line">(<span class="constant">Not</span> all processes could be identified, non-owned process info</div><div class="line"> will <span class="keyword">not</span> be shown, you would have to be root to see it all.)</div><div class="line">tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:</span><span class="number">1004</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      -               </div><div class="line">tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">10.160</span>.<span class="number">128.193</span><span class="symbol">:</span><span class="number">1004</span>     <span class="number">10.160</span>.<span class="number">128.191</span><span class="symbol">:</span><span class="number">21184</span>    <span class="constant">FIN_WAIT2</span>   -               </div><div class="line">unix  <span class="number">2</span>      [ <span class="constant">ACC</span> ]     <span class="constant">STREAM</span>     <span class="constant">LISTENING</span>     <span class="number">69412045</span> -                   <span class="regexp">/var/run</span><span class="regexp">/hadoop-hdfs/dn</span>.<span class="number">1004</span></div></pre></td></tr></table></figure>
+
+<p>客户端出现CLOSE_WAIT我可以理解，因为没有主动关闭。就算接到了服务端的FIN包，虽然会ACK，但不会返还一个FIN包。<br>服务端出现FIN_WAIT2不是很明白，而且和客户端的CLOSE_WAIT不是一一对应的。大概是因为服务端主动关闭socket，等待客户端返还一个FIN包，一直没有回应，就超时了，直接关闭了吧。我计算机网络学的比较烂。。。<br>google找到了一个参数tcp_fin_timeout：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 这个目录下还有很多关于网络的参数</span></div><div class="line">hadoop@inspur122:~$ cat /<span class="keyword">proc</span>/sys/net/ipv4/tcp_fin_timeout</div><div class="line"><span class="number">60</span></div></pre></td></tr></table></figure>
+
+<p>就是说一个FIN_WAIT2的连接超过60秒会直接关掉。大概吧。</p>
+<p>接下来把这段代码写到wordcount里，每次map都读这个文件，而且不关闭。<br>提交job到测试集群，可以观察到连接数暴涨：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span> | wc -l</div><div class="line"><span class="number">53539</span></div><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span> | wc -l</div><div class="line"><span class="number">89481</span></div><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span> | wc -l</div><div class="line"><span class="number">119334</span></div><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~</span><span class="variable">$ </span>netstat -anp | grep <span class="number">1004</span> | wc -l</div><div class="line"><span class="number">173461</span></div></pre></td></tr></table></figure>
+
+<p>过一段时间后出现dead node。跟线上集群之前的症状一样。<br>查看map的日志可以看到很多dead node异常。</p>
+<p>但观察到一个有意思的事。/user/mine/jxy/yarn.cmd这个文件只有一个block，位于3台机器上。这3台机器会比其他节点先挂（挂指的是不能向NN发心跳）。<br>其他机器上挂掉时都是大量CLOSE_WAIT的连接。但这3台机器挂掉时还有大量的FIN_WAIT2连接。<br>可以认为，普通节点，socket资源都耗费在<strong>出去的连接</strong>上了。而这3台机器还有一些资源耗费在<strong>进来的连接</strong>上。</p>
+<p>而且这3台机器也不是一起挂掉的，而是按一个固定的顺序。<br>因为client读取hdfs数据时，是从NN处获取一个DN列表（在我们的集群上就是3个），然后依次尝试。如果一个DN不通就尝试下一个。<br>猜测NN返回的列表顺序是固定的（不考虑本地性的情况下）。但没看代码验证过。</p>
+<p>结论：InputStream必须close啊。。。</p>
+<h2 id="关于socket">关于socket</h2>
+<p><a href="http://en.wikipedia.org/wiki/Network_socket" target="_blank" rel="external">wiki</a>讲的很清楚：一个socket=IP+端口+协议。<br>所以TCP的<code>127.0.0.1:80</code>和UDP的<code>127.0.0.1:80</code>是两个不同的socket，不会互相影响。<br>但我们所说的socket一般默认都是指TCP。</p>
+<h2 id="关于TCP连接状态">关于TCP连接状态</h2>
+<p>关于TCP socket的状态，最权威的当然是<a href="https://www.rfc-editor.org/rfc/rfc793.txt" target="_blank" rel="external">RFC</a>。但一般人看不了这个。还是翻翻计算机网络的教材吧。。。好在我还留着。<br>关于CLOSE_WAIT，<a href="http://blog.sina.com.cn/s/blog_408c00570100eek0.html" target="_blank" rel="external">这篇文章</a>讲的还算清楚。</p>
+<p>之前说过FIN_WAIT2会在一分钟内超时，其实CLOSE_WAIT放着不管也会超时并释放的，见<a href="http://ahuaxuan.iteye.com/blog/657511" target="_blank" rel="external">这个文章</a>。但默认超时是2个小时，足够把集群搞挂了。。。<br>另外这个超时机制不是针对CLOSE_WAIT的，对所有TCP连接都生效。</p>
+<h1 id="hbase_regionserver">hbase regionserver</h1>
+<p>其实处理<a href="/2015/04/07/hbase-switch-problem/">上次hbase的事故</a>时，我就观察到了一些regionserver有大量的CLOSE_WAIT连接。<br>当时虽然觉得有点奇怪，但没有深究。<br>借这次的机会看了下。本来以为是bug，相关JIRA：<a href="https://issues.apache.org/jira/browse/HDFS-5671" target="_blank" rel="external">HDFS-5671</a>、<a href="https://issues.apache.org/jira/browse/HBASE-9393" target="_blank" rel="external">HBASE-9393</a>、<a href="https://issues.apache.org/jira/browse/HBASE-11833" target="_blank" rel="external">HBASE-11833</a></p>
+<p>但后来发现CLOSE_WAIT的连接都是ipv6的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="title">tcp6</span>       <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160.128.139:21508</span>    <span class="number">10.160.128.139:1004</span>     CLOSE_WAIT  <span class="number">16987</span>/java      </div><div class="line">tcp6       <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160.128.139:64814</span>    <span class="number">10.160.128.139:1004</span>     CLOSE_WAIT  <span class="number">16987</span>/java      </div><div class="line">tcp6       <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160.128.139:16763</span>    <span class="number">10.160.128.139:1004</span>     CLOSE_WAIT  <span class="number">16987</span>/java      </div><div class="line">tcp6       <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160.128.139:34750</span>    <span class="number">10.160.128.139:1004</span>     CLOSE_WAIT  <span class="number">16987</span>/java      </div><div class="line">tcp6       <span class="number">1</span>      <span class="number">0</span> <span class="number">10.160.128.139:30541</span>    <span class="number">10.160.128.139:1004</span>     CLOSE_WAIT  <span class="number">16987</span>/java</div></pre></td></tr></table></figure>
+
+<p>看来启动JVM时没加上<code>-Djava.net.preferIPv4Stack=true</code>参数，找时间重启下regionserver再观察下。</p>
+<h1 id="遗留的问题">遗留的问题</h1>
+<h2 id="NN为何切换？">NN为何切换？</h2>
+<p>原因不明。。不知道当时NN的连接数状况。<br>如果确实是这个job导致的，为何切换后的NN一直很稳定。<br>先认为是个偶然事件吧。</p>
+<p>调查NN切换的过程中倒是发现了checkpoint的另一个bug：<a href="https://issues.apache.org/jira/browse/HDFS-6184" target="_blank" rel="external">HDFS-6184</a>。相关分析见<a href="/2015/04/16/standby-namenode-slow-web/">这篇文章</a>最后。</p>
+<h2 id="为何只有少量dead_node？">为何只有少量dead node？</h2>
+<p>按理说，这个job能把整个集群搞挂的。为何最多时只挂了6个节点？<br>是因为发现比较及时么？<br>还是说用户数据倾斜比较严重，某些reduce数据量小，所以触发reduce()方法的次数也少？</p>
+<h2 id="netstat_-anp为何有重复记录？"><code>netstat -anp</code>为何有重复记录？</h2>
+<p>我之前说<code>netstat -anp | grep 1004 | wc -l</code>有8w+记录。但端口号最大就是65535啊，为啥会有这么多连接。<br>其实<code>netstat -anp</code>输出的记录里，有些是重复的，不知为何。如果去重后，就5w左右。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/hdfs/">
+                #hdfs
+              </a>
+            
+              <a href="/tags/socket/">
+                #socket
+              </a>
+            
+              <a href="/tags/运维/">
+                #运维
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/06/27/hadoop-and-windows/">hadoop与windows</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/06/10/linux-tips/">Linux豆知识</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/06/10/socket-exhausted-deadnode/"
+             data-title="socket连接过多导致dead node" data-url="http://jxy.me/2015/06/10/socket-exhausted-deadnode/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#症状"><span class="nav-number">1.</span> <span class="nav-text">症状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于socket"><span class="nav-number">2.1.</span> <span class="nav-text">关于socket</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于TCP连接状态"><span class="nav-number">2.2.</span> <span class="nav-text">关于TCP连接状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hbase_regionserver"><span class="nav-number">3.</span> <span class="nav-text">hbase regionserver</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遗留的问题"><span class="nav-number">4.</span> <span class="nav-text">遗留的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NN为何切换？"><span class="nav-number">4.1.</span> <span class="nav-text">NN为何切换？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为何只有少量dead_node？"><span class="nav-number">4.2.</span> <span class="nav-text">为何只有少量dead node？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#netstat_-anp为何有重复记录？"><span class="nav-number">4.3.</span> <span class="nav-text">netstat -anp为何有重复记录？</span></a></li></ol></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

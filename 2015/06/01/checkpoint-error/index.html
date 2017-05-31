@@ -1,0 +1,926 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,namenode,HA,checkpoint,运维," />
+
+  <title> checkpoint异常需要手动合并editlog // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              checkpoint异常需要手动合并editlog
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-01
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/06/01/checkpoint-error/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/01/checkpoint-error/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>最近我们集群的SNN发生了一些异常，记录下。</p>
+<a id="more"></a>
+<p>关于SNN的作用，见<a href="/2015/04/16/standby-namenode-slow-web/">我以前的一篇文章</a>。</p>
+<h1 id="关于txid">关于txid</h1>
+<p>txid用于标记一条editlog。<br>一般在ANN的dfs.name.dir有几种文件：</p>
+<ul>
+<li>fsimage_XXX，表示这个fsimage文件已经将txid=XXX的editlog合并进来了。这种文件必定有一个同名的md5文件对应。</li>
+<li>fsimage.ckpt_XXX，表示正在做checkpoint的一个fsimage文件，其实就是正在从SNN copy的一个文件</li>
+<li>edits_XXX-YYY，包含从XXX到YYY的所有editlog</li>
+<li>edits_inprogress_XXX，当前正在写的editlog文件，初始的txid是XXX</li>
+</ul>
+<p>NN启动时会加载txid最大的一个fsimage_XXX文件。然后读取XXX之后的所有editlog并合并。如果editlog不连续，NN无法启动。<br>当NN启动完成后，会自动做一次checkpoint。之后开始写新的edits_inprogress文件。</p>
+<h1 id="异常原因">异常原因</h1>
+<p>4月30号删除了大量数据，fsimage文件大小从6G减小到3G。<br>由于找不回当时的日志了，不知道发生了什么。原来的fsimage_AAA有6G左右，经过一次checkpoint后生成了一个3G多的fsimage_BBB文件。<br>但这个BBB不是任何edits文件的边界，所以无法基于这个fsimage_BBB文件继续合并editlog。<br>journalnode的日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">2015-05-02 00:00:14,323 WARN org.apache.hadoop.ipc.Server: IPC Server <span class="operator"><span class="keyword">handler</span> <span class="number">4</span> <span class="keyword">on</span> <span class="number">8485</span>, <span class="keyword">call</span> org.apache.hadoop.hdfs.qjournal.protocol.QJournalProtocol.getEd</span></div><div class="line">itLogManifest <span class="keyword">from</span> <span class="number">172.17</span><span class="number">.1</span><span class="number">.10</span>:<span class="number">48924</span> <span class="keyword">Call</span>#<span class="number">572756</span> Retry#<span class="number">0</span>: error: java.lang.IllegalStateException: Asked <span class="keyword">for</span> firstTxId <span class="number">1604743888</span> which <span class="keyword">is</span> <span class="keyword">in</span> the middle <span class="keyword">of</span> fi</div><div class="line">le /home/hadoop/jn/hz-cluster1/<span class="keyword">current</span>/edits_0000000001604742607-<span class="number">0000000001604746980</span></div><div class="line">java.lang.IllegalStateException: Asked <span class="keyword">for</span> firstTxId <span class="number">1604743888</span> which <span class="keyword">is</span> <span class="keyword">in</span> the middle <span class="keyword">of</span> file /home/hadoop/jn/hz-cluster1/<span class="keyword">current</span>/edits_0000000001604742607-</div><div class="line"><span class="number">0000000001604746980</span></div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.FileJournalManager.getRemoteEditLogs(FileJournalManager.java:<span class="number">198</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.qjournal.<span class="keyword">server</span>.Journal.getEditLogManifest(Journal.java:<span class="number">640</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.qjournal.<span class="keyword">server</span>.JournalNodeRpcServer.getEditLogManifest(JournalNodeRpcServer.java:<span class="number">181</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.qjournal.protocolPB.QJournalProtocolServerSideTranslatorPB.getEditLogManifest(QJournalProtocolServerSideTranslatorPB.java:<span class="number">203</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.qjournal.protocol.QJournalProtocolProtos$QJournalProtocolService$<span class="number">2.</span>callBlockingMethod(QJournalProtocolProtos.java:<span class="number">17453</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.ipc.ProtobufRpcEngine$<span class="keyword">Server</span>$ProtoBufRpcInvoker.<span class="keyword">call</span>(ProtobufRpcEngine.java:<span class="number">585</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.ipc.RPC$<span class="keyword">Server</span>.<span class="keyword">call</span>(RPC.java:<span class="number">928</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.ipc.<span class="keyword">Server</span>$<span class="keyword">Handler</span>$<span class="number">1.</span>run(<span class="keyword">Server</span>.java:<span class="number">2048</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.ipc.<span class="keyword">Server</span>$<span class="keyword">Handler</span>$<span class="number">1.</span>run(<span class="keyword">Server</span>.java:<span class="number">2044</span>)</div><div class="line">    <span class="keyword">at</span> java.security.AccessController.doPrivileged(Native Method)</div><div class="line">    <span class="keyword">at</span> javax.security.auth.Subject.doAs(Subject.java:<span class="number">396</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:<span class="number">1491</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.ipc.<span class="keyword">Server</span>$<span class="keyword">Handler</span>.run(<span class="keyword">Server</span>.java:<span class="number">2042</span>)</div></pre></td></tr></table></figure>
+
+<p>无论是NN直接读取editlog，还是通过JN读取editlog，都必须从一个edits文件的边界开始读，不能一个中间的txid开始读。<br>从生成这个文件开始，SNN无论尝试rollEditLog还是checkpoint都会直接失败。因为读取editlog会直接抛异常。<br>无法rollEditLog，导致ANN一直在写edits_in_process文件，这个文件非常大，将近10G。<br>无法checkpoint，导致ANN的fsimage停在BBB版本。如果failover肯定会失败。</p>
+<h1 id="解决过程">解决过程</h1>
+<p>4月30号之后，这个问题一直没被发现。<br>5月10号，萧山ANN出了点问题，碰到一个bug：<a href="https://issues.apache.org/jira/browse/HDFS-6289" target="_blank" rel="external">HDFS-6289</a>。<br>5月11号，为了防止同样的问题，打算重启下滨江的SNN（hadoop0.photo）。发现启动后总是显示有missing block。虽然能收到所有节点的心跳。<br>检查了hadoop0的日志，发现了之前说的读取editlog的异常。怀疑是元数据有问题。<br>看了下dfs.name.dir，发现了一个10G的edits文件，非常震惊。。。分析日志后发现了fsimage_BBB文件的异常。<br>万幸这个问题不影响ANN的正常功能。但风险很大，一旦ANN挂掉，就起不来了。</p>
+<h2 id="让SNN合并editlog">让SNN合并editlog</h2>
+<p>基于fsimage_BBB文件NN不可能正常启动。好在NN会保留fsimage的2个备份。原来6G多的fsimage_AAA还在，这个文件是正常的，AAA之后所有的editlog也在。只要基于这个文件，手动生成最新的fsimage即可。<br>首先尝试让hadoop0自己去合并，删掉dfs.name.dir中的fsimage_BBB即可。SNN启动过程中会加载txid最大的一个fsimage。<br>由于hadoop0是HA的配置，所以所有editlog都是从journal node中读取的。<br>总共有10G左右的editlog要合并（10多天的量），editlog要一条一条回放，要15小时左右。<br>于是放着NN进程自己合并，明天再来观察。</p>
+<p>5月12号，检查hadoop0的日志，发现虽然合并editlog成功了，但之后报了一个kerberos的异常。NN还是无法启动。<br>猜测是kerberos ticket超过10小时过期了，之后NN读取journal node异常，直接自杀。<br>正常情况下NN中应该有线程负责定期更新ticket的，但合并editlog的过程却没有更新，因为NN相关的服务还没启动。<br>可能设计的时候没想到这种情况。</p>
+<h2 id="单独启动一个NN">单独启动一个NN</h2>
+<p>尝试启动一个单机的、关闭security的NN进程，用来合并editlog。这样NN会直接从dfs.name.dir读文件，而不是读journal node，也不存在kerberos的问题了。<br>合并后的文件应该可以通用的。<br>如果这个方法还不行，就只能分析fsimage的结构，自己写程序处理了。</p>
+<p>在inspur131上直接copy一份tar包，修改配置，只保留几个配置文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~/jxy/edits/hadoop-</span><span class="number">2.2</span>.<span class="number">0</span><span class="variable">$ </span>ls -lh etc/hadoop</div><div class="line">总用量 <span class="number">24</span>K</div><div class="line">-rw-r--r-- <span class="number">1</span> hadoop netease  <span class="number">441</span>  <span class="number">5</span>月 <span class="number">12</span> <span class="number">12</span><span class="symbol">:</span><span class="number">20</span> core-site.xml</div><div class="line">-rw-r--r-- <span class="number">1</span> hadoop netease <span class="number">4.0</span>K  <span class="number">5</span>月 <span class="number">12</span> <span class="number">12</span><span class="symbol">:</span><span class="number">21</span> hadoop-env.sh</div><div class="line">-rw-r--r-- <span class="number">1</span> hadoop netease  <span class="number">575</span>  <span class="number">5</span>月 <span class="number">12</span> <span class="number">12</span><span class="symbol">:</span><span class="number">20</span> hdfs-site.xml</div><div class="line">-rw-r--r-- <span class="number">1</span> hadoop netease <span class="number">9.3</span>K  <span class="number">5</span>月 <span class="number">12</span> <span class="number">12</span><span class="symbol">:</span><span class="number">20</span> log4j.properties</div></pre></td></tr></table></figure>
+
+<p>core-site.xml里只保留一个属性：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">value</span>&gt;</span>hdfs://inspur131.photo.163.org:8020<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>hdfs-site.xml也只保留一个属性：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.name.dir<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">value</span>&gt;</span>/home/hadoop/jxy/edits/name<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>hadoop-env.sh里只设置JAVA_HOME属性。<br>以上就是一个单机的NN进程需要的最小配置了。</p>
+<p>将fsimage_AAA文件和需要的所有edits文件，从NN拷到inspur131上，/home/hadoop/jxy/edits/name目录。然后启动NN：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 不开启security，也就不用sudo了</span></div><div class="line">hadoop<span class="variable">@inspur131</span><span class="symbol">:~/jxy/edits/hadoop-</span><span class="number">2.2</span>.<span class="number">0</span>/sbin<span class="variable">$ </span>./hadoop-daemon.sh start namenode</div></pre></td></tr></table></figure>
+
+<p>由于没有设置HADOOP_LOG_DIR，日志会放在HADOOP_HOME/logs。<br>在NN的web界面可以看到合并的进度。</p>
+<p>5月13号，inspur131上的NN进程合并完毕，总共用了15小时左右：<br><img src="/2015/06/01/checkpoint-error/nn.png" alt=""></p>
+<p>由于没有启动DN，所以NN会一直处于safemode。<br>观察dfs.name.dir，已成功生成fsimage文件。<br><strong>editlog合并结束会自动saving checkpoint，见上图，不要自己-saveNamespace。</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">hadoop@inspur131:~/jxy/edits/name/current$</span> <span class="comment">ls</span> <span class="literal">-</span><span class="comment">lh</span> <span class="comment">|</span> <span class="comment">tail</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span> <span class="comment">2</span><span class="string">.</span><span class="comment">7M</span>  <span class="comment">5月</span> <span class="comment">12</span> <span class="comment">11:51</span> <span class="comment">edits_0000000001604746981</span><span class="literal">-</span><span class="comment">0000000001604768189</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>  <span class="comment">10G</span>  <span class="comment">5月</span> <span class="comment">12</span> <span class="comment">11:55</span> <span class="comment">edits_0000000001604768190</span><span class="literal">-</span><span class="comment">0000000001681027556</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>  <span class="comment">16M</span>  <span class="comment">5月</span> <span class="comment">12</span> <span class="comment">11:55</span> <span class="comment">edits_0000000001681027557</span><span class="literal">-</span><span class="comment">0000000001681148275</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span> <span class="comment">1</span><span class="string">.</span><span class="comment">0M</span>  <span class="comment">5月</span> <span class="comment">13</span> <span class="comment">05:50</span> <span class="comment">edits_inprogress_0000000001681148276</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span> <span class="comment">6</span><span class="string">.</span><span class="comment">3G</span>  <span class="comment">5月</span> <span class="comment">12</span> <span class="comment">11:57</span> <span class="comment">fsimage_0000000001604721018</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>   <span class="comment">62</span>  <span class="comment">5月</span> <span class="comment">12</span> <span class="comment">11:57</span> <span class="comment">fsimage_0000000001604721018</span><span class="string">.</span><span class="comment">md5</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span> <span class="comment">3</span><span class="string">.</span><span class="comment">2G</span>  <span class="comment">5月</span> <span class="comment">13</span> <span class="comment">05:50</span> <span class="comment">fsimage_0000000001681148275</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>   <span class="comment">62</span>  <span class="comment">5月</span> <span class="comment">13</span> <span class="comment">05:50</span> <span class="comment">fsimage_0000000001681148275</span><span class="string">.</span><span class="comment">md5</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>   <span class="comment">11</span>  <span class="comment">5月</span> <span class="comment">13</span> <span class="comment">05:50</span> <span class="comment">seen_txid</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">hadoop</span> <span class="comment">netease</span>  <span class="comment">207</span>  <span class="comment">5月</span> <span class="comment">13</span> <span class="comment">05:50</span> <span class="comment">VERSION</span></div></pre></td></tr></table></figure>
+
+<h2 id="启动SNN">启动SNN</h2>
+<p>将最新生成的fsimage文件拷到hadoop0，启动SNN。SNN会合并一些最新的editlog（11号、12号新生成的editlog，有2G多）。<br>接下来SNN进程却卡住了。接着有用户反应无法读写hdfs。观察RM界面，job能提交上来，但是一直在ACCPETED状态，无法运行。<br>大概持续了20分钟，杀掉SNN进程后，用户使用恢复正常。<br>由于HA集群中，客户端要先去查询hadoop0是否active。hadoop0卡住导致用户也无法使用。相关原理见<a href="/2015/04/09/hadoop-ha-active-nn/">之前的文章</a>。</p>
+<p>猜测SNN卡住是在处理DN的心跳。所以打算利用NN的白名单机制，一次只加几个DN节点。<br>重新尝试启动SNN，白名单里只有一个DN。启动后SNN也是卡住了，但却没有影响用户的读写。过了10几分钟，NN回复正常。<br>尝试在白名单里加更多的DN节点，每次SNN都会卡一阵，但不阻塞hdfs读写。<br>最后所有DN都加进去，SNN成功离开safemode。<br>观察dfs.name.dir，checkpoint也正常了。</p>
+<h1 id="后续">后续</h1>
+<ol>
+<li>SNN为什么会卡住？当时用jstack看是卡在一个读取editlog的线程上。但具体原因不明。</li>
+<li>当时急于回复服务，很多现场没能保留下来。日志也找不回来了。以后应该注意下。</li>
+<li>应该监控checkpoint过程。两种方式：监控SNN的日志，看是否正常触发；或者监控ANN的dfs.name.dir，看是否定期生成editlog和fsimage。</li>
+</ol>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/namenode/">
+                #namenode
+              </a>
+            
+              <a href="/tags/HA/">
+                #HA
+              </a>
+            
+              <a href="/tags/checkpoint/">
+                #checkpoint
+              </a>
+            
+              <a href="/tags/运维/">
+                #运维
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/06/02/funny-federation/">一个有趣的federation部署</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/06/01/multiple-namenode/">跨集群访问</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/06/01/checkpoint-error/"
+             data-title="checkpoint异常需要手动合并editlog" data-url="http://jxy.me/2015/06/01/checkpoint-error/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于txid"><span class="nav-number">1.</span> <span class="nav-text">关于txid</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常原因"><span class="nav-number">2.</span> <span class="nav-text">异常原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决过程"><span class="nav-number">3.</span> <span class="nav-text">解决过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#让SNN合并editlog"><span class="nav-number">3.1.</span> <span class="nav-text">让SNN合并editlog</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单独启动一个NN"><span class="nav-number">3.2.</span> <span class="nav-text">单独启动一个NN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动SNN"><span class="nav-number">3.3.</span> <span class="nav-text">启动SNN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后续"><span class="nav-number">4.</span> <span class="nav-text">后续</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

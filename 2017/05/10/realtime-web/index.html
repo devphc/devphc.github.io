@@ -1,0 +1,1030 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="websocket,spring," />
+
+  <title> Realtime Web // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Realtime Web
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2017-05-10
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2017/05/10/realtime-web/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/10/realtime-web/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>前段时间研究了下WebSocket，趁着还没忘总结下。</p>
+<a id="more"></a>
+<p>其实除了WebSocket还研究了其他一些东西，顺便还写了个调试WebSocket的<a href="https://github.com/jiangxy/websocket-debug-tool" target="_blank" rel="external">小工具</a>，自己会写前端就是好。。。</p>
+<h1 id="先考个古">先考个古</h1>
+<p>一直以来，前端都缺少一种实时的跟后端交互的机制。这其实是http协议的限制。http协议是典型的“请求-响应”式的协议，换句话说后端不能主动向前端“推送”数据，而必须等待前端先发起请求。</p>
+<p>为了实现数据的实时更新，人们想了很多办法：</p>
+<ul>
+<li>短轮询：最简单的办法。既然必须要前端去获取数据更新，又要实时，干脆就不断的去服务端查询，比如每隔1秒就发起一次ajax看是否有新数据。典型的quick and dirty，会有很多无用的请求，对服务端压力也会比较大。</li>
+<li>长轮询：还是轮询，但处理每次请求时，如果没有新数据，服务端不会立刻返回，而是会先hold一会，直到有数据更新或者超时。前端在一次请求结束后立即发起下一次请求，而不是像短轮询一样定时发起请求。好处显而易见，对后端的请求少了很多，但其实没有解决根本问题。这里有个问题就是后端要hold一个请求多久？有<a href="https://tools.ietf.org/html/rfc6202" target="_blank" rel="external">文献</a>提到过最好是30秒~120秒，这个要看实际情况，受网络环境影响都很大，比如防火墙。</li>
+<li>HTTP Streaming：原理其实是<a href="https://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81" target="_blank" rel="external">HTTP Chunking</a>，中文译作“分块传输编码”。当http响应中<code>Transfer-Encoding</code>的值等于<code>chunked</code>时，服务端不必一次性返回所有数据，而是可以分批次的发送。利用这一特性，可以实现后端向前端的实时的数据推送。在此基础上，又衍生出了<a href="https://en.wikipedia.org/wiki/Comet_%28programming%29" target="_blank" rel="external">Comet</a>和<a href="https://developer.mozilla.org/zh-CN/docs/Server-sent_events/Using_server-sent_events" target="_blank" rel="external">Server-sent Event</a>（一般简称SSE或EventSource，都是同一个东西）等技术。优点在于这是真正的实时推送，服务端可以根据需要控制数据何时发送。缺点在于只能单向通信（后端-&gt;前端），不是全双工的。所以一般要额外使用一些请求用于前端到后端的数据传输。</li>
+<li>Flash/Silverlight之类的插件：这个没啥好说的了，都装了插件了，还有什么功能不能实现的。。。缺点在于普及率不高，而且都是私有的协议，感觉都是上个世代的东西了。</li>
+<li>WebSocket：真正意义上的全双工实时通信。在HTML5引入WebSocket API后，其他方案注定都会变成历史的垃圾堆。。。缺点在于各个浏览器对HTML5的支持程度不一，但这只是时间问题。另一个问题是服务端要做为WebSocket做一些改造。毕竟无论轮询还是streaming，都是基于http的，现有的各种服务端基本都能直接支持。而WebSocket则是一种全新的协议。</li>
+</ul>
+<p>综上，可以看出实现实时web的技术大概可以分为3类：轮询/streaming/websocket。借用一张图：<br><img src="/2017/05/10/realtime-web/websocket-1.png" alt=""></p>
+<p>此外有一些概念需要澄清：</p>
+<ul>
+<li>长连接是一个很模糊的词，不是特指某种技术，长轮询/streaming/websocket都可以算是长连接，别纠结概念。。。长连接一般需要服务端做一些针对性的优化。</li>
+<li>同样，Comet也是一个很模糊的词。Wiki中称之为“umbrella term”，指的是一种服务端推送的“风格”，也不是某种具体的技术。不过一般是基于streaming实现的。很多服务端号称支持Comet，比如tomcat，但大多是自己搞了一套私有的API，尽量不要用，否则代码就会跟特定的容器强耦合了。</li>
+<li>很多人将<a href="https://zh.wikipedia.org/wiki/HTTP%E6%8C%81%E4%B9%85%E8%BF%9E%E6%8E%A5" target="_blank" rel="external">HTTP Keep Alive</a>称为长连接。但keep-alive的含义是在同一个TCP连接上可以进行多次http请求（http 1.0时代每次请求都必须打开一个新的TCP连接），跟我们所说的“实时通信”的长连接不是一个概念，注意区分。</li>
+<li>经常见到一个问题：TCP是否是全双工的？答案应该是肯定的，毕竟WebSocket也是基于TCP的。但其实这个问题并不准确，TCP只是定义了传输层的协议，可以双向传输。至于是否能全双工，是取决于底层硬件的。</li>
+</ul>
+<h1 id="WebSocket">WebSocket</h1>
+<p><a href="https://zh.wikipedia.org/wiki/WebSocket" target="_blank" rel="external">WebSocket</a>的原理其实挺简单的，socket通信在后端早就被玩了无数遍了，只不过对于web端还是个新鲜事。</p>
+<p>首先要注意区分WebSocket协议和WebSocket API。<br>WebSocket是一种独立的基于TCP的通信协议，类似于HTTP、FTP。在OSI的网络模型中，它应该是属于应用层的。WebSocket协议在2011年被IETF定为标准<a href="https://tools.ietf.org/html/rfc6455" target="_blank" rel="external">RFC6455</a>，并被<a href="https://tools.ietf.org/html/rfc7936" target="_blank" rel="external">RFC7936</a>所补充规范。虽然名字叫做WebSocket，最初发明它的目的也是为了web的实时通信，但实际上WebSocket也可以用于其他环境，比如完全可以用java写一个WebSocket客户端。只不过这么用的比较少，毕竟与其用WebSocket不如直接用TCP Socket。<br>对于RFC6455，这里还有一个<a href="https://www.gitbook.com/book/chenjianlong/rfc-6455-websocket-protocol-in-chinese/details" target="_blank" rel="external">中文版</a>。<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/WebSocket" target="_blank" rel="external">WebSocket API</a>则是由W3C制定的在浏览器中使用WebSocket协议进行通信的标准API（主要是js环境中的<code>WebSocket</code>对象），是HTML5规范中的一项，似乎目前还没有正式发布，处于<a href="https://www.w3.org/TR/websockets/" target="_blank" rel="external">候选</a>的状态，但主流的浏览器都已经支持了。</p>
+<p>相对于传统的HTTP长连接，WebSocket的优点在于：</p>
+<ol>
+<li>真正的双向通信。而HTTP只能由客户端发起请求。</li>
+<li>HTTP请求中带有大量的header，很多冗余信息，其实很多流量被浪费掉了，WebSocket则没有这个问题。</li>
+<li>WebSocket协议支持各种Extension，可以实现多路复用等功能。</li>
+</ol>
+<p>WebSocket虽然是应用层协议，但却封装的非常“薄”，可以认为就是对TCP的一个简单封装（要不怎么叫Socket呢），在WebSocket中传输的都是字节流，至于如何解释，要交给上层去做。所以往往会有一个“子协议”的概念，比如后面将要提到的STOMP。</p>
+<h2 id="握手过程">握手过程</h2>
+<p>WebSocket虽然是独立于HTTP的另一种协议，但建立连接时却需要借助HTTP协议进行握手，这也是WebSocket的一个特色，利用了HTTP协议中一个特殊的header：<code>Upgrade</code>。在双方握手成功后，就跟HTTP没什么关系了，会直接在底层的TCP Socket基础上进行通信。</p>
+<p>握手请求的一个例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="request">GET <span class="string">ws://localhost:8080/handlerA</span> HTTP/1.1</span></div><div class="line"><span class="attribute">Host</span>: <span class="string">localhost:8080</span></div><div class="line"><span class="attribute">Connection</span>: <span class="string">Upgrade</span></div><div class="line"><span class="attribute">Pragma</span>: <span class="string">no-cache</span></div><div class="line"><span class="attribute">Cache-Control</span>: <span class="string">no-cache</span></div><div class="line"><span class="attribute">Upgrade</span>: <span class="string">websocket</span></div><div class="line"><span class="attribute">Origin</span>: <span class="string">http://localhost:8080</span></div><div class="line"><span class="attribute">Sec-WebSocket-Version</span>: <span class="string">13</span></div><div class="line"><span class="attribute">Sec-WebSocket-Key</span>: <span class="string">IbMym0RGM6WulBh40amXHw==</span></div><div class="line"><span class="attribute">Sec-WebSocket-Extensions</span>: <span class="string">permessage-deflate; client_max_window_bits</span></div></pre></td></tr></table></figure>
+
+<p>删除了一些无关的header，一些值得注意的地方：</p>
+<ol>
+<li>必须是GET请求。WebSocket的URI都是<code>ws://</code>开头的。</li>
+<li>必须包含<code>Connection: Upgrade</code>和<code>Upgrade: websocket</code>两个header。</li>
+<li><code>Sec-WebSocket-Version</code>用于指定WebSocket协议的版本，一般都是13。</li>
+<li><code>Sec-WebSocket-Key</code>是一个base64编码的字符串，用于确认这是一个WebSocket握手请求而不是普通的http请求。服务端要将这个字符串解码然后和某个固定的字符串拼接后求SHA-1，然后base64编码后再返回。具体的计算过程可以参考RFC。</li>
+<li><code>Sec-WebSocket-Extensions</code>用于协商能使用哪些扩展。</li>
+<li>注意跨域问题，服务端必须要校验Origin字段。</li>
+</ol>
+<p>如果握手成功，返回<code>HTTP 101</code>响应：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="status">HTTP/1.1 <span class="number">101</span> Switching Protocols</span></div><div class="line"><span class="attribute">Server</span>: <span class="string">Apache-Coyote/1.1</span></div><div class="line"><span class="attribute">Upgrade</span>: <span class="string">websocket</span></div><div class="line"><span class="attribute">Connection</span>: <span class="string">upgrade</span></div><div class="line"><span class="attribute">Sec-WebSocket-Accept</span>: <span class="string">FcSPcCOgjs4tIy0aH9in+QmWXcg=</span></div><div class="line"><span class="attribute">Sec-WebSocket-Extensions</span>: <span class="string">permessage-deflate;client_max_window_bits=15</span></div><div class="line"><span class="attribute">Date</span>: <span class="string">Tue, 21 Mar 2017 06:17:04 GMT</span></div></pre></td></tr></table></figure>
+
+<p>注意其中的<code>Sec-WebSocket-Accept</code>字段，就是服务端根据<code>Sec-WebSocket-Key</code>计算后的值。客户端必须校验这个值，校验通过才能建立连接。</p>
+<p>为啥WebSocket会使用这种设计？个人猜测，借助HTTP进行握手有一些好处：</p>
+<ol>
+<li>这样设计WebSocket会使用和HTTP相同的端口（80或443），可以穿过很多防火墙。</li>
+<li>直接使用HTTP header中已有的信息，比如Cookie。很多服务端都会在Cookie中种一个sessionid，WebSocket可以直接使用这个sessionid去识别不同的会话，Spring就是这么搞的。</li>
+<li>暂时没想出来。。。</li>
+</ol>
+<p>话说HTTP都是快20年之前的东西了，就有这种设计，也真是NB。。。</p>
+<h2 id="WebSocket_Frame">WebSocket Frame</h2>
+<p>握手成功后，双方就可以切换到WebSocket协议进行通信了。<br>WebSocket中数据交换的基本单位是“帧（Frame）”，其格式参考RFC中的第五章：<a href="https://tools.ietf.org/html/rfc6455#section-5" target="_blank" rel="external">Data Framing</a>。</p>
+<p><img src="/2017/05/10/realtime-web/websocket-2.png" alt=""></p>
+<p>可以对比TCP的header去理解。几个值得注意的地方：</p>
+<ol>
+<li>FIN位用于指示是最后一个帧，在分片的情况下才有用。</li>
+<li>OPCODE字段用于指示帧的类型，4位，所以最多有16种帧。但其实很多没用到：<ul>
+<li>%x0 代表一个继续帧</li>
+<li>%x1 代表一个文本帧</li>
+<li>%x2 代表一个二进制帧</li>
+<li>%x3-7 保留用于未来的非控制帧</li>
+<li>%x8 代表连接关闭</li>
+<li>%x9 代表ping</li>
+<li>%xA 代表pong</li>
+<li>%xB-F 保留用于未来的控制帧</li>
+</ul>
+</li>
+<li>客户端发送数据时必须要有mask，不知道是为啥，也许是出于安全考虑？</li>
+<li>payload len是变长的，可能是7 bits、7+16 bits或者 7+64 bits。</li>
+<li>payload data由部分组成，分别是“扩展数据（Extension Data）”和“应用数据（Application Data）”。还记得握手时的<code>Sec-WebSocket-Extensions</code>么，如果双方同意使用某个扩展，才会有扩展数据。</li>
+</ol>
+<p>从上文中可以看出，WebSocket将帧分为两类：</p>
+<p>控制帧：</p>
+<ul>
+<li>Close：用于关闭当前WebSocket连接。接收方也要响应一个Close帧，然后关闭TCP连接。</li>
+<li>Ping/Pong：用于维持心跳。当收到一个Ping帧时，必须在响应中发送一个Pong帧。</li>
+</ul>
+<p>数据帧：</p>
+<ul>
+<li>Text：说明payload data是UTF-8编码的字节流。</li>
+<li>Binary：字节流如何解释完全交给上层。</li>
+</ul>
+<p>从数据帧的定义可以看出，WebSocket协议中定义好的“逻辑”很少，很多都需要上层应用去补充。所以说WebSocket是对TCP非常薄的一层封装，往往要搭配“子协议”使用。</p>
+<p>话说，在看RFC的过程中还了解到一个有趣的东西：<a href="https://zh.wikipedia.org/wiki/%E6%89%A9%E5%85%85%E5%B7%B4%E7%A7%91%E6%96%AF%E8%8C%83%E5%BC%8F" target="_blank" rel="external">ABNF</a>，可以用于形式化的描述网络协议，数学中还是有挺多好玩的东西的。</p>
+<h2 id="Extension">Extension</h2>
+<p>WebSocket协议定义了<a href="https://tools.ietf.org/html/rfc6455#section-9" target="_blank" rel="external">Extension</a>，在frame中也定义了Extension Data，决定了服务端如何解释Application Data，进而可以对原有的协议做一些扩展，但却没有定义任何具体的Extension，RFC中的原文是：“This document doesn’t define any extension, but implementations MAY use extensions defined separately.”。</p>
+<p>之前说过WebSocket可以支持多路复用，就是以Extension的形式出现的，但似乎还只是草案，见<a href="https://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-01" target="_blank" rel="external">这里</a>，似乎实际中也没什么应用。客户端倒是<a href="https://github.com/sockjs/websocket-multiplex" target="_blank" rel="external">有个库</a>可以支持，但服务端似乎大多不支持Extension。</p>
+<p>也许以后才会出现更多的Extension吧。</p>
+<h2 id="客户端代码">客户端代码</h2>
+<p>如果直接使用原生的WebSocket API，大概是这个样子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 注意url必须是ws://开头的</span></div><div class="line"><span class="keyword">var</span> host = <span class="string">'ws://localhost:8080/handlerA'</span>;</div><div class="line"><span class="comment">// 这个WebSocket是浏览器内置的对象，必须要浏览器支持</span></div><div class="line"><span class="keyword">var</span> ws = <span class="keyword">new</span> WebSocket(host);</div><div class="line"></div><div class="line">ws.binaryType = <span class="string">'arraybuffer'</span>;</div><div class="line">ws.onopen = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_open(e)};</div><div class="line">ws.onmessage = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_message(e)};</div><div class="line">ws.onclose = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_close(e)};</div></pre></td></tr></table></figure>
+
+<h1 id="SockJS">SockJS</h1>
+<p><a href="https://github.com/sockjs/sockjs-client" target="_blank" rel="external">SockJS</a>本质上是一种fallback机制，由于不是所有的浏览器都支持WebSocket，所以在某些环境下我们必须要选择Streaming或轮询的方案，而人工选择这些方案实在太麻烦了，要兼容的情况也太多。SockJS致力于隐藏这些复杂性，自动根据服务端和客户端的情况选择合适的方案，然后对外提供统一的API，应用层无需考虑具体的传输方式。<br>不过，fallback可能有一些限制，原文：“for some fallbacks transports it is not possible to open more than one connection at a time to a single server.”</p>
+<p>总的来说SockJS支持3类传输方式（就是上面讲过的），优先级依次降低：</p>
+<ol>
+<li>WebSocket，最优选择</li>
+<li>Streaming，如果不支持CORS跨域，还要用iframe+<a href="http://www.cnblogs.com/dolphinX/p/3464056.html" target="_blank" rel="external">postMessage</a>之类的去实现跨域</li>
+<li>Polling，最传统的轮询方式</li>
+</ol>
+<p><img src="/2017/05/10/realtime-web/websocket-3.png" alt=""></p>
+<p>客户端代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 前提是先引入sockjs-client</span></div><div class="line"><span class="comment">// sockjs的url必须是http/https</span></div><div class="line"><span class="keyword">var</span> host = <span class="string">'http://localhost:8080/sockjs/handlerA'</span>;</div><div class="line"><span class="keyword">var</span> ws = <span class="keyword">new</span> SockJS(host);</div><div class="line"></div><div class="line"><span class="comment">// sockjs的api跟原生的websocket是基本一致的，它的目标就是提供一致的编码体验</span></div><div class="line">ws.binaryType = <span class="string">'arraybuffer'</span>;</div><div class="line">ws.onopen = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_open(e)};</div><div class="line">ws.onmessage = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_message(e)};</div><div class="line">ws.onclose = <span class="function"><span class="keyword">function</span><span class="params">(e)</span></span>{on_close(e)};</div></pre></td></tr></table></figure>
+
+<p>SockJS建立连接时会先请求一次<code>/info</code>接口，比如你要连接的url是<code>/sockjs/handlerA</code>，就会先请求<code>/sockjs/handlerA/info</code>（其实就是一次普通的GET请求）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="request">GET <span class="string">/sockjs/handlerA/info?t=1494472167320</span> HTTP/1.1</span></div><div class="line"><span class="attribute">Host</span>: <span class="string">localhost:8080</span></div><div class="line"><span class="attribute">Connection</span>: <span class="string">keep-alive</span></div><div class="line"><span class="attribute">Pragma</span>: <span class="string">no-cache</span></div><div class="line"><span class="attribute">Cache-Control</span>: <span class="string">no-cache</span></div><div class="line"><span class="attribute">Accept</span>: <span class="string">*/*</span></div><div class="line"><span class="attribute">Referer</span>: <span class="string">http://localhost:8080/index.html</span></div><div class="line"><span class="attribute">Accept-Encoding</span>: <span class="string">gzip, deflate, sdch, br</span></div><div class="line"><span class="attribute">Accept-Language</span>: <span class="string">zh-CN,zh;q=0.8,en;q=0.6</span></div></pre></td></tr></table></figure>
+
+<p>服务端会返回一些信息，表示服务端支持哪些传输方式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">{"<span class="attribute">entropy</span>":<span class="value">-<span class="number">490091108</span></span>,"<span class="attribute">origins</span>":<span class="value">[<span class="string">"*:*"</span>]</span>,"<span class="attribute">cookie_needed</span>":<span class="value"><span class="literal">true</span></span>,"<span class="attribute">websocket</span>":<span class="value"><span class="literal">true</span></span>}</div></pre></td></tr></table></figure>
+
+<p>SockJS会结合服务端的信息和客户端的环境，选择合适的传输方式，选择过程还有点复杂的，最多可能需要3~4轮的尝试，再加上DNS解析的耗时，所以建立连接可能会稍微慢一点。<br>以下只讨论使用WebSocket的情况。</p>
+<p>如果服务端和客户端都支持WebSocket，之后的通信会通过一个特殊的URI，类似这种<code>ws://localhost:8080/sockjs/handlerA/489/cn05bzby/websocket</code>，这个url的格式是：<code>ws://host:port/myEndpoint/{server-id}/{session-id}/{transport}</code>，其中：</p>
+<ul>
+<li><code>{server-id}</code> - useful for routing requests in a cluster but not used otherwise.</li>
+<li><code>{session-id}</code> - correlates HTTP requests belonging to a SockJS session.</li>
+<li><code>{transport}</code> - indicates the transport type, e.g. “websocket”, “xhr-streaming”, etc.</li>
+</ul>
+<p>不过目测server-id和session-id都是随机生成的，每次连接都会改变，不知道有啥用。也许是在负载均衡中会用到，Spring的文档中专门讲到过WebSocket的负载均衡。</p>
+<p>sockjs其实会对发送的信息做一些修改，打开chrome的调试工具就可以看到。比如客户端发送的信息会被包装为<code>a[&quot;message1&quot;,&quot;message2&quot;]</code>（JSON数组）的形式，还有字母<code>h</code>作为心跳（每25秒一次），<code>o</code>表示连接已建立，<code>c</code>表示关闭连接之类的，也算是一种简单的子协议吧。</p>
+<p>参考资料：<br><a href="https://github.com/sockjs/sockjs-client/wiki" target="_blank" rel="external">https://github.com/sockjs/sockjs-client/wiki</a></p>
+<h1 id="STOMP">STOMP</h1>
+<p><a href="https://stomp.github.io/" target="_blank" rel="external">STOMP</a>其实跟WebSocket没啥必然关系，它是一种mq协议，最初是设计出来给各种脚本语言用的，跟它对等的应该是<a href="https://www.amqp.org/" target="_blank" rel="external">AMQP</a>、<a href="http://mqtt.org/" target="_blank" rel="external">MQTT</a>等协议。由于工作原因，我之前还研究过一点MQTT、XMPP之类的。<br>如果说AMQP的特点是“强大”（企业级的mq规范，提出了各种model），MQTT的特点是“紧凑”（尤其适用于嵌入式设备），那STOMP的特点就是“简单”。正如它的名字（Simple Text Orientated Messaging Protocol），它的设计思路一直就是保持简单的协议、简单的API。而且它是一种Text-Based Protocol，跟HTTP类似，可读性非常好，也非常易于跨平台。只要你的语言提供Socket操作，你都能很快的实现一个STOMP客户端。甚至直接用telnet当作客户端也可以。</p>
+<p>但简单也就意味着功能上要有所取舍。STOMP中完全没有AMQP中的queue、exchange等概念，换句话说，只有publish-subscribe模式，如果想要更灵活的路由和处理逻辑，就会有点麻烦。</p>
+<p>WebSocket通信中最常用的子协议就是STOMP了，当然也有<a href="https://www.rabbitmq.com/web-mqtt.html" target="_blank" rel="external">用MQTT</a>的，你也可以用自己的私有协议，但用STOMP的好处在于：</p>
+<ul>
+<li>STOMP的可靠性已经经过广泛验证</li>
+<li>支持STOMP的服务端很多：RabbitMQ、ActiveMQ等等</li>
+<li>浏览器上已经有了可用的客户端：<a href="https://github.com/jmesnil/stomp-websocket" target="_blank" rel="external">stomp.js</a></li>
+</ul>
+<p>STOMP 1.1的规范：<a href="http://stomp.github.io/stomp-specification-1.1.html" target="_blank" rel="external">http://stomp.github.io/stomp-specification-1.1.html</a><br>stomp.js的文档：<a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank" rel="external">http://jmesnil.net/stomp-websocket/doc/</a></p>
+<p>话说STOMP协议真的是简单易懂，很快就能看完，自己实现一套估计也不费劲。相比之下看各种RFC真是痛苦。。。</p>
+<p>STOMP中的消息都被抽象为“帧”（有点类似AMQP中message的概念），帧的格式和HTTP非常类似，分为command、header、body三部份。其中比较重要的就是SUBSCRIBE/SEND/MESSAGE帧。SUBSCIRBE帧用于订阅某个destination，SEND帧用于发送数据，MESSAGE帧用于从服务端接收数据。尤其注意下其中的destination header，有点像传统mq中的topic。STOMP不限定destination的格式，可以是任意格式字符串，由服务端去解释，不过一般都是<code>/a/b</code>这种类似路径的格式。</p>
+<p>此外，STOMP还支持认证、事务、ACK之类的机制，不再赘述，详情请参考规范。</p>
+<p>一些客户端代码示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 获取stomp对象的几种方式</span></div><div class="line">Stomp.client(url)  </div><div class="line">Stomp.over(ws)</div><div class="line"></div><div class="line"><span class="comment">// 连接服务端的几种方式</span></div><div class="line">client.connect(login, passcode, connectCallback);</div><div class="line">client.connect(login, passcode, connectCallback, errorCallback);</div><div class="line">client.connect(login, passcode, connectCallback, errorCallback, host);</div><div class="line">client.connect(headers, connectCallback);</div><div class="line">client.connect(headers, connectCallback, errorCallback);</div><div class="line"></div><div class="line">client.disconnect(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert(<span class="string">"See you next time!"</span>);</div><div class="line">};</div><div class="line"></div><div class="line">client.heartbeat.outgoing = <span class="number">20000</span>; <span class="comment">// 设置心跳</span></div><div class="line">client.heartbeat.incoming = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="comment">// client同时是生产者和消费者</span></div><div class="line">client.send(<span class="string">"/queue/test"</span>, {priority: <span class="number">9</span>}, <span class="string">"Hello, STOMP"</span>);  <span class="comment">// 发送消息</span></div><div class="line">client.send(destination, {}, body);</div><div class="line"></div><div class="line"><span class="comment">// 订阅消息</span></div><div class="line"><span class="keyword">var</span> subscription = client.subscribe(<span class="string">"/queue/test"</span>, callback);</div><div class="line"><span class="comment">// 取消订阅</span></div><div class="line">subscription.unsubscribe();</div><div class="line"></div><div class="line"><span class="comment">// start the transaction</span></div><div class="line"><span class="keyword">var</span> tx = client.begin();</div><div class="line"><span class="comment">// send the message in a transaction</span></div><div class="line">client.send(<span class="string">"/queue/test"</span>, {transaction: tx.id}, <span class="string">"message in a transaction"</span>);</div><div class="line"><span class="comment">// commit the transaction to effectively send the message</span></div><div class="line">tx.commit();</div></pre></td></tr></table></figure>
+
+<h1 id="WebSocket_with_Spring">WebSocket with Spring</h1>
+<p>Spring 4开始支持WebSocket，相关配置参考<a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/html/websocket.html" target="_blank" rel="external">文档</a>，我这边也有一个<a href="https://github.com/jiangxy/websocket-debug-tool/tree/master/java" target="_blank" rel="external">例子</a>。</p>
+<p>注意添加必要的依赖：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>spring-messaging<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>4.2.6.RELEASE<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>spring-websocket<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>4.2.6.RELEASE<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="title">scope</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>javax.websocket<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>javax.websocket-api<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>1.1<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="title">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="title">scope</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>Spring对WebSocket的支持还是挺全面的，支持直接使用low-level API，支持sockjs，也支持STOMP，跨域/Handshake Interceptor之类的也都支持。</p>
+<p>值得注意的地方：</p>
+<ol>
+<li>对容器版本有要求，低版本的容器中很可能无法使用。目前只支持Tomcat 7.0.47+、Jetty 9.1+、GlassFish 4.1+、WebLogic 12.1.3+，对于不支持的容器，要自己实现RequestUpgradeStrategy和WebSocketHttpRequestHandler等。</li>
+<li>Spring提供了很多可以配置的参数，比如线程池大小/buffer大小/消息大小限制/心跳等等，但很多参数文档中只是提了一下，没说怎么配。。。我还要去翻dtd文件或者google才知道如何配置。</li>
+<li>Spring提供了java版的SockJS client和STOMP client，一般用于调试。</li>
+<li>可以自动识别http或sockjs的session。</li>
+<li>对于websocket，spring没有专门的认证机制，而是直接用http的认证。</li>
+<li>可以用ApplicationListener监听各种事件，非常有用。</li>
+<li>专门为websocket新增了一个scope：<code>@Scope(scopeName = &quot;websocket&quot;)</code>，可以为每个websocket session单独组装一个bean。</li>
+</ol>
+<p>在使用STOMP时，Spring会作为一个简单的in-memory borker存在，但也加入了一些自己特殊的逻辑，关键是要理解消息的流动过程：</p>
+<p><img src="/2017/05/10/realtime-web/websocket-4.png" alt=""></p>
+<p>可以看出Spring的路由策略非常简单，只是基于消息的destination做前缀匹配。某些消息会直接流向broker，另一些消息则会流向Controller方法，经过一些业务逻辑处理后再流向broker。进入broker的消息则会被被直接发给客户端。Spring提供了非常多的注解用于消息的处理，详见文档。如果有些特殊逻辑不能在Controller中处理，也可以使用Channel Interceptor，上图中的request/broker/response三个channel都可以配置。</p>
+<p>Spring默认会使用一个in-memory broker，但是也可以配置为外部的RabbitMQ、ActiveMQ等，称作relay broker，更加利于扩展和维护。</p>
+<h1 id="其他">其他</h1>
+<p>关于EventSource的更多资料：<br><a href="http://javascript.ruanyifeng.com/htmlapi/eventsource.html" target="_blank" rel="external">http://javascript.ruanyifeng.com/htmlapi/eventsource.html</a><br><a href="http://stackoverflow.com/questions/5195452/websockets-vs-server-sent-events-eventsource" target="_blank" rel="external">http://stackoverflow.com/questions/5195452/websockets-vs-server-sent-events-eventsource</a></p>
+<p>RabbitMQ支持的协议类型：<br><a href="https://www.rabbitmq.com/protocols.html" target="_blank" rel="external">https://www.rabbitmq.com/protocols.html</a></p>
+<p>几种MQ协议的对比：<br><a href="https://blogs.vmware.com/vfabric/2013/02/choosing-your-messaging-protocol-amqp-mqtt-or-stomp.html" target="_blank" rel="external">https://blogs.vmware.com/vfabric/2013/02/choosing-your-messaging-protocol-amqp-mqtt-or-stomp.html</a></p>
+<p>google的过程中经常接触到所谓的wire-level protocol，感觉这也是一个有些模糊的词。wire-level protocol不一定是binary的，也可能是text的。根据wiki的说法，SOAP也算是wire-level。个人感觉，只要协议中规定了数据中如何在网络中传输（关键是理解wire的概念），就算是wire-level protocol。与之相对的反义词是API，比如JMS、JDBC，只规定如何使用，不规定数据如何传输。</p>
+<p>为啥会去研究websocket呢，因为直播中的弹幕有用到。顺便也研究了下直播常用的协议：RTMP（flash），HLS（苹果），RTP/RTCP（一般用于视频电话之类的）。我们在H5端用的是HLS，兼容性好，但是延迟比较大。为了克服这个缺点，有人提出可以用WebSocket传输视频帧，然后在canvas上绘制，居然还真有这种案例，感觉这是邪路啊。。。不过说不定像<a href="https://github.com/Flipboard/react-canvas" target="_blank" rel="external">react-canvas</a>（这货star都破万了）一样，意外的好用。。。</p>
+<p>顺便还复习了一下TCP，感慨于TCP的各种精妙设计，ACK/滑动窗口/重发控制/流控/延迟应答等等，很多时候我们都只是在重复前人啊。。。</p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/websocket/">
+                #websocket
+              </a>
+            
+              <a href="/tags/spring/">
+                #spring
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/04/02/lazy-busy-lazy/">拖更已是常态</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2017/05/10/realtime-web/"
+             data-title="Realtime Web" data-url="http://jxy.me/2017/05/10/realtime-web/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#先考个古"><span class="nav-number">1.</span> <span class="nav-text">先考个古</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WebSocket"><span class="nav-number">2.</span> <span class="nav-text">WebSocket</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#握手过程"><span class="nav-number">2.1.</span> <span class="nav-text">握手过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebSocket_Frame"><span class="nav-number">2.2.</span> <span class="nav-text">WebSocket Frame</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Extension"><span class="nav-number">2.3.</span> <span class="nav-text">Extension</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端代码"><span class="nav-number">2.4.</span> <span class="nav-text">客户端代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SockJS"><span class="nav-number">3.</span> <span class="nav-text">SockJS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STOMP"><span class="nav-number">4.</span> <span class="nav-text">STOMP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WebSocket_with_Spring"><span class="nav-number">5.</span> <span class="nav-text">WebSocket with Spring</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">6.</span> <span class="nav-text">其他</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

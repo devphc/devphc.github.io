@@ -1,0 +1,923 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="java,豆知识," />
+
+  <title> java豆知识 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              java豆知识
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-04-06
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/04/06/java-tips/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/06/java-tips/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>一些零散的java知识点。</p>
+<a id="more"></a>
+<h1 id="关于泛型">关于泛型</h1>
+<p>似乎<code>Class&lt;? extends Xface&gt;</code>和<code>Class&lt;Xface&gt;</code>在很多情况下是等价的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] s) <span class="keyword">throws</span> Exception {</div><div class="line">    Class&lt;? extends TestInterface&lt;String&gt;&gt; cls = getClass(String.class);</div><div class="line">    <span class="comment">// 这两种写法都是正确的</span></div><div class="line">    <span class="comment">// Class&lt;TestInterface&lt;String&gt;&gt; cls = getClass(String.class);        </span></div><div class="line">    cls.newInstance().test(<span class="string">"StringTest"</span>);</div><div class="line"> </div><div class="line">    <span class="comment">// 注释掉的这段代码也是能正常编译的，运行时才会报类转换错误，Map不能转成String</span></div><div class="line">    <span class="comment">// 因为是伪泛型吧，泛型只在编译期检查。只要编译不出错，getClass返回的必定StringTest.class</span></div><div class="line">    <span class="comment">// Class&lt;TestInterface&lt;Map&gt;&gt; cls = getClass(Map.class);</span></div><div class="line">    <span class="comment">// cls.newInstance().test(new HashMap());</span></div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">interface</span> <span class="title">TestInterface</span>&lt;<span class="title">T</span>&gt; </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span>(T param);</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">StringTest</span> <span class="keyword">implements</span> <span class="title">TestInterface</span>&lt;<span class="title">String</span>&gt; </span>{</div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span>(String param) {</div><div class="line">        System.out.println(param);</div><div class="line">    }</div><div class="line">}</div><div class="line"><span class="comment">// StringTest.class不能直接转换成Class&lt;TestInterface&lt;T&gt;&gt;，而是要先转换为Class&lt;? extends TestInterface&lt;T&gt;&gt;</span></div><div class="line"><span class="comment">// 只有Class&lt;? extends TestInterface&lt;T&gt;&gt;才能转换成Class&lt;TestInterface&lt;T&gt;&gt;</span></div><div class="line"><span class="comment">// 所以又写了个getClass2方法做“中转”</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Class&lt;TestInterface&lt;T&gt;&gt; <span class="title">getClass</span>(Class&lt;T&gt; cls) {</div><div class="line">    <span class="keyword">return</span> (Class&lt;TestInterface&lt;T&gt;&gt;) getClass2(cls);</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Class&lt;? extends TestInterface&lt;T&gt;&gt; <span class="title">getClass2</span>(Class&lt;T&gt; cls) {</div><div class="line">    <span class="keyword">return</span> (Class&lt;? extends TestInterface&lt;T&gt;&gt;) StringTest.class;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h1 id="Class-newInstance">Class.newInstance</h1>
+<p>有些区别以前就知道，比如<code>Class.newInstance</code>要求必须有无参的public构造函数，而<code>Constructor.newInstance</code>更灵活，利用反射的手段还可以调用私有的构造函数。<br>但为何不推荐用<code>Class.newInstance</code>？因为二者对异常处理的差别。见：<a href="http://stackoverflow.com/questions/195321/why-is-class-newinstance-evil" target="_blank" rel="external">http://stackoverflow.com/questions/195321/why-is-class-newinstance-evil</a>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Class&lt;?&gt;[] EMPTY_ARRAY = <span class="keyword">new</span> Class[] {};</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TestReflect</span> </span>{</div><div class="line">    <span class="comment">// 这个类的构造函数会抛出IOException</span></div><div class="line">    <span class="keyword">public</span> <span class="title">TestReflect</span>() <span class="keyword">throws</span> IOException {</div><div class="line">        <span class="keyword">if</span> (System.currentTimeMillis() &gt; <span class="number">0</span>) {</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] s) {</div><div class="line">    Class&lt;TestReflect&gt; cls = TestReflect.class;</div><div class="line">    <span class="comment">// 这个try-catch看似捕获了所有异常，其实没有</span></div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        cls.newInstance();</div><div class="line">    } <span class="keyword">catch</span> (InstantiationException e) {</div><div class="line">        e.printStackTrace();</div><div class="line">    } <span class="keyword">catch</span> (IllegalAccessException e) {</div><div class="line">        e.printStackTrace();</div><div class="line">    }</div><div class="line">    <span class="comment">// 这条语句根本不会执行</span></div><div class="line">    System.out.println(<span class="string">"end of main"</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>上面这段代码编译是没问题的，但运行时会由于<code>IOException</code>异常终止。正常情况下<code>IOException</code>必须被捕获并处理的（只有<code>RuntimeException</code>及其子类可以不被捕获），但<code>Class.newInstance</code>绕过了编译期的这个检查。<br>相当于<code>IOException</code>直接被抛到最上层，程序直接终止，后面的语句都不会执行。而且打印出的堆栈信息也有问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Exception in thread <span class="string">"main"</span> java.io.IOException</div><div class="line">    at alg.Test2$TestReflect.&lt;init&gt;(Test2.java:<span class="number">21</span>)</div><div class="line">    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:<span class="number">39</span>)</div><div class="line">    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:<span class="number">27</span>)</div><div class="line">    at java.lang.reflect.Constructor.newInstance(Constructor.java:<span class="number">513</span>)</div><div class="line">    at java.lang.Class.newInstance0(Class.java:<span class="number">355</span>)</div><div class="line">    at java.lang.Class.newInstance(Class.java:<span class="number">308</span>)</div><div class="line">    at alg.Test2.test(Test2.java:<span class="number">55</span>)</div><div class="line">    at alg.Test2.main(Test2.java:<span class="number">46</span>)</div></pre></td></tr></table></figure>
+
+<p>堆栈给出的异常代码是构造函数，而不是<code>Class.newInstance</code>，debug时会非常麻烦。</p>
+<p>而<code>Constructor.newInstance</code>会将所有异常包装成一个<code>InvocationTargetException</code>再次抛出：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Class&lt;TestReflect&gt; cls = TestReflect.class;</div><div class="line"></div><div class="line"><span class="keyword">try</span> {</div><div class="line">    Constructor&lt;TestReflect&gt; c = cls</div><div class="line">            .getDeclaredConstructor(EMPTY_ARRAY);</div><div class="line">    c.newInstance();</div><div class="line">} <span class="keyword">catch</span> (SecurityException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">} <span class="keyword">catch</span> (IllegalArgumentException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">} <span class="keyword">catch</span> (NoSuchMethodException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">} <span class="keyword">catch</span> (InstantiationException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">} <span class="keyword">catch</span> (IllegalAccessException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">} <span class="keyword">catch</span> (InvocationTargetException e) {</div><div class="line">    e.printStackTrace();</div><div class="line">}</div><div class="line"><span class="comment">// 这个语句会被执行</span></div><div class="line">System.out.println(<span class="string">"end of main"</span>);</div></pre></td></tr></table></figure>
+
+<p>异常堆栈：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">java.lang.reflect.InvocationTargetException</div><div class="line">    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:<span class="number">39</span>)</div><div class="line">    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:<span class="number">27</span>)</div><div class="line">    at java.lang.reflect.Constructor.newInstance(Constructor.java:<span class="number">513</span>)</div><div class="line">    at alg.Test2.main(Test2.java:<span class="number">33</span>)</div><div class="line">Caused by: java.io.IOException</div><div class="line">    at alg.Test2$TestReflect.&lt;init&gt;(Test2.java:<span class="number">21</span>)</div><div class="line">    ... <span class="number">5</span> more</div></pre></td></tr></table></figure>
+
+<p>这个异常信息清晰很多，也说明了异常的语句确实是<code>newInstance</code>那一步。</p>
+<p>综上，确实应该尽量少用<code>Class.newInstance</code>。</p>
+<h1 id="volatile">volatile</h1>
+<p>这篇文章讲的比较详细：<a href="http://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/java/j-jtp06197.html</a>。</p>
+<p>简言之，每个线程有自己的本地内存和共享的主内存（只是逻辑上的概念）。线程在赋值a=1时，只是将本地内存中的值修改，并不保证将修改刷新到主内存中。<br>如何保证刷新主内存？1.加synchronized关键字。线程在离开synchronized语句块时，会自动刷新，JVM强制。2.使用volatile关键字。volatile的变量可以保证读写操作是原子性的，会立即刷到主内存。<br>volatile保证对某个变量（其实就是某块内存地址）的读写都是原子性的。必定不会有多个线程同时读volatile变量、或者同时写volatile变量。所以可以用作简单的同步机制。<br><code>i++</code>这种操作，即使加了volatile不能保证原子性。<code>i++</code>可以分解为三步：读/增加/写回。第一步的读和第三步的写是原子性的。但整体不是原子性。<br>volatile一般用于基本类型，int/boolean之类，其实也可以用于对象，见文中的例子。但这种用法非常容易出错，还是不要用的好，给自己找麻烦。<br>用volatile要仔细思考，否则得不偿失，只为了一点点性能提升，还不如用synchronized直观。</p>
+<h1 id="transient">transient</h1>
+<p>这个关键字感觉很少见。<br>只在实现<code>Serializable</code>接口的类中有用，被这个关键字修饰的变量不会序列化。<br>不过本来java自带的序列化机制就用的不多吧。。。<br>感觉这是个历史遗留问题，要实现这种功能完全可以用注解，就像Jackson JSON一样，没必要新增个关键字。</p>
+<h1 id="wait()">wait()</h1>
+<p>看到一个<a href="http://coolxing.iteye.com/blog/1236696" target="_blank" rel="external">比较有意思的问题</a>。作者最后提的几个问题比较有意思。</p>
+<p>第一个问题，代码中的while()不能换成if()。根源还是在于notifyAll不能精确唤醒某个线程。notifyAll会唤醒所有等待的线程，但其中有些线程是”目标”，要输出数据.有些线程只是”误伤”，需要继续wait。 所以即使唤醒后也要在while循环里继续判断是否wait。<br>改成if的话，各个线程的执行顺序无法确定了，有可能死锁。如果线程3先执行完毕，线程2获得锁，把state改为3，线程1和线程2就只能一直等待。</p>
+<p>第二个问题，notifyAll也不能改成notify。notify是随机唤醒一个等待的线程。可能死锁。比如线程1设置state=2，然后notify，假设线程3被唤醒，发现state不是3，继续wait。接着线程1获得锁，发现state不是1，也wait。于是3个线程都处于wait状态。</p>
+<p>几个注意点：wait()一般都要在while循环里调用；sth.wait()的线程会释放sth对象的锁，在唤醒前不会再参与锁的竞争；sth.wait()的前提是当前线程持有sth对象的锁，否则会抛IllegalMonitorStateException异常；wait()的线程被唤醒后，会重新尝试获得锁，然后从wait()开始执行。</p>
+<p>wait/notify是比较底层的线程同步手段，能不用尽量不用。concurrent包提供了很多替代品。</p>
+<p>题外话：1.JVM中的所有对象都有一个隐含的锁，或者叫监视器（monitor），包括XX.class对象。synchronized的原理就是利用这个；2.JVM中的线程都是映射到系统内核本身的线程机制的。</p>
+<h1 id="CountDownLatch">CountDownLatch</h1>
+<p>最近用CountDownLatch碰到一个死锁的问题。代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 线程池</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> ExecutorService exec = Executors</div><div class="line">    .newCachedThreadPool(<span class="keyword">new</span> ThreadFactory() {</div><div class="line"></div><div class="line">      <span class="keyword">public</span> Thread <span class="title">newThread</span>(Runnable runnable) {</div><div class="line">        Thread thread = Executors.defaultThreadFactory().newThread(</div><div class="line">            runnable);</div><div class="line">        thread.setDaemon(<span class="keyword">true</span>);</div><div class="line">        <span class="keyword">return</span> thread;</div><div class="line">      }</div><div class="line"></div><div class="line">    });</div><div class="line"></div><div class="line"><span class="comment">// main函数</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> IOException,</div><div class="line">    InterruptedException {</div><div class="line">  CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(<span class="number">10</span>);</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {</div><div class="line">    exec.submit(<span class="keyword">new</span> PutRunner(conf,latch));</div><div class="line">  }</div><div class="line">  latch.await();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// runnable</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PutRunner</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>{</div><div class="line"></div><div class="line">  <span class="keyword">private</span> Configuration conf = <span class="keyword">null</span>;</div><div class="line">  <span class="keyword">private</span> CountDownLatch latch = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">  <span class="keyword">public</span> <span class="title">PutRunner</span>(Configuration conf, CountDownLatch latch) {</div><div class="line">    <span class="keyword">this</span>.conf = conf;</div><div class="line">    <span class="keyword">this</span>.count = count;</div><div class="line">  }</div><div class="line"></div><div class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">      <span class="comment">// do something</span></div><div class="line">    } <span class="keyword">catch</span> (IOException e) {</div><div class="line">      e.printStackTrace();</div><div class="line">    }</div><div class="line">    latch.countDown();</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>运行这个程序的时候，有时能正常结束，有时就会死锁。debug了半天，请教了同事才明白。<br>在<code>PutRunner.run()</code>方法里将<code>latch.countDown()</code>放到最后，前面的try-catch看似捕获了所有的异常（checked exception），但如果有RuntimeException（unchecked exception）线程会直接终止，导致<code>latch.countDown()</code>不会执行，于是main线程一直卡在<code>latch.await()</code>不能结束。<br>坑爹的是这个RuntimeException会被吃掉。。。在命令行中根本看不到任何异常信息。一个类似的问题见<a href="http://stackoverflow.com/questions/1687977/how-to-properly-catch-runtimeexceptions-from-executors" target="_blank" rel="external">StackOverflow</a>。<br>将<code>catch (IOException e)</code>改成<code>catch (Exception e)</code>，就可以了。当然也有其他更优雅的解决方法。</p>
+<h1 id="NoClassDefFoundError_vs_ClassNotFoundException">NoClassDefFoundError vs ClassNotFoundException</h1>
+<p>java的classpath机制还是比较头疼的，最常见的两个错误就是<code>NoClassDefFoundError</code>和<code>ClassNotFoundException</code>，关于二者的区别可以参考<a href="http://stackoverflow.com/questions/34413/why-am-i-getting-a-noclassdeffounderror-in-java" target="_blank" rel="external">这个帖子</a>。</p>
+<p>从原理上说，jvm会从classpath中寻找class并加载到内存中。在使用一个类时，会先从内存中找，然后从classpath中找。如果“内存-classpath”这个链路中找不到，或者找到后出了其他错误，抛<code>NoClassDefFoundError</code>；如果从classpath找不到，抛<code>ClassNotFoundException</code>。注意二者之间微妙的联系：很多情况下，NoClassDefFoundError是由ClassNotFoundException引起的，比如下面这种（这个错误是由于编译时classpath中有guava，但运行时classpath中没有导致的）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Exception in thread <span class="string">"main"</span> <span class="filename">java.lang.NoClassDefFoundError</span>: com/google/common/collect/Maps</div><div class="line">  at <span class="filename">com.vdian.stm.test.TestDO.main(TestDO.java</span>:<span class="number">67</span>)</div><div class="line">Caused by: <span class="filename">java.lang.ClassNotFoundException</span>: <span class="filename">com.google.common.collect.Maps</span></div><div class="line">  at java.net.URLClassLoader.findClass(URLClassLoader.java:<span class="number">381</span>)</div><div class="line">  at <span class="filename">java.lang.ClassLoader.loadClass(ClassLoader.java</span>:<span class="number">424</span>)</div><div class="line">  at <span class="filename">sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java</span>:<span class="number">331</span>)</div><div class="line">  at <span class="filename">java.lang.ClassLoader.loadClass(ClassLoader.java</span>:<span class="number">357</span>)</div></pre></td></tr></table></figure>
+
+<p>但NoClassDefFoundError也不一定全是由ClassNotFoundException引起。如果classpath能找到对应的类，但初始化类的过程中出错，也会出现NoClassDefFoundError：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> Exception {</div><div class="line">    <span class="comment">// 第一次调用，出现java.lang.ExceptionInInitializerError</span></div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="keyword">new</span> TestStatic();</div><div class="line">    } <span class="keyword">catch</span> (Throwable e) {</div><div class="line">        e.printStackTrace();</div><div class="line">    }</div><div class="line">    <span class="comment">// 第二次调用，出现java.lang.NoClassDefFoundError: Could not initialize class leetcode.TestStatic</span></div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="keyword">new</span> TestStatic();</div><div class="line">    } <span class="keyword">catch</span> (Throwable e) {</div><div class="line">        e.printStackTrace();</div><div class="line">    }</div><div class="line">    <span class="comment">// 第三次调用，结果跟第二次调用一样</span></div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="keyword">new</span> TestStatic();</div><div class="line">    } <span class="keyword">catch</span> (Throwable e) {</div><div class="line">        e.printStackTrace();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><figcaption><span>TestStatic.java</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestStatic</span> </span>{</div><div class="line">    <span class="comment">// 无论是静态方法还是静态成员变量，都会导致这个类初始化出错</span></div><div class="line">    <span class="comment">// 有趣的是抛出的异常是跟static代码的顺序有关的</span></div><div class="line"></div><div class="line">    <span class="comment">// 如果这段代码先运行，会抛出RuntimeException</span></div><div class="line">    <span class="keyword">static</span> {</div><div class="line">        <span class="keyword">if</span> (System.currentTimeMillis() &gt; <span class="number">0</span>)</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"hahaha"</span>);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="comment">// 如果这段代码先运行，会抛出ArithmeticException</span></div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> undefined = <span class="number">1</span> / <span class="number">0</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>错误信息：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">java.lang.ExceptionInInitializerError</div><div class="line">  at com.vdian.stm.test.TestDO.main(TestDO.java:<span class="number">69</span>)</div><div class="line">Caused by: java.lang.RuntimeException: hahaha</div><div class="line">  at leetcode.TestStatic.&lt;clinit&gt;(TestStatic.java:<span class="number">16</span>)</div><div class="line">  <span class="keyword">...</span> <span class="number">1</span> more</div><div class="line">java.lang.NoClassDefFoundError: Could not initialize class leetcode.TestStatic</div><div class="line">  at com.vdian.stm.test.TestDO.main(TestDO.java:<span class="number">75</span>)</div><div class="line">java.lang.NoClassDefFoundError: Could not initialize class leetcode.TestStatic</div><div class="line">  at com.vdian.stm.test.TestDO.main(TestDO.java:<span class="number">81</span>)</div></pre></td></tr></table></figure>
+
+<p>另外注意异常信息中的<code>&lt;clinit&gt;</code>，这是一个特殊的标志，表示初始化某个类的static方法和变量。类似的还有一个<code>&lt;init&gt;</code>，表示调用类的构造函数。</p>
+<p>从使用场景上来说：</p>
+<ol>
+<li>如果某个类是编译时需要的并且编译成功：<br>1.1 运行时不存在，一般会抛NoClassDefFoundError + 类名，第一次调用时会有个<code>Caused by ClassNotFoundException</code><br>1.2 运行时存在但类初始化出错，第一次使用该类时出现ExceptionInInitializerError，以后再使用时就会抛NoClassDefFoundError: Could not initialize class + 类名</li>
+<li>如果某个类是通过反射加载的（换句话说，不需要编译时存在），比如<code>Class.forName</code>：<br>2.1 运行时不存在，直接抛ClassNotFoundException（这些反射的方法会跳过内存中查找的步骤，直接从classpath中查找）<br>2.2 运行时存在但类初始化出错，跟1.2是一样的情况</li>
+</ol>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/java/">
+                #java
+              </a>
+            
+              <a href="/tags/豆知识/">
+                #豆知识
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/04/07/hbase-switch-problem/">交换机引起的hbase事故</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/04/01/nodemanager-suicide/">DNS异常导致RM/NM进程挂掉</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/04/06/java-tips/"
+             data-title="java豆知识" data-url="http://jxy.me/2015/04/06/java-tips/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于泛型"><span class="nav-number">1.</span> <span class="nav-text">关于泛型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Class-newInstance"><span class="nav-number">2.</span> <span class="nav-text">Class.newInstance</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#volatile"><span class="nav-number">3.</span> <span class="nav-text">volatile</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#transient"><span class="nav-number">4.</span> <span class="nav-text">transient</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#wait()"><span class="nav-number">5.</span> <span class="nav-text">wait()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CountDownLatch"><span class="nav-number">6.</span> <span class="nav-text">CountDownLatch</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NoClassDefFoundError_vs_ClassNotFoundException"><span class="nav-number">7.</span> <span class="nav-text">NoClassDefFoundError vs ClassNotFoundException</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>
