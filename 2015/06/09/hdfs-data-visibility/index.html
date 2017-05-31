@@ -1,0 +1,926 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,hdfs," />
+
+  <title> 关于HDFS的数据可见性 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              关于HDFS的数据可见性
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-09
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/06/09/hdfs-data-visibility/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/09/hdfs-data-visibility/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>以前写的一篇文章。</p>
+<a id="more"></a>
+<p>以前一直知道，写入hdfs的数据不会马上可见。<br>稍微看了些代码，总结下。</p>
+<h1 id="关于HDFS写">关于HDFS写</h1>
+<h2 id="单一写，并发读">单一写，并发读</h2>
+<p>传统的文件系统是允许对一个文件并发写入的，只是如果不同步的话，文件内容会乱掉。<a href="http://blog.chinaunix.net/uid-11452714-id-3771084.html" target="_blank" rel="external">http://blog.chinaunix.net/uid-11452714-id-3771084.html</a><br>HDFS不允许并发写，但可以并发读：<a href="http://www.cnblogs.com/ZisZ/p/3253570.html" target="_blank" rel="external">http://www.cnblogs.com/ZisZ/p/3253570.html</a><br>大多数分布式文件系统都不允许并发写，代价太大。</p>
+<p>如果多线程试图同时写一个文件，只有一个线程可以正常写，其他线程会抛出AlreadyBeingCreatedException异常：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException): failed to <span class="operator"><span class="keyword">create</span> file /tmp/appendTest <span class="keyword">for</span> DFSClient_NONMAPREDUCE_-<span class="number">427798443</span>_10 <span class="keyword">on</span> client <span class="number">172.31</span><span class="number">.132</span><span class="number">.146</span> because <span class="keyword">current</span> leaseholder <span class="keyword">is</span> trying <span class="keyword">to</span> recreate file.</span></div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java:<span class="number">2275</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.FSNamesystem.appendFileInternal(FSNamesystem.java:<span class="number">2153</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.FSNamesystem.appendFileInt(FSNamesystem.java:<span class="number">2386</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.FSNamesystem.appendFile(FSNamesystem.java:<span class="number">2347</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.<span class="keyword">server</span>.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java:<span class="number">508</span>)</div></pre></td></tr></table></figure>
+
+<p>如果一个客户端A获取了lease，但写数据时意外退出，文件没有close，lease不会自己释放（正常close的话lease是会释放的）。<br>只能等时间超过soft limit后，另一个客户端B尝试写同一个文件，NN回收lease；或者时间超过hard limit后lease被NN的一个后台线程回收。</p>
+<p>所以如果客户端B尝试写同一个文件，如果还没超出hard limit，第一次尝试必定会失败的，因为同一个文件的lease还被占用着：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.RecoveryInProgressException): Failed <span class="built_in">to</span> <span class="built_in">close</span> <span class="built_in">file</span> /tmp/appendTest. Lease recovery is <span class="operator">in</span> progress. Try again later.</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java:<span class="number">2310</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFileInternal(FSNamesystem.java:<span class="number">2153</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFileInt(FSNamesystem.java:<span class="number">2386</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java:<span class="number">2347</span>)</div></pre></td></tr></table></figure>
+
+<p>再尝试时，如果时间已经超过soft limit，才能成功获得lease；否则必定继续失败，只有等超过soft limit后，NN才会把lease分给新的客户端。<br>所以写数据时一般要加上重试机制。<br>可以自己写个程序验证下，用以下命令可以看到正在写还没有close的文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="title">hadoop</span> fsck -openforwrite /tmp</div></pre></td></tr></table></figure>
+
+<h2 id="写数据机制">写数据机制</h2>
+<p>其实hadoop权威指南已经讲得比较清楚了，这里结合代码复述下。相关的类主要是DFSClient和DFSOutputStream。这块还有点复杂，我也没完全看懂。</p>
+<p>我们一般通过FileSystem.create或FileSystem.append方法获得output stream（其实是DFSOutputStream），然后write(byte[])写数据。<br>注意客户端写数据是直接和datanode交互的，只有申请新block时才需要和namenode交互。<br>如果是create，客户端通过RPC协议（ClientProtocol.addBlock方法，这个类名字和mapreduce的RPC重复了。。。）向NN申请一个新block，开始写数据。<br>如果是append，客户端会先判断目标文件的最后一个block是否写满，如果已满就申请新的block，否则就在最后一个block上追加。<br>无论如何，客户端会得到一个目标block用于写入。</p>
+<p>NN在分配一个block时还会返回对应的pipeline。如果副本数设置为3，那么pipeline就是3个节点。如果是create，NN挑3个节点组成pipeline（这里有规则的，但对我们这种单机房单机架的来说，就是随机）。如果客户端同时也是DN，那么必定有一个副本同时在当前节点上（这个没从代码上求证过）。如果是append，并且在原来的block上追加数据，那返回的pipeline就是原来的3个节点。</p>
+<p>我们调用write(byte[])方法时，数据并没有马上写入pipeline。DFSOutputStream会暂时缓存数据。<br>数据的发送是以packet为单位的，一个packet大小默认64K（dfs.client-write-packet-size，默认65536）。DFSOutputStream内部有两个queue：dataQueue和ackQueue。待写入的数据达到64K时，DFSOutputStream将数据包装成一个packet并放入dataQueue，等待一个守护线程DataStreamer去消费。<br>DataStreamer从dataQueue中取出packet，发到pipeline，将packet加入ackQueue。pipiline中的所有节点都将数据写入后，DataStreamer会收到ack消息，并将packet从ackQueue中移除。这样才算是数据真正写入完毕。</p>
+<p>其实一个packet不全是数据。DFSOutputStream会将数据组合成一个个chunk（dfs.bytes-per-checksum，默认512），每一个chunk加一个校验值。默认的校验（dfs.checksum.type，默认CRC32C）需要占用4个字节（见DataChecksum类），也就是说每个chunk实际占用516个字节。一个packet最多存储65536/516=127个chunk。所以，一个packet的实际大小只有127*516=65532字节，其中只有65024个字节是真正的数据。这个计算逻辑见DFSOutputStream：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">computePacketChunkSize</span>(<span class="keyword">int</span> psize, <span class="keyword">int</span> csize) {</div><div class="line">    <span class="keyword">int</span> chunkSize = csize + checksum.getChecksumSize();   <span class="comment">// 512+4</span></div><div class="line">    chunksPerPacket = Math.max(psize/chunkSize, <span class="number">1</span>);   <span class="comment">// 65536/516=127</span></div><div class="line">    packetSize = chunkSize*chunksPerPacket;      <span class="comment">// 127*516=65532</span></div><div class="line">    <span class="keyword">if</span> (DFSClient.LOG.isDebugEnabled()) {</div><div class="line">      DFSClient.LOG.debug(<span class="string">"computePacketChunkSize: src="</span> + src +</div><div class="line">                <span class="string">", chunkSize="</span> + chunkSize +</div><div class="line">                <span class="string">", chunksPerPacket="</span> + chunksPerPacket +</div><div class="line">                <span class="string">", packetSize="</span> + packetSize);</div><div class="line">    }</div><div class="line">  }</div></pre></td></tr></table></figure>
+
+<p>DataStreamer每次写到pipeline的数据也不一定是64K。上面说过，一个满的packet只有65024个字节，而且write时还会生成一个header信息，先写出header，再写出packet本身。如果是最后一个packet，还可能凑不满127个chunk，就更小了。数据也不一定能被512字节整除。还要考虑到写入的数据不能超过block size（block size必须是chunk的整数倍，否则会报错），也会对packet大小做一些调整。</p>
+<p>Packet的结构见DFSOutputStream.Packet类。</p>
+<p>写数据时，其实是先写到一个512字节的buffer里，写满了就调用flushBuffer()方法计算checksum，将checksum和数据写入currentPacket。如果currentPacket已经写满了，就放入dataQueue，这里会阻塞，因为缓存的packet有个最大值，默认80个（这个80是写死在程序里的，不知为何）。如果已经写到block的最后，还会发送一个空的packet对象，要求DN将数据持久化（这个机制见下面的分析）。之后通过和NN的RPC协议申请一个新的block继续写。</p>
+<h1 id="数据可见性">数据可见性</h1>
+<p><a href="http://www.cnblogs.com/ZisZ/p/3253354.html" target="_blank" rel="external">http://www.cnblogs.com/ZisZ/p/3253354.html</a>（只能参考。原作者的hadoop版本比较老。）</p>
+<p>客户端写入hdfs的数据不是立即可见的。</p>
+<p>以前一直以为正在写的整个block都不可见，其实不是。<strong>只要写入pipeline并且ack的数据，都是可见的。</strong></p>
+<p>只有缓存在写客户端的数据，对其他读客户端才是不可见的。根据上面的描述，客户端最多缓存80个packet（dataQueue和ackQueue的size之和，这个80是写死在程序里的），每个packet大概64K，所以总共有大概5M的数据不可见。之所以是“大概”，因为packet中有校验数据，而且有一个currentPacket不在queue里。准确的值是65024*81=5.023M，差不多。<br>如果客户端意外挂掉，缓存的数据会完全丢失，也就是说最多丢5M的数据。</p>
+<p>但是，写到pipeline的数据虽然能看到，但不能保证不丢失。因为DN端也会将数据缓存（这个缓存机制还不太明白，没看过代码），而不是立即写到磁盘。极端情况下，pipeline里的3个节点都挂掉，写入pipeline的数据也会丢。<br>只有写满一个block时，客户端才会发送一个空的packet，这个packet的header有个特殊的标志位，要求DN将当前block的数据刷到磁盘。<br>所以极端情况下，可能会丢一个block的数据（这是某些资料的说法，我没看DN的代码求证过。感觉上有点问题，难道整个block都缓存在内存里？只有DN内存里的数据会丢吧，如果blocksize设的很大，岂不是很耗内存。所以感觉不太可能丢整个block，应该也是有一个buffer之类的）。不过3个节点一起挂掉的概率很小吧。</p>
+<p>虽然写入pipeline的数据对客户端可见了（去读这个文件的话可以读到）。但如果看hadoop fs -ls看这个文件，会发现这个文件的大小没有变化，可能还是0字节。</p>
+<p>因为客户端写入数据时只需要和DN交互，NN只知道这个文件有哪个block在写，但写入的数据量是不知道的。客户端读的时候也是直接读DN上的block，所以可以读到pipeline中的数据。<br>只有等一个block写完或者客户端主动close，NN那边才能看到大小的变化（只有这时才会与NN交互）。<br>如果客户端意外挂掉，等超过1个小时（hard limit）文件大小也会变化。<br>如果客户端意外挂掉，另一个客户端1分钟（soft limit）后重新获取lease并且append，上一个客户端写入pipeline的数据也还在的。</p>
+<h1 id="hflush和hsync">hflush和hsync</h1>
+<p>hflush要求客户端将所有buffer里的数据写入pipeline。之后数据对所有客户端可见。本质就是阻塞所有写入，将currentPacket加入dataQueue（即使currentPacket还没满），然后等待queue中的所有数据都ack。<br>hsync在hflush的基础上，会将currentPacket的isSync标识设为true，DN收到这样一个packet后，会将数据刷入磁盘。即使没有数据要flush，也会新建一个空的packet对象，设置isSync并发送。</p>
+<p>这个两个方法都是为了防止数据丢失的。hflush防止客户端缓存的数据丢失，hsync防止客户端和pipeline缓存的数据丢失。<br>即使是hsync，也只是保证数据刷到磁盘，但可能在磁盘的缓存里。所以没有绝对的安全的。<br>而且这两个方法会影响写入的效率。</p>
+<p>感觉上，如果对数据可见性有要求，可以定期hflush；客户端挂掉最多丢5M数据，不能接受这种情况，也要定期hflush；其他情况都没必要hflush。<br>hsync完全没必要，写到pipeline的数据已经很安全了。</p>
+<p>上面说过写入pipeline的数据不会立即让NN端的文件大小改变。其实hsync时可以强制更新文件大小。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">FileSystem fs = FileSystem.<span class="keyword">get</span>(conf);</div><div class="line"><span class="comment">// 这里要强制转换下。HdfsDataOutputStream才有对应的hsync(EnumSet)方法，普通的DFSOutputStream没有</span></div><div class="line">HdfsDataOutputStream <span class="keyword">out</span> = (HdfsDataOutputStream) fs.create(<span class="keyword">new</span> Path(<span class="string">"/tmp/bigBlock2"</span>));</div><div class="line"><span class="keyword">out</span>.hsync(EnumSet.of(SyncFlag.UPDATE_LENGTH));</div></pre></td></tr></table></figure>
+
+<p>不用想就知道，肯定对性能影响非常大。</p>
+<h1 id="关于HDFS读">关于HDFS读</h1>
+<p>其实和本文关系不大，只是顺便整理下。</p>
+<p>简单整理下HDFS读数据的机制。</p>
+<ul>
+<li>网络读。很好理解。客户端直接连DataNode，通过网络传输数据。最常见，适用于各种情况。</li>
+<li>本地socket读。如果客户端同时是DataNode，并且要读的数据就在本地，可以省掉网络传输的过程。这也是MapReduce计算本地性的基本原理。“带宽是最宝贵的资源”</li>
+<li>本地磁盘读。即Short-Circuit Local Reads。当要读的数据在本地时，可以不走socket，直接用系统调用读磁盘上的文件。效率更高，但需要编译对应系统的native lib。</li>
+<li>内存读。即缓存机制。hadoop 2.3.0新增了DataNode端的缓存机制，可以将一些block缓存到内存中。是否适用看应用场景吧。好处是效率高，坏处是额外占用内存，而且这些内存是off-heap的，不受GC管理。</li>
+</ul>
+<h2 id="关于Short-Circuit_Local_Reads">关于Short-Circuit Local Reads</h2>
+<p>关于这个配置还有些问题。</p>
+<p>网上有很多文档给出的配置是要dfs.block.local-path-access.user属性的，只有特定的用户才能使用local read。实际上那是老的实现方法（legacy），基于<a href="https://issues.apache.org/jira/browse/HDFS-2246" target="_blank" rel="external">HDFS-2246</a>。<br>这种方法配置麻烦，配置项很多，并且有安全隐患。<br>在hadoop 2.1.0以后的版本已经有了新的实现，基于<a href="https://issues.apache.org/jira/browse/HDFS-347" target="_blank" rel="external">HDFS-347</a>。</p>
+<p>新的实现需要libhadoop.so，要在不同系统上分别编译。只需要如下两个配置即可：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.client.read.shortcircuit<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">value</span>&gt;</span>true<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">property</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.domain.socket.path<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">value</span>&gt;</span>/var/lib/hadoop-hdfs/dn_socket<span class="tag">&lt;/<span class="title">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">property</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><a href="http://hadoop.apache.org/docs/r2.5.2/hadoop-project-dist/hadoop-hdfs/ShortCircuitLocalReads.html" target="_blank" rel="external">hadoop 2.5.2的文档</a>中已经给出了2种实现的配置（2.2.0的文档中只有新的实现）。</p>
+<p>org.apache.hadoop.hdfs.BlockReaderLocalLegacy类的注释：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">* This <span class="keyword">is</span> the legacy implementation based <span class="keyword">on</span> HDFS-<span class="number">2246</span>, which requires</div><div class="line">* permissions <span class="keyword">on</span> the datanode <span class="keyword">to</span> <span class="keyword">be</span> <span class="keyword">set</span> <span class="keyword">so</span> that clients can directly access the</div><div class="line">* blocks. The <span class="keyword">new</span> implementation based <span class="keyword">on</span> HDFS-<span class="number">347</span> should <span class="keyword">be</span> preferred <span class="keyword">on</span> UNIX</div><div class="line">* systems where the required native code <span class="built_in">has</span> been implemented.&lt;<span class="keyword">br</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>参考：<br><a href="http://blog.cloudera.com/blog/2013/08/how-improved-short-circuit-local-reads-bring-better-performance-and-security-to-hadoop/" target="_blank" rel="external">http://blog.cloudera.com/blog/2013/08/how-improved-short-circuit-local-reads-bring-better-performance-and-security-to-hadoop/</a><br><a href="http://www.importnew.com/6151.html" target="_blank" rel="external">http://www.importnew.com/6151.html</a></p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/hdfs/">
+                #hdfs
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/06/10/linux-tips/">Linux豆知识</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/06/02/funny-federation/">一个有趣的federation部署</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/06/09/hdfs-data-visibility/"
+             data-title="关于HDFS的数据可见性" data-url="http://jxy.me/2015/06/09/hdfs-data-visibility/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于HDFS写"><span class="nav-number">1.</span> <span class="nav-text">关于HDFS写</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单一写，并发读"><span class="nav-number">1.1.</span> <span class="nav-text">单一写，并发读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写数据机制"><span class="nav-number">1.2.</span> <span class="nav-text">写数据机制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据可见性"><span class="nav-number">2.</span> <span class="nav-text">数据可见性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hflush和hsync"><span class="nav-number">3.</span> <span class="nav-text">hflush和hsync</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于HDFS读"><span class="nav-number">4.</span> <span class="nav-text">关于HDFS读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于Short-Circuit_Local_Reads"><span class="nav-number">4.1.</span> <span class="nav-text">关于Short-Circuit Local Reads</span></a></li></ol></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

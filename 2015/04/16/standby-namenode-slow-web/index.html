@@ -1,0 +1,907 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hadoop,namenode,HA,checkpoint,运维," />
+
+  <title> SNN web页面加载缓慢 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              SNN web页面加载缓慢
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-04-16
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/04/16/standby-namenode-slow-web/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/16/standby-namenode-slow-web/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>我们的SNN已经运行很长时间了。中间发生过几次failover。<br>最近打开web页面的时候非常卡。因为Loading edits的条目非常多，日积月累。<br>其实重启下就可以了。但还是要从代码里研究下。顺便整理下SNN的作用。</p>
+<a id="more"></a>
+<p>在一个HA的集群中，StandbyNN负责以前SecondaryNN的工作：合并editlog、做checkpoint。<br>ANN与SNN之间通过JN分享editlog。</p>
+<h1 id="合并editlog">合并editlog</h1>
+<p>在HA的情况下，standbyNN中有一个线程EditLogTailerThread每隔一段时间（dfs.ha.tail-edits.period，单位秒，默认60）从JN中读取editlog合并到fsimage里（此时fsimage在内存中）。这是为了保持SNN和ANN的状态一致，应对随时可能的failover。<br>实际上SNN的状态还是会稍微落后于ANN的，但不会落后太多。</p>
+<p>SNN读取editlog的日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="number">2015</span>-<span class="number">04</span>-<span class="number">15</span> <span class="number">10</span>:<span class="number">38</span>:<span class="number">26</span>,<span class="number">177</span> INFO org.apache.hadoop.hdfs.server.namenode.FSImage: Reading org.apache.hadoop.hdfs.server.namenode.RedundantEditLogInputStream@<span class="number">3486113</span>d expecting start txid <span class="comment">#52576338</span></div><div class="line"><span class="number">2015</span>-<span class="number">04</span>-<span class="number">15</span> <span class="number">10</span>:<span class="number">38</span>:<span class="number">26</span>,<span class="number">177</span> INFO org.apache.hadoop.hdfs.server.namenode.FSImage: Start loading edits file http://inspur122.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269, http://inspur129.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269</div><div class="line"><span class="number">2015</span>-<span class="number">04</span>-<span class="number">15</span> <span class="number">10</span>:<span class="number">38</span>:<span class="number">26</span>,<span class="number">177</span> INFO org.apache.hadoop.hdfs.server.namenode.EditLogInputStream: Fast-forwarding stream 'http://inspur122.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269, http://inspur129.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269' to transaction ID <span class="number">52576338</span></div><div class="line"><span class="number">2015</span>-<span class="number">04</span>-<span class="number">15</span> <span class="number">10</span>:<span class="number">38</span>:<span class="number">26</span>,<span class="number">177</span> INFO org.apache.hadoop.hdfs.server.namenode.EditLogInputStream: Fast-forwarding stream 'http://inspur122.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269' to transaction ID <span class="number">52576338</span></div><div class="line"><span class="number">2015</span>-<span class="number">04</span>-<span class="number">15</span> <span class="number">10</span>:<span class="number">38</span>:<span class="number">26</span>,<span class="number">196</span> INFO org.apache.hadoop.hdfs.server.namenode.FSImage: Edits file http://inspur122.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269, http://inspur129.photo.<span class="number">163</span>.org:<span class="number">8480</span>/getJournal?<span class="variable">jid=</span>hp1&<span class="variable">segmentTxId=</span><span class="number">52576338</span>&<span class="variable">storageInfo=</span>-<span class="number">47</span>%<span class="number">3</span>A200695073%<span class="number">3</span>A1406364468930%<span class="number">3</span>ACID-ae986bcb-<span class="number">6</span>ca9-<span class="number">40</span>c3-a54b-ff20c5b14269 of size <span class="number">13723</span> edits <span class="comment"># 114 loaded in 0 seconds</span></div></pre></td></tr></table></figure>
+
+<p>EditLogTailerThread同时负责触发rollEditLog。这个线程每次运行时，如果距离上次rollEditLog的时间超过dfs.ha.log-roll.period（单位秒，默认120），就触发一次rollEditLog（通过RPC协议NamenodeProtocol。这个协议是用于ANN与SNN间通信的）。</p>
+<p>相关代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doWork</span>() {</div><div class="line">      <span class="keyword">while</span> (shouldRun) {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">          <span class="comment">// 检查距离上次rollEditLog的间隔是否超过2分钟（dfs.ha.log-roll.period）</span></div><div class="line">          <span class="comment">// There's no point in triggering a log roll if the Standby hasn't</span></div><div class="line">          <span class="comment">// read any more transactions since the last time a roll was</span></div><div class="line">          <span class="comment">// triggered. </span></div><div class="line">          <span class="keyword">if</span> (tooLongSinceLastLoad() &&</div><div class="line">              lastRollTriggerTxId &lt; lastLoadedTxnId) {</div><div class="line">            triggerActiveLogRoll();</div><div class="line">          }</div><div class="line">          <span class="javadoc">/**</span></div><div class="line">           * Check again in case someone calls {@link EditLogTailer#stop} while</div><div class="line">           * we're triggering an edit log roll, since ipc.Client catches and</div><div class="line">           * ignores {@link InterruptedException} in a few places. This fixes</div><div class="line">           * the bug described in HDFS-2823.</div><div class="line">           */</div><div class="line">          <span class="keyword">if</span> (!shouldRun) {</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">          }</div><div class="line">          <span class="comment">// 从JN中读取editlog并合并到内存中的fsimage里</span></div><div class="line">          doTailEdits();</div><div class="line">        } <span class="keyword">catch</span> (EditLogInputException elie) {</div><div class="line">          LOG.warn(<span class="string">"Error while reading edits from disk. Will try again."</span>, elie);</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException ie) {</div><div class="line">          <span class="comment">// interrupter should have already set shouldRun to false</span></div><div class="line">          <span class="keyword">continue</span>;</div><div class="line">        } <span class="keyword">catch</span> (Throwable t) {</div><div class="line">          LOG.fatal(<span class="string">"Unknown error encountered while tailing edits. "</span> +</div><div class="line">              <span class="string">"Shutting down standby NN."</span>, t);</div><div class="line">          terminate(<span class="number">1</span>, t);</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">try</span> {</div><div class="line">          <span class="comment">// sleep 1分钟（dfs.ha.tail-edits.period）</span></div><div class="line">          Thread.sleep(sleepTimeMs);</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">          LOG.warn(<span class="string">"Edit log tailer interrupted"</span>, e);</div><div class="line">        }</div><div class="line">      }</div><div class="line">    }</div></pre></td></tr></table></figure>
+
+<p>所谓的rollEditLog操作就是ANN将内存中的editlog刷到磁盘上，重命名文件，同时txid++，生成一个新的edit文件开始写，以我们的测试集群为例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">hadoop@inspur129:~$</span> <span class="comment">ls</span> <span class="literal">-</span><span class="comment">lh</span> <span class="comment">/mnt/dfs/0/hdfs/name/current</span> <span class="comment">|</span> <span class="comment">tail</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>  <span class="comment">20K</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">11:30</span> <span class="comment">edits_0000000000052577094</span><span class="literal">-</span><span class="comment">0000000000052577263</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>  <span class="comment">30K</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">11:32</span> <span class="comment">edits_0000000000052577264</span><span class="literal">-</span><span class="comment">0000000000052577515</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span> <span class="comment">6</span><span class="string">.</span><span class="comment">8K</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">11:34</span> <span class="comment">edits_0000000000052577516</span><span class="literal">-</span><span class="comment">0000000000052577562</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span> <span class="comment">1</span><span class="string">.</span><span class="comment">0M</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">11:34</span> <span class="comment">edits_inprogress_0000000000052577563</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>  <span class="comment">17M</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">09:47</span> <span class="comment">fsimage_0000000000052575292</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>   <span class="comment">62</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">09:47</span> <span class="comment">fsimage_0000000000052575292</span><span class="string">.</span><span class="comment">md5</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>  <span class="comment">17M</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">10:47</span> <span class="comment">fsimage_0000000000052576563</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>   <span class="comment">62</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">10:47</span> <span class="comment">fsimage_0000000000052576563</span><span class="string">.</span><span class="comment">md5</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>    <span class="comment">9</span>  <span class="comment">4月</span> <span class="comment">15</span> <span class="comment">11:34</span> <span class="comment">seen_txid</span></div><div class="line"><span class="literal">-</span><span class="comment">rw</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span><span class="comment">r</span><span class="literal">-</span><span class="literal">-</span> <span class="comment">1</span> <span class="comment">root</span> <span class="comment">root</span>  <span class="comment">216</span>  <span class="comment">4月</span> <span class="comment">14</span> <span class="comment">16:45</span> <span class="comment">VERSION</span></div></pre></td></tr></table></figure>
+
+<p>可见这种edits_xxx的文件都是每2分钟生成一个。（因为测试集群读写少，合并editlog时间可以忽略不计，线上集群就不一定了）<br>rollEditLog后，对应的txid就可以被SNN读到了（通过JN的“中转”）。<br>rollEditLog的逻辑见FSImage.rollEditLog()方法。</p>
+<p>SNN页面加载缓慢就是因为它把每次EditLogTailerThread读取的editlog都显示在页面上了<br>时间长了，条目会非常多。</p>
+<h1 id="做checkpoint">做checkpoint</h1>
+<p>关于checkpoint，<a href="http://blog.cloudera.com/blog/2014/03/a-guide-to-checkpointing-in-hadoop/" target="_blank" rel="external">Cloudera Blog</a>讲得很清楚。<br>checkpoint的作用就是合并editlog到fsimage。editlog有点类似hbase中的WAL。</p>
+<p>触发checkpoint的条件：</p>
+<ol>
+<li>上次checkpoint后经过一定时间（dfs.namenode.checkpoint.period，默认3600秒）。</li>
+<li>未合并的事务数达到某个值（dfs.namenode.checkpoint.txns，这个值很大，一般达不到）。</li>
+</ol>
+<p>有一个线程每60秒（dfs.namenode.checkpoint.check.period）运行一次，检查是否满足上面任意一个条件，满足则开始checkpoint。</p>
+<p>我以前一直以为是触发checkpoint后再合并editlog。但根据上面的分析，SNN是每隔1分钟就合并一次的。所以checkpoint过程就很简单了，其实就是先saveNameSpace，将内存中的fsimage写到磁盘上，然后通知ANN来拉取（我没记错的话应该是这样）。checkpoint时没有合并editlog的步骤了，省时间。checkpoint相关逻辑见StandbyCheckpointer类。</p>
+<p>关于checkpoint要注意的几个问题：</p>
+<ol>
+<li>如果fsimage传输的速度太慢，超过dfs.image.transfer.timeout（默认10分钟），SNN会认为checkpoint失败，1分钟之后又会触发checkpoint，再失败、再触发，一直这样循环。我们以前ANN和SNN网络比较慢，碰到过这个问题。另外，传输fsimage时可以设置带宽上限（dfs.image.transfer.bandwidthPerSec）。</li>
+<li>在fsimage传输过程中，failover会部分失败：可能出现脑裂，一个NN进程会自杀。我们也碰到过。这是个bug：<a href="https://issues.apache.org/jira/browse/HDFS-4816" target="_blank" rel="external">HDFS-4816</a>。</li>
+<li>在SNN做checkpoint的过程中，zkfc会认为SNN挂掉了。。。这是个bug：<a href="https://issues.apache.org/jira/browse/HDFS-6184" target="_blank" rel="external">HDFS-6184</a>。zkfc的检查机制见<a href="/2015/04/01/ha-and-zookeeper/">以前的文章</a>。观察zkfc的日志可以看到SNN的状态在SERVICE_NOT_RESPONDING和SERVICE_HEALTHY之间变化，周期和checkpoint的周期一致。SERVICE_NOT_RESPONDING时zkfc会重新发起选举，试图让当前节点成为standby。但当前节点本来就是standby，所以无影响。只有zkfc的日志中能看到异常。<strong>一切正常的话，zkfc进程不应该产生任何日志。</strong></li>
+</ol>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hadoop/">
+                #hadoop
+              </a>
+            
+              <a href="/tags/namenode/">
+                #namenode
+              </a>
+            
+              <a href="/tags/HA/">
+                #HA
+              </a>
+            
+              <a href="/tags/checkpoint/">
+                #checkpoint
+              </a>
+            
+              <a href="/tags/运维/">
+                #运维
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/04/16/kerberos-tips/">Kerberos豆知识</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/04/09/hadoop-ha-active-nn/">HA集群中如何判断ActiveNN</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/04/16/standby-namenode-slow-web/"
+             data-title="SNN web页面加载缓慢" data-url="http://jxy.me/2015/04/16/standby-namenode-slow-web/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#合并editlog"><span class="nav-number">1.</span> <span class="nav-text">合并editlog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#做checkpoint"><span class="nav-number">2.</span> <span class="nav-text">做checkpoint</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!doctype html>
+<html class="theme-next use-motion">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
+
+
+    <meta name="description" content="思绪偶尔在这里停留" />
+
+
+
+	<meta name="keywords" content="hbase,豆知识," />
+
+  <title> HBase豆知识 // foolbear的冥想盆 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+    <a href="/" class="brand">
+        <span class="logo">
+          <i class="icon-logo"></i>
+        </span>
+        <span class="site-title">foolbear的冥想盆</span>
+    </a>
+</h1>
+
+
+  <ul id="menu" class="menu">
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-books">
+        <a href="/2016/04/16/gitbook/">
+          <i class="menu-item-icon icon-books"></i> <br />
+          书目
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              HBase豆知识
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-07-06
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/06/hbase-tips/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/06/hbase-tips/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>近日重看了《HBase权威指南》，结合着0.98.8的代码，总结一些知识点。<br>由于hbase版本更新很快，而且每个版本变化都很大，本文不一定适用于其他版本。<br>我们是0.94和0.98混着用的，也可能有些0.94的知识点混在里面。。。</p>
+<p>话说，<code>hadoop</code>还是<code>Hadoop</code>我都觉得挺正常，但<code>hbase</code>就不如<code>HBase</code>顺眼。。。</p>
+<a id="more"></a>
+<h1 id="B+树和LSM树">B+树和LSM树</h1>
+<p>太理论的我也不懂。<br>B+树是传统RDBMS中实现索引的关键。特点是数据都在叶节点，而且查找操作非常高效。<br>但更新代价比较大，可能导致叶节点的分裂。更新索引的时间可能比真正写数据的时间还长，一些大表的索引比数据还大。<br>而且对磁盘的依赖较大，因为机械磁盘的随机读写性能都是比较差的。所以RDBMS都在往SSD发展。。。<br>较适合读多写少的情况。</p>
+<p><a href="http://www.cnblogs.com/siegfang/archive/2013/01/12/lsm-tree.html" target="_blank" rel="external">LSM树</a>的核心思想在于延迟更新，会将数据/索引的更新暂时以日志的形式记录下来，等待后台线程去合并。<br>可以将随机写转化为顺序写（将update和delete都转化为insert），所以不像B+树那样受机械硬盘的限制。<br>特别适合大量写入的情况。读性能也不错，但storefile过多的话，估计读性能会下降比较快。<br>由于需要后台线程合并，有额外开销。当这种额外开销超过带来的性能收益时，就不值得了。也是一种trade-off。</p>
+<h1 id="关于hlog">关于hlog</h1>
+<p>注意hlog是regionserver级别的。所有region的日志都会写到一个文件中。当需要回复的时候，按不同的region拆分hlog。拆分好后，region才会开始回放日志。这个拆分的过程可能会非常慢，因为日志文件没有任何索引，只能从头遍历。<br>这种设计的前提是需要hlog拆分的情况比较少，可以将所有hlog写入转换为顺序写，提升性能。如果每个region维护一个hlog，可能造成大量随机写。</p>
+<p>hlog其实就是hadoop的sequence file，其中key是HLogKey对象，包括region，tablename、sequence id、时间戳等信息；value是WALEdit对象。一个WALEdit对象中可以包括多KeyValue对象（这应该是为了保证行级别的原子性。如果更新一行中的多个列，会产生多个KeyValue对象，但在hlog中只保存一条记录）。</p>
+<p>hlog对于写入影响很大，所以可以关闭wal或者延迟刷新wal以提升性能。</p>
+<p>日志文件滚动有2种情况：</p>
+<ol>
+<li>regionserver中的LogRoller进程每一小时触发一次日志滚动。</li>
+<li>当日志文件达到hbase.regionserver.hlog.blocksize大小时，触发日志滚动。</li>
+</ol>
+<p>每次日志滚动的时候，都会触发一次对oldlog的检查。这个检查有2种情况：</p>
+<ol>
+<li>遍历所有hlog file，如果某个hlog file中最大的sequence number小于所有store file中最大的sequence number，说明对应的hlog file中的记录已经全部持久化了，这个hlog file可以被删除了。所谓删除也不是马上删除，而是移动到一个临时目录（0.94是/hbase/.oldlogs），等待master中的一个LogCleaner线程来删除。相关逻辑见FSHLog.rollWriter方法。</li>
+<li>如果hlog file文件数量大于hbase.regionserver.maxlogs，就遍历最老的一个hlog，找到哪条记录还没有被持久化，强制相应的region做一次flush，然后将最老的文件移动到临时目录等待删除。</li>
+</ol>
+<h1 id="hlog拆分">hlog拆分</h1>
+<p>当集群启动或regionserver挂掉时，都需要拆分/回放日志。<br>以0.94 hbase为例。<br>所有hlog都存在/hbase/.logs/${regionserver.id}目录下。当回放hlog时，hmaster会按顺序遍历这个目录下所有文件，将对应region的日志放到一个临时目录/hbase/splitlog/${regionserver.id}/${region.name}。当一个hlog拆分完毕后，对应的文件会移动到/hbase/.oldlogs，等待master中的线程去定期删除。当所有hlog文件拆分完毕后，将拆分后的日志移动到/hbase/${table.name}/${region.name}/recovered.edits目录，然后打开region。region打开时如果发现recovered.edits目录，就会回放其中的日志，回放完毕才能对外服务。</p>
+<p>hlog拆分机制经历过很多变化，从早期版本的单线程拆分，到多线程，到目前的分布式处理。</p>
+<h1 id="关于HA">关于HA</h1>
+<p>hbase没有真正的实现HA。根据上面的分析，当一个regionserver挂掉后，要经历很长时间的hlog拆分、回放过程。<br>拆分log时，会遍历/hbase/.logs下所有文件，日志越多恢复服务所需时间也越长。<br>所以及时删除log是很必要的，删除机制见我上面的分析。</p>
+<h1 id="region_split">region split</h1>
+<p>用户可以设置自己的split策略，我们一般用ConstantSizeRegionSplitPolicy，同时将hbase.hregion.max.filesize设为一个比较大的值，这样可以手动控制split的时机。注意这个属性限定的是一个store的大小，而不是整个region的大小。<br>split过程非常快，因为只是新建一些引用文件，当一个引用文件对应的数据被compact处理后，才会删除引用文件。<br>当一个region中存在引用文件时，不能再次split。</p>
+<h1 id="触发compact检查的几种情况">触发compact检查的几种情况</h1>
+<p>compact是hbase里特别折腾人的机制之一。<br>有几种操作会触发compact检查：</p>
+<ol>
+<li>memstore flush</li>
+<li>在hbase shell里执行compact、major_compact命令</li>
+<li>调用HAdmin类的相应方法</li>
+<li>regionserver中有一个线程CompactionChecker，默认每10秒执行一次，检查所有online的region</li>
+</ol>
+<p>每次触发compact检查后，再判断是minor还是major（用户手动触发的major_compact除外）。<br>compact的临时数据会写到/hbase/${table.name}/${region.name}/.tmp目录中。</p>
+<p>RegionServer中有一个对象CompactSplitThread负责compact/split/merge region。这货虽然叫XXThread但其实不是线程。。。<br>每个compact是否是major，由CompactionPolicy.isMajorCompaction方法决定。<br>默认的RatioBasedCompactionPolicy只会检查hbase.hregion.majorcompaction属性。<br>所以这个属性设为0之后就不会触发major compact。但由minor提升而来的major还是存在的（如果某次minor compact选择的storefile就是当前region的所有storefile，就会提升为major compcat，只会出现在写入较少的表上）。<br>每次compact后会再检查一次是否要split。</p>
+<h1 id="关于flush与compcat">关于flush与compcat</h1>
+<p>每次flush后，都会检查是否需要split、是否需要compact，见MemStoreFlusher类。<br>如果要split，就直接split；否则再检查是否要compact。是否compact由StoreEngine.needsCompcation方法决定。<br>默认是DefaultStoreEngine，其实是交给RatioBasedCompactionPolicy.needsCompaction方法决定。<br>我以前以为split后会立刻触发compact，看来不是。</p>
+<h1 id="关于large和small线程池">关于large和small线程池</h1>
+<p>CompactSplitThread中有两个线程池：large和small。<br>如果一次compact要处理的数据量大于hbase.regionserver.thread.compaction.throttle，就进入large线程池。否则进入small线程池。<br>这个large/small和是否major compact没有必然联系。不知为何要这样设计。</p>
+<h1 id="关于hfile">关于hfile</h1>
+<p>HFile格式：<br><img src="/2015/07/06/hbase-tips/1.png" alt=""></p>
+<p>KeyValue格式：<br><img src="/2015/07/06/hbase-tips/2.png" alt=""></p>
+<p>HFile一旦写入完成，就是不可变的。因为hdfs要修改已经存在的文件只能append，而HFile元数据在末尾，不能直接append。<br>DataIndex和MetaIndex是类似于B+树的索引结构。RegionServer启动的时候，会将所有索引加载到内存里，便于后续查找。<br>这个索引只能到块的级别（索引了每个块的rowid范围），同一个块内的KV是没索引的，只是按Key排序。所以想找特定的KV时，可能要遍历整个块。<br>注意只有rowid是有索引的，而且对于column family、column qualifier是没索引的。</p>
+<p>hbase默认的块大小是64KB。写入的数据量大于64KB后，会生成一个新的块并写入。如果开启了压缩，写入的数据一般小于64KB。如果写入一个特别大的KV，也可能大于64KB。<br>hbase的块和hdfs的块没有任何关系。</p>
+<p>KeyValue其实很多信息都是冗余的。比如column family，在同一个storefile中肯定全都是一样的。<br>为了减少查询开销，节省空间，务必选择名称较短的列族和列。</p>
+<h1 id="hbase读路径">hbase读路径</h1>
+<p>说说自己的理解，没有看代码求证过。</p>
+<ol>
+<li>如果读请求中包含时间戳条件，根据storefile的时间戳排除一些文件。</li>
+<li>如果能应用bloom filter，又可以排除一些storefile。</li>
+<li>在剩下的storefile和memstore里扫描所需数据。由于storefile和memstore是有rowid索引的，可以快速选出一批备选storefile。</li>
+<li>扫描备选的storefile，定位到所需的block。遍历block，找到所需的KeyValue。在这个扫描过程中，还要加上其他一些过滤条件，比如特定的列名。</li>
+<li>猜测扫描顺序是先memstore，再按时间降序扫描所有storefile。这样可以取得最新的数据，跟踪到同一份数据的update/delete。</li>
+</ol>
+<h1 id="关于二级索引">关于二级索引</h1>
+<p>hbase中只有一种索引：rowkey（转换成byte[]按升序排列）。而如果需要多种索引就比较麻烦。</p>
+<ol>
+<li>存多份数据，并建不同的rowkey格式。缺点是数据量放大很多倍。</li>
+<li>用户自己维护一个索引表。其实不一定是索引表，也可能是用于索引的列族。这种方式很难保证原子性，很可能数据表已经更新，但索引表还没更新（索引表可能是用MR定期更新）。而且用户写代码时也要自己处理索引表相关逻辑。</li>
+<li>coprocessor。不是很了解，我的理解是将方法2中用户手动的操作转换为服务端自动的操作。</li>
+</ol>
+<h1 id="关于bloom_filter">关于bloom filter</h1>
+<p>相关原理见<a href="http://blog.csdn.net/jiaomeng/article/details/1495500" target="_blank" rel="external">这篇文章</a>。<br>bloom filter对get操作很有效，因为可以快速判断一个rowkey是否在一个storefile里。<br>但scan操作不一定有效，因为scan是个范围，bloom filter无法判断这个范围的所有rowkey是否都在某个storefile里。</p>
+<p>在0.98中建表是默认都开启了ROW级别的BloomFilter。<br>ROW级别的BloomFilter对Scan一定是无效的。<br>ROWCOL级别的BloomFilter对包含列条件的Scan可能有效。</p>
+<p>所以bloom filter是否适用还是要看自己的使用场景。</p>
+<h1 id="常见服务端优化">常见服务端优化</h1>
+<ol>
+<li>JVM调优。regionserver对内存非常敏感。目标：减少老年代的内存碎片，尽量让对象在新生代就死亡；减少FGC，否则可能触发zk超时。</li>
+<li>开启MSLAB特性。默认是开启的，但可能浪费一些内存。</li>
+<li>开启snappy压缩。snappy压缩优于lzo。</li>
+<li>手动管理split和compcat、监控storefile数量。这也是无奈之举。尽量在流量低的时候做这些操作。</li>
+<li>分散热点，将写入量较大的region分散到不同regionserver。</li>
+</ol>
+<h1 id="常见客户端优化">常见客户端优化</h1>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 客户端务必关闭autoFlush，这样数据会批量提交</span></div><div class="line">table.setAutoFlush(<span class="literal">false</span>,<span class="literal">false</span>);</div><div class="line"> </div><div class="line"><span class="comment">// 写数据时，对于不重要的数据可以异步写入WAL，可以提升性能</span></div><div class="line">put.setDurability(Durability.ASYNC_WAL);</div><div class="line"> </div><div class="line"><span class="comment">// 写数据时，对于不重要的数据可以关闭WAL</span></div><div class="line">put.setDurability(Durability.SKIP_WAL);</div><div class="line"> </div><div class="line"><span class="comment">// scan时，加上尽可能多的条件，不光starkey、endkey，如果有column family、column qualifier，也尽量加上</span></div><div class="line"><span class="comment">// 能加filter的话也尽量加上。这样可以让服务端过滤更多数据</span></div><div class="line"> </div><div class="line"><span class="comment">// scan时，设置cache和batch，减少RPC次数</span></div><div class="line"><span class="comment">// cache控制每次RPC请求返回多少行，batch控制每行最多返回多少列</span></div><div class="line"><span class="comment">// 在程序里设置cache和hbase.client.scanner.caching属性是一样的效果</span></div><div class="line"><span class="comment">// 参考http://m.blog.csdn.net/blog/jiaomicha/23871123</span></div><div class="line"> </div><div class="line"><span class="comment">// scan返回的ResultScanner，记得close</span></div><div class="line"> </div><div class="line"><span class="comment">// scan时，只返回需要的数据，减少网络流量</span></div><div class="line"><span class="comment">// 如果只需要某一列的，那就把列加为scan的条件</span></div><div class="line"><span class="comment">// 如果只需要rowkey，不需要任意列的数据，可以加filter只返回rowkey</span></div><div class="line"> </div><div class="line"><span class="comment">// 根据需要使用HTablePool</span></div><div class="line"><span class="comment">// 注意HTable对象不是线程安全的</span></div></pre></td></tr></table></figure>
+
+<p>建表时的一些优化：</p>
+<ol>
+<li>尽量只有一个列族</li>
+<li>预分区</li>
+<li>列族和列的名字尽量短</li>
+<li>尽量开启snappy/lzo压缩</li>
+<li>开启bloom filter（0.98默认会开启ROW级别的，如果有特殊需求可以开启ROWCOL级别的）</li>
+</ol>
+<h1 id="服务端比较重要的一些配置项">服务端比较重要的一些配置项</h1>
+<p>比较容易出问题的一些配置。</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>zookeeper.session.timeout</td>
+<td>zk客户端的超时设置，也受服务端限制</td>
+</tr>
+<tr>
+<td>hbase.regionserver.handler.count</td>
+<td>rpc handler用于处理客户端读写。当每次RPC操作数据量较小时，这个数字可以设的大一点，否则可能对regionserver产生较大内存压力，进而造成GC问题。要结合自己的内存大小来设置。</td>
+</tr>
+<tr>
+<td>hbase.regionserver.maxlogs</td>
+<td>每个regionserver保存的日志文件数量，不要太大，不然回放日志时间很长</td>
+</tr>
+<tr>
+<td>hbase.regionserver.hlog.blocksize</td>
+<td>每个hlog日志文件的大小，不要太大，不然回放日志时间很长</td>
+</tr>
+<tr>
+<td>hbase.hstore.blockingStoreFiles</td>
+<td>当某个store中storefile数量超过这个值时，整个region就会阻止继续写入，等待后台合并</td>
+</tr>
+<tr>
+<td>hbase.hstore.blockingWaitTime</td>
+<td>跟上一个配置相关。每次阻止写入多长时间。</td>
+</tr>
+<tr>
+<td>hbase.hregion.memstore.block.multiplier</td>
+<td>如果客户端写入过快来不及flush，memstore最多可以增加到几倍，之后会阻止写入</td>
+</tr>
+<tr>
+<td>hbase.hregion.max.filesize</td>
+<td>每个region的大小，超过这个大小会触发自动split，只有当hbase.regionserver.region.split.policy设置为ConstantSizeRegionSplitPolicy时才有效</td>
+</tr>
+<tr>
+<td>hbase.regionserver.regionSplitLimit</td>
+<td>当一个regionserver上region数量达到这个数字，就不会自动split了。但还是可以手动触发。</td>
+</tr>
+<tr>
+<td>hbase.hregion.majorcompaction</td>
+<td>major compact的周期，设为0可以关闭自动major compact。跟compaction policy有关，默认是RatioBasedCompactionPolicy</td>
+</tr>
+<tr>
+<td>hbase.hstore.compaction.min</td>
+<td>每次minor compact，最少选择多少个storefile？</td>
+</tr>
+<tr>
+<td>hbase.hstore.compaction.max</td>
+<td>每次minor compact，最多选择多少个storefile？</td>
+</tr>
+<tr>
+<td>hbase.hstore.compaction.max.size</td>
+<td>minor compact时，大于这大小的storefile会被排除</td>
+</tr>
+<tr>
+<td>hbase.regionserver.thread.compaction.large</td>
+<td>compact时large线程池的大小</td>
+</tr>
+<tr>
+<td>hbase.regionserver.thread.compaction.small</td>
+<td>compact时small线程池的大小</td>
+</tr>
+<tr>
+<td>hbase.regionserver.thread.compaction.throttle</td>
+<td>如果一次compact（不分minor/major）处理的数据量大于这个值，进入large线程池；否则进入small线程池。</td>
+</tr>
+</tbody>
+</table>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hbase/">
+                #hbase
+              </a>
+            
+              <a href="/tags/豆知识/">
+                #豆知识
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/07/19/interview-summary/">面试总结</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/07/06/scheduler-diff-2-5-2/">2.5.2中queueMaxAppsDefault的一个bug</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+        <div class="ds-thread" data-thread-key="2015/07/06/hbase-tips/"
+             data-title="HBase豆知识" data-url="http://jxy.me/2015/07/06/hbase-tips/">
+        </div>
+
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
+        <p class="site-author-name">foolbear</p>
+      </div>
+      <p class="site-description motion-element">思绪偶尔在这里停留</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </div>
+        <div class="site-state-item site-state-tags">
+            <span class="site-state-item-count">43</span>
+            <span class="site-state-item-name">标签</span>
+        </div>
+        <div class="site-state-item site-state-pages">
+            <span class="site-state-item-count">3</span>
+            <span class="site-state-item-name">页面</span>
+        </div>
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="social-info motion-element">
+        
+          
+            <span class="social-item">
+              <a href="https://github.com/jiangxy">GitHub</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="mailto:foolbeargm@gmail.com">邮件</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="http://weibo.com/foolbearwb">微博</a>
+            </span>
+          
+            <span class="social-item">
+              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
+            </span>
+          
+        
+      </div>
+
+      
+      
+        <div class="cc-license motion-element">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+          </a>
+        </div>
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#B+树和LSM树"><span class="nav-number">1.</span> <span class="nav-text">B+树和LSM树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于hlog"><span class="nav-number">2.</span> <span class="nav-text">关于hlog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hlog拆分"><span class="nav-number">3.</span> <span class="nav-text">hlog拆分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于HA"><span class="nav-number">4.</span> <span class="nav-text">关于HA</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#region_split"><span class="nav-number">5.</span> <span class="nav-text">region split</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#触发compact检查的几种情况"><span class="nav-number">6.</span> <span class="nav-text">触发compact检查的几种情况</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于flush与compcat"><span class="nav-number">7.</span> <span class="nav-text">关于flush与compcat</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于large和small线程池"><span class="nav-number">8.</span> <span class="nav-text">关于large和small线程池</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于hfile"><span class="nav-number">9.</span> <span class="nav-text">关于hfile</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hbase读路径"><span class="nav-number">10.</span> <span class="nav-text">hbase读路径</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于二级索引"><span class="nav-number">11.</span> <span class="nav-text">关于二级索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于bloom_filter"><span class="nav-number">12.</span> <span class="nav-text">关于bloom filter</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见服务端优化"><span class="nav-number">13.</span> <span class="nav-text">常见服务端优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见客户端优化"><span class="nav-number">14.</span> <span class="nav-text">常见客户端优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务端比较重要的一些配置项"><span class="nav-number">15.</span> <span class="nav-text">服务端比较重要的一些配置项</span></a></li></ol></div>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2015 - 
+  2017
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">foolbear</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".fancybox").fancybox();
+    });
+  </script>
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '292px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      if ($('.post-toc-content').html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"foolbear"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-60003547-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

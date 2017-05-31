@@ -136,8 +136,8 @@
           
           
             
-              <a class="post-title-link" href="/2017/05/10/realtime-web/">
-                Realtime Web
+              <a class="post-title-link" href="/2015/03/08/pages-dns/">
+                为github pages绑定域名
               </a>
             
           
@@ -147,15 +147,15 @@
       <div class="post-meta">
         <span class="post-time">
           
-            发表于 2017-05-10
+            发表于 2015-03-08
           
         </span>
         
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2017/05/10/realtime-web/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/10/realtime-web/"></span>
+            <a href="/2015/03/08/pages-dns/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/08/pages-dns/"></span>
             </a>
           </span>
           
@@ -171,13 +171,22 @@
 
         
           
-            <p>前段时间研究了下WebSocket，趁着还没忘总结下。</p>
+            <p>之前为了给blog绑定域名，折腾了很长时间，记录下。</p>
+<p>其实<a href="https://help.github.com/articles/about-custom-domains-for-github-pages-sites/" target="_blank" rel="external">github pages的帮助</a>已经说得很清楚了，有两种方式：</p>
+<ol>
+<li>A记录指向github pages的IP，这个IP可能会变；</li>
+<li>CNAME记录指向xxx.github.io；</li>
+</ol>
+<p>在自己的repo里再加一个CNAME文件即可。注意不要和域名的CNAME记录混淆。</p>
+<p>最初我用自己的域名<code>foolbear.me</code>的A记录设置，确实能成功，但要fan| qiang。。。</p>
+<p>我以为是github的IP被qiang了，于是换成CNAME方式。<br>按github的文档，CNAME方式有个问题，只能绑定二级域名，就是只能绑定<code>blog.foolbear.me</code>，而不能直接绑定<code>foolbear.me</code>。我用godaddy和linode的nameserver都测试过，确实无法直接在裸域名上新建CNAME记录。</p>
+<p>但<a href="https://www.dnspod.cn/" target="_blank" rel="external">DNSPod</a>可以。于是把域名的nameserver改成dnspod，直接新建一个<code>@</code>的CNAME记录指向jiangxy.github.io。<br>绑定确实成功了，但还是要fan| qiang。。。我这才意识到自己的域名被qiang了。。。</p>
+<p>只有http的访问被重置，而且是关键字屏蔽。比如<code>http://www.apple.com/foolbear.me</code>都会直接返回<code>链接被重置</code>，接下来几分钟之内都无法访问apple.com。。。</p>
+<p>我也很无奈。。。我没干啥啊。。。</p>
+<p>好在dns还是正常的，除了http外其他访问方式还正常。</p>
+<p>只能重新申请域名并绑定，终于成功了。</p>
+<p>这次申请了im的域名。原来的me域名只能绑定到linode上了。</p>
 
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2017/05/10/realtime-web/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
           
         
       </div>
@@ -188,12 +197,16 @@
         
           <div class="post-tags">
             
-              <a href="/tags/websocket/">
-                #websocket
+              <a href="/tags/github-pages/">
+                #github pages
               </a>
             
-              <a href="/tags/spring/">
-                #spring
+              <a href="/tags/dns/">
+                #dns
+              </a>
+            
+              <a href="/tags/域名/">
+                #域名
               </a>
             
           </div>
@@ -222,8 +235,8 @@
           
           
             
-              <a class="post-title-link" href="/2017/04/02/lazy-busy-lazy/">
-                拖更已是常态
+              <a class="post-title-link" href="/2015/03/07/hexo-and-git/">
+                用git同步hexo文章
               </a>
             
           
@@ -233,15 +246,15 @@
       <div class="post-meta">
         <span class="post-time">
           
-            发表于 2017-04-02
+            发表于 2015-03-07
           
         </span>
         
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2017/04/02/lazy-busy-lazy/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/02/lazy-busy-lazy/"></span>
+            <a href="/2015/03/07/hexo-and-git/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/07/hexo-and-git/"></span>
             </a>
           </span>
           
@@ -257,13 +270,109 @@
 
         
           
-            <p>年终总结时，我曾痛下决心，每月至少写一篇，结果。。。</p>
+            <p>hexo写作有个问题就是换机器时如何同步。网上有很多文章用dropbox实现的。<br>相对而言我还是git更熟悉些，所以选择用git在不同机器间同步文章和配置。<br>而且hexo init后还自动生成了一个.gitignore，说明hexo默认也是偏向于git的。</p>
+<p>场景：在一台全新的机器上写blog，步骤尽量简化。</p>
 
             <div class="post-more-link text-center">
-              <a class="btn" href="/2017/04/02/lazy-busy-lazy/#more">
+              <a class="btn" href="/2015/03/07/hexo-and-git/#more">
                 阅读全文 &raquo;
               </a>
             </div>
+          
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/hexo/">
+                #hexo
+              </a>
+            
+              <a href="/tags/git/">
+                #git
+              </a>
+            
+          </div>
+        
+
+        
+
+        
+        
+          <div class="post-eof"></div>
+        
+      </div>
+    
+  </div>
+
+
+  
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/02/26/endless-tech/">
+                只取一瓢
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-02-26
+          
+        </span>
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/02/26/endless-tech/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/02/26/endless-tech/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          
+            <p>折腾hexo的时候，也想改改主题，自定义些样式之类的。<br>但是稍微google了下之后，感叹前端技术真是太tm复杂了啊。框架多如牛毛，没几天就有一个xxx.js出来。<br>而且没有一个统一的标准，没有谁能一统天下，angular/react/backbone/…<br>还有各种js模板：jade/ejs/swig/…<br>对我这种java开发，真是太难了。。。只会html，还在用jquery ui做界面，连“业余”都算不上。。。</p>
+<p>还有css，真是头疼啊，为啥显示效果总是跟我想的不一样。。。<br>css还有各种模板语言，也没有个能统一的。</p>
+<p>可能最近是前端技术的爆发期吧。</p>
+<p>还有Node.js这种颠覆了前端/后端分工的逆天存在。。。</p>
+<p>相对而言，后端技术似乎就稳定的多。看看数据库方向，mysql统治了多少年。</p>
+<p>但最近大数据方面的框架/产品也不少。<br>hadoop虽然是事实上的标准，但地位也不是那么稳固。<br>hadoop每个版本都会加入很多新功能：yarn/HA/cache/…每个新版本都要付出学习成本。<br>基于yarn也实现了很多计算引擎，tez/spark/storm on yarn/hbase on yarn/…尤其spark发展非常快。<br>hbase的每个小版本变化都非常大，而且最近发布了1.0版本。</p>
+<p>还有很多：sentry/azkaban/hue/hcatalog/ambari/…<br>还有更多都没听过的东西。</p>
+<p>废话这么多，只是想说明，<em>不要妄图搞明白所有的技术</em>。<br>技术太多，很难全部掌握，只会让自己身心俱疲。<br>更悲剧的是，当你掌握它之后，它可能已经过时了。技术的发展方向是很难预料的。</p>
+<p>应该分两个方向：</p>
+<ul>
+<li>自底向上：夯实基础。一些基础的理论/语言是比较稳定的。比如算法、数据结构、java。</li>
+<li>自顶向下：把握大局，不要拘泥于细节。很多东西我能知道大概的原理，但我没必要深入到源码去求证。</li>
+</ul>
+<p>只关注“底”和“顶”，至于中间的东西，可以挑一些重要的深入了解，比如hadoop。其他的，酌情考虑吧。</p>
+<p>胡言乱语一番，睡觉去了。</p>
+
           
         
       </div>
@@ -304,8 +413,8 @@
           
           
             
-              <a class="post-title-link" href="/2017/01/15/2017-and-redux/">
-                时间倏忽而逝
+              <a class="post-title-link" href="/2015/02/23/foolbear-hexo-init/">
+                记录下搭建hexo的一些问题
               </a>
             
           
@@ -315,15 +424,15 @@
       <div class="post-meta">
         <span class="post-time">
           
-            发表于 2017-01-14
+            发表于 2015-02-23
           
         </span>
         
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2017/01/15/2017-and-redux/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/15/2017-and-redux/"></span>
+            <a href="/2015/02/23/foolbear-hexo-init/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/02/23/foolbear-hexo-init/"></span>
             </a>
           </span>
           
@@ -339,9 +448,10 @@
 
         
           
-            <p><center>转眼已是经年</center><br>
+            <p>一直想找个地方写些文字，兜兜转转，还是选择了<a href="https://pages.github.com/" target="_blank" rel="external">GitHub Pages</a>。<br>试过<a href="http://jekyllrb.com/" target="_blank" rel="external">Jekyll</a>，可惜ruby跟我相性实在不合，折腾了半天也没搞明白。<br>于是选择了<a href="http://hexo.io" target="_blank" rel="external">Hexo</a>。使用很简单，js也比ruby亲切些，但搭建过程中还是碰到一些问题，这里记录下。</p>
+<p>我的环境是Win7 x64。<br>
             <div class="post-more-link text-center">
-              <a class="btn" href="/2017/01/15/2017-and-redux/#more">
+              <a class="btn" href="/2015/02/23/foolbear-hexo-init/#more">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -355,12 +465,8 @@
         
           <div class="post-tags">
             
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-              <a href="/tags/react/">
-                #react
+              <a href="/tags/hexo/">
+                #hexo
               </a>
             
           </div>
@@ -371,592 +477,6 @@
         
         
           <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/12/07/wx-applet/">
-                不务正业again
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-12-07
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/12/07/wx-applet/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/07/wx-applet/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>又一次不务正业，研究了下微信小程序。</p>
-<p>其实微信小程序已经火了好久了。几个月之前内测的时候，很多人就迫不及待去研究，各种破解资料、教程满天飞。公司内部也专门组织人去学习了下。<br>可惜当时我事情比较多，只是打了个酱油，等公测开始才真正去研究了下。<a href="https://github.com/jiangxy/wxapplet-canvas-demo" target="_blank" rel="external">写了个简单的小游戏</a>，算是对小程序有了个大概的了解。话说最好的学习方式果然还是实践。古人云：“纸上得来终觉浅，须知此事要躬行”。</p>
-<p><strong>本文不是一个教程</strong>，只是总结下学习过程中的感想。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/12/07/wx-applet/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/小程序/">
-                #小程序
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/10/24/1024-festival/">
-                壹〇二四
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-10-24
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/10/24/1024-festival/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/24/1024-festival/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>据说今天（2016-10-24）是程序员的节日？不过没啥过节的气氛嘛，大家还是该干啥干啥。<br>懒得想题目了，随便借用一下。题目这种东西嘛，不是很重要，反正是无主题随意吐槽。<br>不过1024是开篇的日子，等写完估计是十一月了。。。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/10/24/1024-festival/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/10/02/docker-for-mac/">
-                Docker与虚拟化
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-10-02
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/10/02/docker-for-mac/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/02/docker-for-mac/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>其实docker也火了好久了。<a href="/2015/09/04/some-messy-thought/">一年之前</a>我就想试下，结果在mac上安装太麻烦了，由于不支持<a href="https://linuxcontainers.org/" target="_blank" rel="external">LXC</a>，还要搞个VirtualBox的虚拟机过渡，感觉很不爽。既然要用虚拟机，不如直接选择<a href="https://www.vagrantup.com/" target="_blank" rel="external">Vagrant</a>。<br>但最近<a href="https://docs.docker.com/docker-for-mac/" target="_blank" rel="external">Docker for Mac</a>发布了，据说不再需要VirtualBox了，赶紧来试下，顺便总结下自己对于虚拟化的一些理解。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/10/02/docker-for-mac/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/docker/">
-                #docker
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/09/06/zhen-second-hand-qianduan/">
-                真・二手前端
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-09-06
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/09/06/zhen-second-hand-qianduan/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/06/zhen-second-hand-qianduan/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p><a href="/2015/09/21/second-hand-frontend/">《二手的前端开发》</a>续集，继续折腾，跳了React的大坑。。。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/09/06/zhen-second-hand-qianduan/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/react/">
-                #react
-              </a>
-            
-              <a href="/tags/前端/">
-                #前端
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/06/10/machine-learning-outsider/">
-                ML门外汉的哀嚎
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-06-10
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/06/10/machine-learning-outsider/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/10/machine-learning-outsider/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>每月总有那么几天，不吐不快。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/06/10/machine-learning-outsider/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-              <a href="/tags/machine-learning/">
-                #machine learning
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/05/06/db-unit-test/">
-                关于数据库单元测试
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-05-06
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/05/06/db-unit-test/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/db-unit-test/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>一般我们都会用JUnit写单元测试，但是如果测试涉及到数据库，就会有点麻烦。<br>总结下我的一些解决方法，当然未必是最好的。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/05/06/db-unit-test/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/java/">
-                #java
-              </a>
-            
-              <a href="/tags/unit-test/">
-                #unit test
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/04/16/gitbook/">
-                GitBook开坑纪念
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-04-16
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/04/16/gitbook/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/16/gitbook/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>这是个大坑。<br>不过挖坑一向是我的优良品德之一，记得填就好。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/04/16/gitbook/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/gitbook/">
-                #gitbook
-              </a>
-            
-          </div>
-        
-
-        
-
-        
         
       </div>
     
@@ -969,7 +489,7 @@
 
           
             <div class="pagination">
-              <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">&raquo;</a>
+              <a class="extend prev" rel="prev" href="/page/5/">&laquo;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span>
             </div>
           
         </div>
