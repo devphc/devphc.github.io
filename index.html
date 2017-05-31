@@ -1,1303 +1,304 @@
-<!doctype html>
-<html class="theme-next use-motion">
+<!DOCTYPE html>
+<html class="theme theme-white">
+
 <head>
-  
-
-<meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-
-  <meta name="google-site-verification" content="5xgDjDYDdxdIb-75WSsQSK3Q7DJXJH-lnUsmFYEF2po" />
-
-
-
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
-
-
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.3.0"/>
-
-
-    <meta name="description" content="思绪偶尔在这里停留" />
-
-
-
-
-    <meta name="keywords" content="hadoop,hdfs,yarn,hive,hbase,spark,bigdata,java" />
-
-
-
-    <link rel="alternate" href="/atom.xml" title="foolbear的冥想盆" type="application/atom+xml" />
-
-
-
-    <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.3.0" />
-
-
-
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="Keywords" content=",裴含超" />
+    <meta name="Description" content="独立开发者://github.com/devphc。裴含超的Github：https://github.com/devphc" />
+    <meta id="viewport" name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1; user-scalable=no;" />
+    <meta name="baidu-site-verification" content="SCHX6x0bsb" />
+    <title>裴含超</title>
+    <link href="https://www.zybuluo.com/static/assets/template-theme-white.css" rel="stylesheet" media="screen">
+    <style type="text/css">
+    #wmd-preview h1 {
+        color: #0077bb;
+    }
+    
+    .img {
+        width: 100%;
+        height: 360px;
+        float: left;
+        overflow: hidden;
+    }
+    
+    .imgg {
+        width: 100%;
+        height: 1880px;
+        float: left;
+        overflow: hidden;
+    }
+    
+    .img1 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/fusai/WeChat_1470802920.jpeg);
+        background-repeat: no-repeat;
+        background-size: contain;
+        float: left;
+    }
+    
+    .img2 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/fusai/WeChat_1470807846.jpeg);
+        background-repeat: no-repeat;
+        background-size: contain;
+        float: left;
+        margin-right: 20px;
+    }
+    
+    .img4 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/001.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img5 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/002.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img6 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/003.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img7 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/004.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img8 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/005.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img9 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/006.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img10 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/007.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img11 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/008.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img12 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/009.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img13 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/010.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img14 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/011.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .img15 {
+        width: 30%;
+        height: 360px;
+        background-image: url(http://jiac-cdn.fami2u.com/012.jpeg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        float: left;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    </style>
+    <script>
+    function browserRedirect() {
+        var sUserAgent = navigator.userAgent.toLowerCase();
+        var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+        var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+        var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+        var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+        var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+        var bIsAndroid = sUserAgent.match(/android/i) == "android";
+        var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+        var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+        if (!(bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM)) {
+            window.location.href = "https://github.com/devphc";
+        } else {
+            window.location.href = "https://github.com/devphc";
+        }
+    }
+    </script>
+    <script>
     (function() {
-      var hm = document.createElement("script");
-      hm.src = "//hm.baidu.com/hm.js?bc28da8fcb75f09bc7d85422ea4b736e";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
     })();
-  </script>
-
-
-  <title> foolbear的冥想盆 </title>
+    </script>
 </head>
 
-<body>
-  <div class="container one-column 
-   page-home 
-">
-    <div class="headband"></div>
-
-    <div id="header" class="header">
-      <div class="header-inner">
-        <h1 class="site-meta">
-    <a href="/" class="brand">
-        <span class="logo">
-          <i class="icon-logo"></i>
-        </span>
-        <span class="site-title">foolbear的冥想盆</span>
-    </a>
-</h1>
-
-
-  <ul id="menu" class="menu">
-    
-      
-      <li class="menu-item menu-item-home">
-        <a href="/">
-          <i class="menu-item-icon icon-home"></i> <br />
-          首页
-        </a>
-      </li>
-    
-      
-      <li class="menu-item menu-item-archives">
-        <a href="/archives">
-          <i class="menu-item-icon icon-archives"></i> <br />
-          归档
-        </a>
-      </li>
-    
-      
-      <li class="menu-item menu-item-tags">
-        <a href="/tags">
-          <i class="menu-item-icon icon-tags"></i> <br />
-          标签
-        </a>
-      </li>
-    
-      
-      <li class="menu-item menu-item-books">
-        <a href="/2016/04/16/gitbook/">
-          <i class="menu-item-icon icon-books"></i> <br />
-          书目
-        </a>
-      </li>
-    
-      
-      <li class="menu-item menu-item-about">
-        <a href="/about">
-          <i class="menu-item-icon icon-about"></i> <br />
-          关于
-        </a>
-      </li>
-    
-  </ul>
-
-
-      </div>
-    </div>
-
-    <div id="main" class="main">
-      <div class="main-inner">
-        <div id="content" class="content">
-          
-            
-          
-
-          <div id="posts" class="posts-expand">
-            
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2017/05/10/realtime-web/">
-                Realtime Web
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2017-05-10
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2017/05/10/realtime-web/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/10/realtime-web/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>前段时间研究了下WebSocket，趁着还没忘总结下。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2017/05/10/realtime-web/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/websocket/">
-                #websocket
-              </a>
-            
-              <a href="/tags/spring/">
-                #spring
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2017/04/02/lazy-busy-lazy/">
-                拖更已是常态
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2017-04-02
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2017/04/02/lazy-busy-lazy/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/02/lazy-busy-lazy/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>年终总结时，我曾痛下决心，每月至少写一篇，结果。。。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2017/04/02/lazy-busy-lazy/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2017/01/15/2017-and-redux/">
-                时间倏忽而逝
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2017-01-14
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2017/01/15/2017-and-redux/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/15/2017-and-redux/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p><center>转眼已是经年</center><br>
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2017/01/15/2017-and-redux/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-              <a href="/tags/react/">
-                #react
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/12/07/wx-applet/">
-                不务正业again
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-12-07
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/12/07/wx-applet/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/07/wx-applet/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>又一次不务正业，研究了下微信小程序。</p>
-<p>其实微信小程序已经火了好久了。几个月之前内测的时候，很多人就迫不及待去研究，各种破解资料、教程满天飞。公司内部也专门组织人去学习了下。<br>可惜当时我事情比较多，只是打了个酱油，等公测开始才真正去研究了下。<a href="https://github.com/jiangxy/wxapplet-canvas-demo" target="_blank" rel="external">写了个简单的小游戏</a>，算是对小程序有了个大概的了解。话说最好的学习方式果然还是实践。古人云：“纸上得来终觉浅，须知此事要躬行”。</p>
-<p><strong>本文不是一个教程</strong>，只是总结下学习过程中的感想。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/12/07/wx-applet/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/小程序/">
-                #小程序
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/10/24/1024-festival/">
-                壹〇二四
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-10-24
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/10/24/1024-festival/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/24/1024-festival/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>据说今天（2016-10-24）是程序员的节日？不过没啥过节的气氛嘛，大家还是该干啥干啥。<br>懒得想题目了，随便借用一下。题目这种东西嘛，不是很重要，反正是无主题随意吐槽。<br>不过1024是开篇的日子，等写完估计是十一月了。。。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/10/24/1024-festival/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/10/02/docker-for-mac/">
-                Docker与虚拟化
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-10-02
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/10/02/docker-for-mac/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/02/docker-for-mac/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>其实docker也火了好久了。<a href="/2015/09/04/some-messy-thought/">一年之前</a>我就想试下，结果在mac上安装太麻烦了，由于不支持<a href="https://linuxcontainers.org/" target="_blank" rel="external">LXC</a>，还要搞个VirtualBox的虚拟机过渡，感觉很不爽。既然要用虚拟机，不如直接选择<a href="https://www.vagrantup.com/" target="_blank" rel="external">Vagrant</a>。<br>但最近<a href="https://docs.docker.com/docker-for-mac/" target="_blank" rel="external">Docker for Mac</a>发布了，据说不再需要VirtualBox了，赶紧来试下，顺便总结下自己对于虚拟化的一些理解。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/10/02/docker-for-mac/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/docker/">
-                #docker
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/09/06/zhen-second-hand-qianduan/">
-                真・二手前端
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-09-06
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/09/06/zhen-second-hand-qianduan/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/06/zhen-second-hand-qianduan/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p><a href="/2015/09/21/second-hand-frontend/">《二手的前端开发》</a>续集，继续折腾，跳了React的大坑。。。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/09/06/zhen-second-hand-qianduan/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/react/">
-                #react
-              </a>
-            
-              <a href="/tags/前端/">
-                #前端
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/06/10/machine-learning-outsider/">
-                ML门外汉的哀嚎
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-06-10
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/06/10/machine-learning-outsider/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/10/machine-learning-outsider/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>每月总有那么几天，不吐不快。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/06/10/machine-learning-outsider/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/杂谈/">
-                #杂谈
-              </a>
-            
-              <a href="/tags/machine-learning/">
-                #machine learning
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/05/06/db-unit-test/">
-                关于数据库单元测试
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-05-06
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/05/06/db-unit-test/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/db-unit-test/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>一般我们都会用JUnit写单元测试，但是如果测试涉及到数据库，就会有点麻烦。<br>总结下我的一些解决方法，当然未必是最好的。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/05/06/db-unit-test/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/java/">
-                #java
-              </a>
-            
-              <a href="/tags/unit-test/">
-                #unit test
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2016/04/16/gitbook/">
-                GitBook开坑纪念
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2016-04-16
-          
-        </span>
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2016/04/16/gitbook/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/16/gitbook/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <p>这是个大坑。<br>不过挖坑一向是我的优良品德之一，记得填就好。</p>
-
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2016/04/16/gitbook/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/gitbook/">
-                #gitbook
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-      </div>
-    
-  </div>
-
-
-  
-
-          </div>
-
-          
-            <div class="pagination">
-              <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">&raquo;</a>
-            </div>
-          
+<body class="theme theme-white">
+    <div id="wmd-preview" class="wmd-preview wmd-preview-full-reader">
+        <div class="md-section-divider"></div>
+        <div class="md-section-divider"></div>
+        <h1 data-anchor-id="nssl" id="裴含超">裴含超</h1>
+        <p data-anchor-id="g1zx">独立开发者,Meteor开发工程师,小名毛毛,大家都喜欢叫我毛毛。
+            <p data-anchor-id="g1zx">家乡在河北邯郸。
+                <p data-anchor-id="g1zx">目前任职于北京一家智能硬件公司，<a href="http://cmeteor.org/" target="_blank">cmeteor中文论坛管理员</a> ，meteor社区群主。</p>
+            </p>
+            <div class="md-section-divider"></div>
+            <h3 data-anchor-id="lgij" id="裴含超的相关连接">裴含超的相关连接</h3>
+            <p data-anchor-id="scz3">裴含超的Github：<a href="https://github.com/devphc" target="_blank">Github （有一些Meteor的开源组件）</a></p>
+            <p data-anchor-id="jl9c"><a href="https://github.com/hacksong2016" target="_blank">做的一些演示Demo已开源</a></p>
+            <a href="https://www.meteor.com/" target="_blank">Meteor</a>，欢迎在Github上Star Meteor。（还有我个人的github😄 ）</p>
+        </blockquote>
+        <p data-anchor-id="yrii">　　Meteor 是一个构建在 Node.js 之上的平台，用来开发实时网页程序。Meteor 位于程序数据库和用户界面之间，保持二者之间的数据同步更新。因为 Meteor 是基于 Node.js 开发的，所以在客户端和服务器端都使用 JavaScript 作为开发语言。而且，Meteor 程序的代码还能在前后两端共用。Meteor 这个平台很强大，网页程序开发过程中的很多复杂、容易出错的功能都能抽象出来，实现起来很简单。</p>
+        <div class="md-section-divider"></div>
+        <!-- <div class="img">
+        <div class="img3"></div>
+        <div class="img2"></div>
+        <div class="img1"></div>
+        </div> -->
+        <!--  <div class="md-section-divider"></div>
+        <div class="md-section-divider"></div>
+        <h1 data-anchor-id="nssl" id="裴含超">2016-08-09七夕记录</h1>
+        <p data-anchor-id="g1zx">裴含超,贾蒙娜 我们至今已走过了609天,14616时,876960分钟,52617600秒。
+            <p data-anchor-id="g1zx">家乡都在美丽的邯郸。 -->
+        <!-- <br>目前任职于北京法米里克信息技术有限公司，目前主要负责
+                <a href="http://bjcie.fami2u.com/" target="_blank">文创大赛&nbsp;</a>的研发工作。</p> -->
+        <!-- <div class="md-section-divider"></div>
+            <h3 data-anchor-id="lgij" id="裴含超的相关连接">裴含超的相关连接</h3>
+            <p data-anchor-id="scz3">裴含超的Github：<a href="https://github.com/devphc" target="_blank">Github （有一些Meteor的开源组件）</a></p> -->
+        <!-- <a href="https://www.meteor.com/" target="_blank">Meteor</a>，欢迎在Github上Star Meteor。</p> -->
+        <!-- </blockquote> -->
+        <h3 data-anchor-id="njng" id="Meteor特性">Meteor七大特性</h3>
+        <ul data-anchor-id="yoz6">
+            <li>Data on the Wire. Meteor 不发 HTML，服务器端只负责发送数据，让客户端来渲染。</li>
+            <li>One Language. 前后端都是 JavaScript 语言。</li>
+            <li>Database Everywhere. 前后端都可以直接创建存取修改数据库里的数据，并且安全。</li>
+            <li>Latency Compensation. Meteor 在前端提前获取数据并模拟数据模型，使其看起来像是从服务器端立即返回了数据。</li>
+            <li>Full Stack Reactivity. 实时相应是 Meteor 的缺省配置。在所有层面，从数据库到模板，都会在必要时自动更新。</li>
+            <li>Embrace the Ecosystem. Meteor 完全开源并集成了很多现有的开源工具和框架。例如 Angular，React。Meteor 有自己的 AtmosphereJS 包下载管理应用，也可直接使用 NPM (目前是非官方支持)。</li>
+            <li>Simplicity Equals Productivity. Meteor 简单易上手，API 简介优美。</li>
+        </ul>
+        <div class="md-section-divider"></div>
+        <h3 data-anchor-id="yiuj" id="使用方法">安装方法</h3>
+        <ul data-anchor-id="4l47">
+            <li>
+                <p>Meteor WINDOWS安装方法,<a href="http://www.jianshu.com/p/d2cfac850787" target="_blank">请自行查看</a>。</p>
+                <blockquote class="white-blockquote">
+                    <p><a href="http://docs.meteor.com/" target="_blank">官方English API</a>
+                        <br>
+                        <a href="http://zh.dis100% 100%meteor.com/chapters/introduction/" target="_blank">知乎Chinese API</a></p>
+                </blockquote>
+            </li>
+            <li>
+                <p>Meteor OSX 安装方法（推荐）</p>
+            </li>
+        </ul>
+        <div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="bfnz"><ol class="linenums"><li class="L0"><code class="language-groovy"><span class="str">'curl https://install.meteor.com/ | sh'</span></code></li></ol></pre>
+        <div class="md-section-divider"></div>
+        
+        
+<!--         <div class="md-section-divider"></div>
+        <h1 data-anchor-id="nssl" id="裴含超">2016-08-09七夕记录</h1>
+        <p data-anchor-id="yrii">七夕晒照咯,希望可以一直幸福的走下去～</p>
+        <p data-anchor-id="yrii">工作固然重要,陪伴家人也必不可少～</p>
+        <div class="md-section-divider"></div>
+        <div class="img">
+            <div class="img2"></div>
+            <div class="img1"></div>
         </div>
-
-        
-<div class="sidebar-toggle">
-  <div class="sidebar-toggle-line-wrap">
-    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-  </div>
-</div>
-
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-inner">
-
-    
-
-    <div class="site-overview">
-      <div class="site-author motion-element">
-        <img class="site-author-image" src="/about/avatar.jpg" alt="foolbear" />
-        <p class="site-author-name">foolbear</p>
-      </div>
-      <p class="site-description motion-element">思绪偶尔在这里停留</p>
-      <div class="site-state motion-element">
-        <div class="site-state-item site-state-posts">
-          <span class="site-state-item-count">54</span>
-          <span class="site-state-item-name">日志</span>
-        </div>
-        <div class="site-state-item site-state-tags">
-            <span class="site-state-item-count">43</span>
-            <span class="site-state-item-name">标签</span>
-        </div>
-        <div class="site-state-item site-state-pages">
-            <span class="site-state-item-count">3</span>
-            <span class="site-state-item-name">页面</span>
-        </div>
-      </div>
-
-      
-        <div class="feed-link motion-element">
-          <a href="/atom.xml">
-            <i class="menu-item-icon icon-feed"></i>
-            RSS
-          </a>
-        </div>
-      
-
-      <div class="social-info motion-element">
-        
-          
-            <span class="social-item">
-              <a href="https://github.com/jiangxy">GitHub</a>
-            </span>
-          
-            <span class="social-item">
-              <a href="http://www.zhihu.com/people/fool-bear">知乎</a>
-            </span>
-          
-            <span class="social-item">
-              <a href="mailto:foolbeargm@gmail.com">邮件</a>
-            </span>
-          
-            <span class="social-item">
-              <a href="http://weibo.com/foolbearwb">微博</a>
-            </span>
-          
-            <span class="social-item">
-              <a href="https://www.linkedin.com/in/jiangxy">LinkedIn</a>
-            </span>
-          
-        
-      </div>
-
-      
-      
-        <div class="cc-license motion-element">
-          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
-            <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
-          </a>
-        </div>
-      
-
-    </div>
-
-    
-
-  </div>
-</div>
-
-
-      </div>
-    </div>
-
-    <div id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">
-  
-  &copy; &nbsp;  2015 - 
-  2017
-  <span class="with-love">
-    <i class="icon-heart"></i>
-  </span>
-  <span class="author">foolbear</span>
-</div>
-
-<div class="powered-by">
-  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
-</div>
-
-<div class="theme-info">
-  主题 - <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
-</div>
-
-
-
-      </div>
-    </div>
-
-    <div class="back-to-top"></div>
-  </div>
-
-  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
-
-  
-  
-
-  
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $(".fancybox").fancybox();
-    });
-  </script>
-
-  <script type="text/javascript">
-  function hasMobileUA () {
-    var nav = window.navigator;
-    var ua = nav.userAgent;
-    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
-
-    return pa.test(ua);
-  }
-
-  function isDesktop () {
-    return screen.width > 991 && !hasMobileUA();
-  }
-
-  function isTablet () {
-    return screen.width < 992 && screen.width > 767 && hasMobileUA();
-  }
-
-  function isMobile () {
-    return screen.width < 767 && hasMobileUA();
-  }
-
-  function escapeSelector (selector) {
-    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
-  }
-</script>
-
-  
-
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
-  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
-
-  
-  <script type="text/javascript" id="motion.page.home">
-    $(document).ready(function () {
-      $.Velocity.RunSequence([
-        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
-        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
-        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200, sequenceQueue: false } }
-      ]);
-      $('.menu-item').velocity('transition.slideDownIn', {display: null});
-    });
-  </script>
-
-
-  <script type="text/javascript" id="motion.global">
-  $(document).ready(function () {
-    var body = $('body');
-    var isSidebarVisible = false;
-    var sidebarToggle = $('.sidebar-toggle');
-    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
-    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
-    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
-    var sidebar = $('.sidebar');
-
-    var SIDEBAR_WIDTH = '292px';
-    var SIDEBAR_DISPLAY_DURATION = 300;
-
-    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
-
-    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
-    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
-    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
-
-    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
-    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
-    var sidebarToogleLine2ndStatusClose = {opacity: 0};
-
-    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
-    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
-    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
-
-    sidebatToggleMotion();
-    postsListMotion();
-    backToTopMotion();
-
-
-    $(document)
-      .on('sidebar.isShowing', function () {
-        isDesktop() && body.velocity(
-          {paddingRight: SIDEBAR_WIDTH},
-          SIDEBAR_DISPLAY_DURATION
-        );
-        sidebarContentMotion();
-      })
-      .on('sidebar.isHiding', function () {});
-
-
-    function backToTopMotion () {
-      var b2top = $('.back-to-top');
-      b2top.on('click', function () {
-        body.velocity('scroll');
-      });
-    }
-
-    function sidebarShowMotion () {
-
-      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
-      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
-      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
-
-      sidebar.velocity({width: SIDEBAR_WIDTH}, {
-        display: 'block',
-        duration: SIDEBAR_DISPLAY_DURATION,
-        complete: function () {
-          sidebar.addClass('sidebar-active');
-          sidebar.trigger('sidebar.didShow');
-        }
-      });
-      sidebar.trigger('sidebar.isShowing');
-    }
-
-    function sidebarHideMotion () {
-      isDesktop() && body.velocity({paddingRight: 0});
-      sidebar.velocity('reverse');
-
-      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
-      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
-      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
-
-      sidebar.removeClass('sidebar-active');
-      sidebar.trigger('sidebar.isHiding');
-    };
-
-    function sidebarContentMotion () {
-      $('.sidebar .motion-element').velocity(
-        'transition.slideRightIn',
-        {stagger: 50, drag: true}
-      );
-    }
-
-    function postsListMotion () {
-      var postMotionOptions = postMotionOptions || {stagger: 300, drag: true};
-      $('.post').velocity('transition.slideDownIn', postMotionOptions);
-    }
-
-    function sidebatToggleMotion () {
-      sidebarToggle.on('click', function () {
-        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
-        isSidebarVisible = !isSidebarVisible;
-      });
-
-      sidebarToggle.hover(function () {
-        if (isSidebarVisible) {return}
-        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
-        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
-        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
-      }, function () {
-        if (isSidebarVisible) {return}
-        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
-        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
-        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
-      });
-    }
-  });
-
-</script>
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-    
-  
-
-  <script type="text/javascript">
-    var duoshuoQuery = {short_name:"foolbear"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0]
-      || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-  </script>
-
-  
-  
-  <script type="text/javascript">
-    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-      e.src='//www.google-analytics.com/analytics.js';
-      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-    ga('create','UA-60003547-1');ga('send','pageview');
-  </script>
-
+        <h1 data-anchor-id="nssl" style="margin-top:20px !important;" id="裴含超">北戴河游照</h1>
+        <div class="imgg">
+            <div class="img4"></div>
+            <div class="img5"></div>
+            <div class="img6"></div>
+            <div class="img7"></div>
+            <div class="img8"></div>
+            <div class="img9"></div>
+            <div class="img10"></div>
+            <div class="img11"></div>
+            <div class="img12"></div>
+            <div class="img13"></div>
+            <div class="img14"></div>
+            <div class="img15"></div>
+        </div> -->
 </body>
+
 </html>
